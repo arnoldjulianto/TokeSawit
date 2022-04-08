@@ -13,7 +13,7 @@ class NotificationHandler {
 
   async onRegister(token) {
     console.log('NotificationHandler:', token.token);
-    await AsyncStorage.setItem("deviceToken", token.token);
+    AsyncStorage.setItem("deviceToken", token.token);
     if (typeof this._onRegister === 'function') {
       this._onRegister(token);
     }

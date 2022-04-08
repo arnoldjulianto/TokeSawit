@@ -173,8 +173,8 @@ const Profil =  ({route, navigation}) => {
                         <View style={styles.segmenWrapper}>
                             <Text style={styles.segmenTitle}>Biodata</Text>
                             <View style={styles.formGroup}>
-                                <Text style={styles.formLabel}>Username</Text>
-                                {/* <View style={styles.inputWrapper}>
+                                {/*<Text style={styles.formLabel}>Username</Text>
+                                 <View style={styles.inputWrapper}>
                                     <TextInput style={styles.textInput} placeholder={"Masukkan Username"} placeholderTextColor= 'gray' value={usernameEdit}  onFocus = {()=> onInputFocusHandler()} onBlur={() => onInputBlurHandler() } onChangeText = {(value) => setUsernameEdit(value)} onSubmitEditing={() => { inputNamaLengkap.focus()}} blurOnSubmit={false} returnKeyType="next"   ></TextInput>
                                 </View> */}
                             </View>

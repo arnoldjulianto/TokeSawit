@@ -12,8 +12,9 @@ import RekeningBank from '../RekeningBank';
 import PilihRekeningBank from '../RekeningBank/pilih_bank';
 import AddRekeningBank from '../RekeningBank/add';
 import InputPin from '../InputPin';
+import BuatPinBaru from '../BuatPinBaru';
 import TentukanAgen from '../TentukanAgen/context_tentukan_agen';
 
 export {
-    HomeStackNavigator,  Login, Register, InputNoHp, SmsVerificationProvider, FotoKlaimDo, PreviewFotoKlaimDo, TentukanAgen, DetailJualDo, RekeningBank, PilihRekeningBank, AddRekeningBank, InputPin, SmsVerificationAndroid
+    HomeStackNavigator,  Login, Register, InputNoHp, SmsVerificationProvider, FotoKlaimDo, PreviewFotoKlaimDo, TentukanAgen, DetailJualDo, RekeningBank, PilihRekeningBank, AddRekeningBank, InputPin, BuatPinBaru, SmsVerificationAndroid
 }

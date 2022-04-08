@@ -29,12 +29,13 @@ const Login = ({navigation}) => {
 
     useEffect(() => {
         getDeviceToken();
-    }, [deviceToken]);
+    }, []);
 
     const getDeviceToken = async () => {
         try{
-            setDeviceToken(await AsyncStorage.getItem("deviceToken"));
-            console.log('Device Token : '+deviceToken);
+            const token = await AsyncStorage.getItem("deviceToken");
+            setDeviceToken(token);
+            console.log('Device Token : '+token);
         }catch(e){
             console.log(e);
         }
@@ -66,7 +67,7 @@ const Login = ({navigation}) => {
             
         }
         else {
-            signIn(username, password, deviceToken);
+            signIn(username, password, null, deviceToken);
         }
     }
 

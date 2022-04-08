@@ -216,7 +216,7 @@ const InputPin = ({route, navigation}) => {
                 </View>
 
                 <View style={styles.formGroup}>
-                    <TouchableOpacity style={styles.btnLupaPin}>
+                    <TouchableOpacity style={styles.btnLupaPin} onPress={()=> navigation.navigate("BuatPinBaru", {username})}>
                         <Text style={styles.btnLupaPinLabel}>Lupa Pin?</Text>
                     </TouchableOpacity>
                 </View>

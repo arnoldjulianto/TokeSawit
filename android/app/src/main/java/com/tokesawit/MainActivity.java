@@ -15,11 +15,11 @@ public class MainActivity extends ReactActivity {
     return "TokeSawit";
   }
 
-  @Override
-  public void onActivityResult(int requestCode, int resultCode, Intent data)
-  {
-    super.onActivityResult(requestCode, resultCode, data);
-    //probably some other stuff here
-    SendSMSPackage.getInstance().onActivityResult(requestCode, resultCode, data);
-  }
+  // @Override
+  // public void onActivityResult(int requestCode, int resultCode, Intent data)
+  // {
+  //   super.onActivityResult(requestCode, resultCode, data);
+  //   //probably some other stuff here
+  //   SendSMSPackage.getInstance().onActivityResult(requestCode, resultCode, data);
+  // }
 }
