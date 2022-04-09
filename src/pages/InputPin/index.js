@@ -7,6 +7,7 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import iconAdd from '../../assets/icon/add.png';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import CheckBox from '@react-native-community/checkbox';
+import AsyncStorage from '@react-native-community/async-storage';
 
 const NAVY = CONSTANTS.COLOR.NAVY;
 const ORANGE = CONSTANTS.COLOR.ORANGE;
@@ -14,7 +15,7 @@ const alert_title = CONSTANTS.MSG.ALERT_TITLE;
 const base_url = CONSTANTS.CONFIG.BASE_URL;
 
 const InputPin = ({route, navigation}) => {
-    let {username, id_rekening_bank, no_rekening, atas_nama, parent } = route.params;
+    let {id_rekening_bank, no_rekening, atas_nama, nama_bank, logo, parent } = route.params;
     const inputPin1 = useRef();
     const [inputPin2, setInputPin2] = useState();
     const [inputPin3, setInputPin3] = useState();
@@ -40,13 +41,36 @@ const InputPin = ({route, navigation}) => {
     const [alert_message, setAlertMessage] = useState("");
     const [confirmTextAlert, setConfirmTextAlert] = useState("");
     const [cancelTextAlert, setCancelTextAlert] = useState("");
+    const [username, setUsername] = useState();
+    let task;
     
     useEffect (() => {
         const unsubscribe = navigation.addListener('focus', () => {
+            setLoadingVisible(true);
+            getUser();
             inputPin1.current.focus();
         });
         return unsubscribe;
     },[navigation])
+
+    const getUser = async () => {
+        try {
+          const value = await AsyncStorage.getItem('username');
+          if (value === null) {
+            // We have data!!
+            setUsername("");
+          }
+          else{
+            setUsername(value);
+          }
+          console.log(value)
+          setLoadingVisible(false);
+        } catch (error) {
+          // Error retrieving data
+          console.log(error)
+          setLoadingVisible(false);
+        }
+    };
 
     const addRekeningBankHandler = (pin6) => {
         setLoadingVisible(true);
@@ -60,6 +84,8 @@ const InputPin = ({route, navigation}) => {
             setConfirmButtonAlert(false);
             setCancelTextAlert("Tutup");
             setAlertMessage("Permintaan Tidak Dapat Dipenuhi, Server Tidak Merespon");
+            task = () => loadAddRekeningBank();
+            setAlertCancelTask(task);
         }, 30000);
 
         const params = {
@@ -92,7 +118,13 @@ const InputPin = ({route, navigation}) => {
             clearTimeout(timeout);
             setLoadingVisible(false);
             if(json.response == 1){
-                navigation.navigate("RekeningBank", {username});
+                setAlert(true);
+                setAlertMessage(json.msg);
+                setCancelTextAlert("Tutup");
+                setConfirmButtonAlert(false);
+                setCancelButtonAlert(true);
+                task = () => loadRekeningBank();
+                setAlertCancelTask( task );
             }
             else{
                 setAlert(true);
@@ -119,7 +151,19 @@ const InputPin = ({route, navigation}) => {
             setCancelButtonAlert(true);
             setLoadingVisible(false);
             console.log(error);
+            task = () => loadAddRekeningBank();
+            setAlertCancelTask(task);
         });
+    }
+
+    const loadRekeningBank = () => () => {
+        setAlert(false)
+        navigation.navigate("RekeningBank", {username});
+    }
+
+    const loadAddRekeningBank = () => () => {
+        setAlert(false)
+        navigation.navigate("AddRekeningBank", {username, id_rekening_bank, nama_bank, logo});
     }
 
     if(loadingVisible){
@@ -147,9 +191,7 @@ const InputPin = ({route, navigation}) => {
                     confirmText={confirmTextAlert}
                     confirmButtonColor={NAVY}
                     cancelButtonColor={ORANGE}
-                    onCancelPressed={() => {
-                        setAlert(false);
-                    }}
+                    onCancelPressed={alertCancelTask}
                     onConfirmPressed={alertConfirmTask}
             />
             <SearchBar title={"Input Pin"} navigation={navigation} refresh ={false}  />
@@ -214,11 +256,17 @@ const InputPin = ({route, navigation}) => {
                         }} />
                     </View>
                 </View>
+                
+                <View style={{flex:1, flexDirection:'row', justifyContent:'space-between'}}>
+                    <View style={{flex:1}}>
+                        <Text style={styles.ketLabel}>Jika Anda Belum Membuat Pin, Maka Sistem Akan Menyimpan Pin Ini Sebagai Pin Baru</Text>
+                    </View>
 
-                <View style={styles.formGroup}>
-                    <TouchableOpacity style={styles.btnLupaPin} onPress={()=> navigation.navigate("BuatPinBaru", {username})}>
-                        <Text style={styles.btnLupaPinLabel}>Lupa Pin?</Text>
-                    </TouchableOpacity>
+                    <View style={{flex:0.5}}>
+                        <TouchableOpacity style={styles.btnLupaPin} onPress={()=> navigation.navigate("BuatPinBaru", {username, id_rekening_bank, no_rekening, atas_nama, nama_bank, logo, parent})}>
+                            <Text style={styles.btnLupaPinLabel}>Lupa Pin?</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
             </View>
         </View>
@@ -266,17 +314,24 @@ const styles = StyleSheet.create({
     btnLupaPin: {
         flexDirection:'row',
         backgroundColor:ORANGE,
-        marginTop:20,
+        marginTop:0,
         marginBottom:30,
         height:40,
         borderRadius:10,
-        alignItems:'center',
+        alignItems:'flex-start',
         justifyContent:"center"
        
     },
     btnLupaPinLabel : {
         flex:1,
-        fontSize:18,
+        fontSize:16,
+        color:'white',
+        marginLeft:10,
+        textAlign:'right'
+    },
+    ketLabel : {
+        flex:1,
+        fontSize:13,
         color:'white',
         marginLeft:10,
     },

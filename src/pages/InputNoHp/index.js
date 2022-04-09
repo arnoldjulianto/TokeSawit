@@ -11,8 +11,8 @@ const alert_title = CONSTANTS.MSG.ALERT_TITLE;
 const base_url = CONSTANTS.CONFIG.BASE_URL;
 
 const SmsVerification = ({route, navigation}) => {
-    let {parent} = route.params;
-    const closeAlert = () => {
+    let {username, id_rekening_bank, no_rekening, atas_nama, user_new_pin, nama_bank, logo, parent} = route.params;
+    const closeAlert = () => () => {
         console.log("alert close");
         setAlert(false);
     }
@@ -43,6 +43,18 @@ const SmsVerification = ({route, navigation}) => {
             setConfirmButtonAlert(false);
             setCancelTextAlert("Tutup");
             setAlertMessage("Permintaan Tidak Dapat Dipenuhi, Server Tidak Merespon");
+            if(parent == "AddRekeningBank") {
+                task = () => loadAddRekeningBank();
+                setAlertCancelTask(task);
+            }
+            else if(parent == "Login"){
+                task = () => loadLogin();
+                setAlertCancelTask(task);
+            }
+            else if(parent == "Register"){
+                task = () => loadRegister();
+                setAlertCancelTask(task);
+            }
         }, 30000);
 
         const params = {
@@ -83,8 +95,18 @@ const SmsVerification = ({route, navigation}) => {
                 setCancelButtonAlert(true);
                 setConfirmButtonAlert(false);
                 setCancelTextAlert("Lanjutkan");
-                task = () => loadRegister();
-                setAlertCancelTask(task);
+                if(parent == "AddRekeningBank") {
+                    task = () => loadAddRekeningBank();
+                    setAlertCancelTask(task);
+                }
+                else if(parent == "Login"){
+                    task = () => loadLogin();
+                    setAlertCancelTask(task);
+                }
+                else if(parent == "Register"){
+                    task = () => loadRegister();
+                    setAlertCancelTask(task);
+                }
             }
             console.log(json);
         })
@@ -97,20 +119,50 @@ const SmsVerification = ({route, navigation}) => {
             setCancelButtonAlert(true);
             setLoadingVisible(false);
             console.log(error);
+            if(parent == "AddRekeningBank") {
+                task = () => loadAddRekeningBank();
+                setAlertCancelTask(task);
+            }
+            else if(parent == "Login"){
+                task = () => loadLogin();
+                setAlertCancelTask(task);
+            }
+            else if(parent == "Register"){
+                task = () => loadRegister();
+                setAlertCancelTask(task);
+            }
         });
     } 
 
     const loadSmsVerification = () => () => {
-        setAlertConfirmTask(() => closeAlert());
+        setAlert(false);
         const params = {
-            no_telepon : "+62"+no_telepon, parent
+            username,
+            id_rekening_bank, 
+            no_rekening, 
+            atas_nama, 
+            user_new_pin,
+            nama_bank, 
+            logo,
+            parent,
+            no_telepon : "+62"+no_telepon
         }
         navigation.navigate('SmsVerificationProvider', params);
     }
 
     const loadRegister = () => () => {
-        setAlertConfirmTask(() => closeAlert());
+        setAlert(false);
         navigation.navigate('Register');
+    }
+
+    const loadLogin = () => () => {
+        setAlert(false);
+        navigation.navigate('Login');
+    }
+
+    const loadAddRekeningBank = () => () => {
+        setAlert(false);
+        navigation.navigate("AddRekeningBank", {username, id_rekening_bank, nama_bank, logo});
     }
 
     const resetNoTelepon = (value) => {
@@ -157,7 +209,7 @@ const SmsVerification = ({route, navigation}) => {
                 <Text style={styles.inputNoHpTitle2}>Sawit</Text>
                 <Text style={styles.inputNoHpTitle3}> | No. Telepon</Text>
             </View>
-            <Text style={styles.inputNoHpSubTitle}>Silahkan Mengisi Form di Bawah Ini Untuk Login Menggunakan No. Telepon</Text>
+            <Text style={styles.inputNoHpSubTitle}>Silahkan Mengisi Form di Bawah Ini Untuk Verifikasi Menggunakan No. Telepon</Text>
          
             <ScrollView style={styles.inputNoHpArea}>
                 <View style={styles.formGroup} >

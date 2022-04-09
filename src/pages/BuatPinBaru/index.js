@@ -7,6 +7,7 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import iconAdd from '../../assets/icon/add.png';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import CheckBox from '@react-native-community/checkbox';
+import AsyncStorage from '@react-native-community/async-storage';
 
 const NAVY = CONSTANTS.COLOR.NAVY;
 const ORANGE = CONSTANTS.COLOR.ORANGE;
@@ -14,7 +15,7 @@ const alert_title = CONSTANTS.MSG.ALERT_TITLE;
 const base_url = CONSTANTS.CONFIG.BASE_URL;
 
 const BuatPinBaru = ({route, navigation}) => {
-    let {username, id_rekening_bank, no_rekening, atas_nama, parent } = route.params;
+    let {id_rekening_bank, no_rekening, atas_nama, nama_bank, logo, parent } = route.params;
     const inputPin1 = useRef();
     const [inputPin2, setInputPin2] = useState();
     const [inputPin3, setInputPin3] = useState();
@@ -56,15 +57,41 @@ const BuatPinBaru = ({route, navigation}) => {
     const [user_new_pin, setUserNewPin] = useState(); 
     const [lbl_pesan, setLblPesan] = useState("Masukkan Kembali Pin Yang Anda Buat");
     const [cek_user_new_pin, setCekUserNewPin] = useState(false);
+    const [no_telepon, setNoTelepon] = useState();
+    const [username, setUsername] = useState();
+    let task;
 
     useEffect (() => {
         const unsubscribe = navigation.addListener('focus', () => {
+            setLoadingVisible(true);
+            getUser();
             inputPin1.current.focus();
+            console.log(parent)
         });
         return unsubscribe;
     },[navigation])
 
-
+    const getUser = async () => {
+        try {
+          const value1 = await AsyncStorage.getItem('username');
+          const value2 = await AsyncStorage.getItem('no_telepon');
+          if (value1 !== null) {
+            // We have data!!
+            setUsername(value1);
+          }
+          if (value2 !== null) {
+            // We have data!!
+            setNoTelepon(value2);
+          }
+          console.log("Username : "+value1);
+          console.log("No Telepon : "+value2);
+          setLoadingVisible(false);
+        } catch (error) {
+          // Error retrieving data
+          console.log(error)
+          setLoadingVisible(false);
+        }
+    };
     
     if(loadingVisible){
         return(
@@ -92,6 +119,8 @@ const BuatPinBaru = ({route, navigation}) => {
             setConfirmButtonAlert(false);
             setCancelTextAlert("Tutup");
             setAlertMessage("Permintaan Tidak Dapat Dipenuhi, Server Tidak Merespon");
+            task = () => loadAddRekeningBank();
+            setAlertCancelTask(task);
         }, 30000);
 
         const params = {
@@ -124,7 +153,8 @@ const BuatPinBaru = ({route, navigation}) => {
             clearTimeout(timeout);
             setLoadingVisible(false);
             if(json.response == 1){
-                navigation.navigate("InputPin", {username, id_rekening_bank, no_rekening, atas_nama, parent } );
+                console.log(username);
+                navigation.navigate("SmsVerificationProvider", {usernameRoute:username, id_rekening_bank, no_rekening, atas_nama, user_new_pin, nama_bank, logo, no_telepon, parent } );
             }
             else{
                 setAlert(true);
@@ -138,7 +168,7 @@ const BuatPinBaru = ({route, navigation}) => {
                 setPin4("")
                 setPin5("")
                 setPin6("")
-                setAlertCancelTask(() => loadInputPin())
+                setAlertCancelTask(() => loadAddRekeningBank())
                 inputPin1.current.focus()
             }
             console.log(json);
@@ -152,13 +182,14 @@ const BuatPinBaru = ({route, navigation}) => {
             setCancelButtonAlert(true);
             setLoadingVisible(false);
             console.log(error);
-            setAlertCancelTask(() => loadInputPin())
+            setAlertCancelTask(() => loadAddRekeningBank())
         });
         
     }
 
-    const loadInputPin = () => () => {
-        navigation.navigate("InputPin", {username, id_rekening_bank, no_rekening, atas_nama, parent } );
+    const loadAddRekeningBank = () => () => {
+        setAlert(false)
+        navigation.navigate("AddRekeningBank", {username, id_rekening_bank, nama_bank, logo, parent } );
     }
 
 

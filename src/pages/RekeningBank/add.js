@@ -7,13 +7,15 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import iconAdd from '../../assets/icon/add.png';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import CheckBox from '@react-native-community/checkbox';
+import AsyncStorage from '@react-native-community/async-storage';
+
 const NAVY = CONSTANTS.COLOR.NAVY;
 const ORANGE = CONSTANTS.COLOR.ORANGE;
 const alert_title = CONSTANTS.MSG.ALERT_TITLE;
 const base_url = CONSTANTS.CONFIG.BASE_URL;
 
 const AddRekeningBank = ({route, navigation}) => {
-    let {username, id_rekening_bank, nama_bank, logo} = route.params;
+    let { id_rekening_bank, nama_bank, logo} = route.params;
     const [showAlert, setAlert] = useState(false);
     const closeAlert = () => () => {
         console.log("alert close");
@@ -30,7 +32,34 @@ const AddRekeningBank = ({route, navigation}) => {
     const [no_rekening, setNoRekening] = useState("");
     const [atas_nama, setAtasNama] = useState("");
     const [inputAtasNama, setInputAtasNama] = useState();
+    const [username, setUsername] = useState();
     let task;
+
+    useEffect (() => {
+        const unsubscribe = navigation.addListener('focus', () => {
+            setLoadingVisible(true);
+            getUser();  
+        });
+        return unsubscribe;   
+    },[navigation])
+
+    const getUser = async () => {
+        try {
+          const value = await AsyncStorage.getItem('username');
+          if (value === null) {
+            // We have data!!
+            setUsername("");
+          }
+          else{
+            setUsername(value);
+          }
+          setLoadingVisible(false);
+        } catch (error) {
+          // Error retrieving data
+          console.log(error)
+          setLoadingVisible(false);
+        }
+    };
     
     const submitHandler = () => {
         if(no_rekening == ""){
@@ -48,79 +77,8 @@ const AddRekeningBank = ({route, navigation}) => {
             setAlertMessage("Atas Nama Tidak Boleh Kosong");
         }
         else{
-            // setLoadingVisible(true);
-            // setCancelButtonAlert(true);
-            // setConfirmButtonAlert(false);
-
-            // const timeout = setTimeout(() => {
-            //     setAlert(true);
-            //     setLoadingVisible(false);
-            //     setCancelButtonAlert(true);
-            //     setConfirmButtonAlert(false);
-            //     setCancelTextAlert("Tutup");
-            //     setAlertMessage("Permintaan Tidak Dapat Dipenuhi, Server Tidak Merespon");
-            // }, 30000);
-
-            // const params = {
-            //     username,
-            //     id_rekening_bank,
-            //     no_rekening,
-            //     atas_nama,
-
-            // }
-            // console.log(params);
-            
-            // const createFormData = (body) => {
-            //     const data = new FormData();
-            //     Object.keys(body).forEach(key => {
-            //         data.append(key, body[key]);
-            //     });
-            //     return data;
-            // }
-            // const formData = createFormData(params);
-            // fetch(base_url+'RekeningBank/get_api_add_rekening_bank',
-            // {
-            //     method: 'post',
-            //     body: formData,
-            //     headers: {
-            //     'Content-Type': 'multipart/form-data; ',
-            //     },
-            // })
-            // .then((response) => response.json())
-            // .then((json) => {
-            //     clearTimeout(timeout);
-            //     setLoadingVisible(false);
-            //     setAlert(true);
-            //     if(json.response == 1){
-            //         setAlert(true);
-            //         setAlertMessage(json.msg);
-            //         setCancelTextAlert("Tutup");
-            //         setConfirmButtonAlert(false);
-            //         setCancelButtonAlert(true);
-            //         task = () => loadRekeningSaya();
-            //         setAlertCancelTask(task);
-            //     }
-            //     else{
-            //         setAlert(true);
-            //         setAlertMessage(json.msg);
-            //         setCancelTextAlert("Tutup");
-            //         setConfirmButtonAlert(false);
-            //         setCancelButtonAlert(true);
-            //     }
-            //     console.log(json);
-            // })
-            // .catch((error) => {
-            //     clearTimeout(timeout);
-            //     setAlert(true);
-            //     setAlertMessage("Terjadi Kesalahan. \n"+error);
-            //     setCancelTextAlert("Tutup");
-            //     setConfirmButtonAlert(false);
-            //     setCancelButtonAlert(true);
-            //     setLoadingVisible(false);
-            //     console.log(error);
-            // });
             const parent = route.name;
-            navigation.navigate("InputPin", {username, id_rekening_bank, no_rekening, atas_nama, parent });
+            navigation.navigate("InputPin", {username, id_rekening_bank, no_rekening, atas_nama, nama_bank, logo, parent });
         }
     }
 

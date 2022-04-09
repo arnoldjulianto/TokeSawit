@@ -7,13 +7,15 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import iconAdd from '../../assets/icon/add.png';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import CheckBox from '@react-native-community/checkbox';
+import AsyncStorage from '@react-native-community/async-storage';
+
 const NAVY = CONSTANTS.COLOR.NAVY;
 const ORANGE = CONSTANTS.COLOR.ORANGE;
 const alert_title = CONSTANTS.MSG.ALERT_TITLE;
 const base_url = CONSTANTS.CONFIG.BASE_URL;
 
 const PilihRekeningBank = ({route, navigation}) => {
-    let {username} = route.params;
+    //let {username} = route.params;
     const [showAlert, setAlert] = useState(false);
     const [arrMasterRekeningBank, setArrMasterRekeningBank] = useState([]);
     const closeAlert = () => {
@@ -33,6 +35,7 @@ const PilihRekeningBank = ({route, navigation}) => {
     const [isSelected, setSelection] = useState(false);
     const [searchParam, setSearchParam] = useState("");
     const [ didKeyboardShow, setKeyboardShow ] = useState(false);
+    const [username, setUsername] = useState();
 
     // useEffect (() => {
     //     loadMasterRekeningBank();
@@ -49,6 +52,33 @@ const PilihRekeningBank = ({route, navigation}) => {
     useEffect (() => {
         loadMasterRekeningBank();
     },[searchParam])
+
+    useEffect (() => {
+        const unsubscribe = navigation.addListener('focus', () => {
+            setLoadingVisible(true);
+            getUser();  
+        });
+        return unsubscribe;
+    },[navigation])
+
+    const getUser = async () => {
+        try {
+          const value = await AsyncStorage.getItem('username');
+          if (value === null) {
+            // We have data!!
+            setUsername("");
+          }
+          else{
+            setUsername(value);
+            loadMasterRekeningBank();
+          }
+          setLoadingVisible(false);
+        } catch (error) {
+          // Error retrieving data
+          console.log(error)
+          setLoadingVisible(false);
+        }
+    };
 
     const onRefresh = React.useCallback(() => {
         setRefreshing(true);

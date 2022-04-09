@@ -128,6 +128,7 @@ const HomeStackNavigator = ({navigation}) => {
                     setConfirmButtonAlert(false);
                     setCancelTextAlert("Tutup");
                     AsyncStorage.setItem("username", json.username);
+                    AsyncStorage.setItem("no_telepon", json.no_telepon);
                     AsyncStorage.setItem("deviceToken", json.device_token);
                 }
                 else{
@@ -157,6 +158,7 @@ const HomeStackNavigator = ({navigation}) => {
                 console.log(e);
             }
             dispatch({type:'LOGOUT'});
+            
         },
     }),[]);
 

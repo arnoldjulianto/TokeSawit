@@ -6,6 +6,7 @@ import CONSTANTS from '../../../assets/constants';
 import AsyncStorage from '@react-native-community/async-storage';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import iconEdit from '../../../assets/icon/edit-white.png';
+import iconLogOut from '../../../assets/icon/logout.png';
 import iconBankCardWhite from '../../../assets/icon/bank-card-white.png';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import Select2 from "react-native-select-two";
@@ -79,13 +80,27 @@ const Profil =  ({route, navigation}) => {
         getUser();
     },[]);
 
-    // useEffect(() => {
-    //     const unsubscribe = navigation.addListener('focus', () => {
-    //         setLoadingVisible(true);
-    //         getUser();
-    //     });
-    //     return unsubscribe;
-    // }, [navigation]);
+    const getUser = async () => {
+        try {
+          const value = await AsyncStorage.getItem('username');
+          if (value === null) {
+            // We have data!!
+            navigation.navigate("Login");
+            setLoadingVisible(false);
+            setUsername("");
+          }
+          else{
+            const timeout = setTimeout(() => {
+                loadDataUser(value);
+                clearTimeout(timeout);
+            },0)  
+          }
+        } catch (error) {
+          // Error retrieving data
+          console.log(error)
+          setLoadingVisible(false);
+        }
+    };
 
     useEffect (() => {
         let i =0;
@@ -360,27 +375,6 @@ const Profil =  ({route, navigation}) => {
             )
         }
     }
-            
-    const getUser = async () => {
-        try {
-          const value = await AsyncStorage.getItem('username');
-          if (value === null) {
-            // We have data!!
-            navigation.navigate("Login");
-            setLoadingVisible(false);
-          }
-          else{
-            const timeout = setTimeout(() => {
-                loadDataUser(value);
-                clearTimeout(timeout);
-            },0)  
-          }
-        } catch (error) {
-          // Error retrieving data
-          console.log(error)
-          setLoadingVisible(false);
-        }
-    };
 
     const loadDataUser = (username) => {
         setLoadingVisible(true);
@@ -903,52 +897,69 @@ const Profil =  ({route, navigation}) => {
                     <Text style={styles.titleLabel}>Klik Disini Untuk Login</Text>
                 </TouchableOpacity>
             )}    
-            
-            <View style={styles.profilArea}>
-                <Image style={styles.fotoProfil} source={{uri : base_url+"assets/upload/file user/"+foto_profil}} />
-                <View style={styles.profilWrapper}> 
-                    <Text style={styles.namaLengkapLabel}>{nama_lengkap}</Text>
-                    {/* <Text style={styles.noHpLabel}>{no_telepon.substring(0,6)+no_telepon.substring(6,4).replace(no_telepon.substring(6,4),"****")+no_telepon.substring(10)}</Text> */}
 
-                    <Text style={styles.noHpLabel}>{username}</Text>
+        {username != "" &&
+            (
+                <View>
+                    <View style={styles.profilArea}>
+                        <Image style={styles.fotoProfil} source={{uri : base_url+"assets/upload/file user/"+foto_profil}} />
+                        <View style={styles.profilWrapper}> 
+                            <Text style={styles.namaLengkapLabel}>{nama_lengkap}</Text>
+                            {/* <Text style={styles.noHpLabel}>{no_telepon.substring(0,6)+no_telepon.substring(6,4).replace(no_telepon.substring(6,4),"****")+no_telepon.substring(10)}</Text> */}
 
-                    <View style={{flexDirection:'row', justifyContent:"space-between",marginTop:10}} >
-                        <View style={{flex:1, alignItems:'center'}} >
-                            <Text style={styles.countLabel} >10</Text>
-                            <Text style={styles.ketLabel} >Karyawan</Text>
-                        </View>
+                            <Text style={styles.noHpLabel}>{username}</Text>
 
-                        <View style={{flex:1, alignItems:'center'}} >
-                            <Text style={styles.countLabel} >670</Text>
-                            <Text style={styles.ketLabel}>Mengikuti</Text>
-                        </View>
+                            <View style={{flexDirection:'row', justifyContent:"space-between",marginTop:10}} >
+                                <View style={{flex:1, alignItems:'center'}} >
+                                    <Text style={styles.countLabel} >10</Text>
+                                    <Text style={styles.ketLabel} >Karyawan</Text>
+                                </View>
 
-                        <View style={{flex:1, alignItems:'center'}} >
-                            <Text style={styles.countLabel} >1170</Text>
-                            <Text style={styles.ketLabel} >Pengikut</Text>
+                                <View style={{flex:1, alignItems:'center'}} >
+                                    <Text style={styles.countLabel} >670</Text>
+                                    <Text style={styles.ketLabel}>Mengikuti</Text>
+                                </View>
+
+                                <View style={{flex:1, alignItems:'center'}} >
+                                    <Text style={styles.countLabel} >1170</Text>
+                                    <Text style={styles.ketLabel} >Pengikut</Text>
+                                </View>
+                            </View>
+                            {/* <Text style={styles.alamatLabel}>{nama_jalan+no_rumah+rw+rt+kelurahan_desa+kecamatan+kota_kabupaten+provinsi}</Text> */}
                         </View>
                     </View>
-                    {/* <Text style={styles.alamatLabel}>{nama_jalan+no_rumah+rw+rt+kelurahan_desa+kecamatan+kota_kabupaten+provinsi}</Text> */}
-                </View>
-            </View>
-            
-            <View style={{flexDirection:'row'}} >
-                <TouchableOpacity style={styles.btnRekeningSaya} onPress={()=> {loadRekeningBank()} }>
-                    <Image style={styles.btnRekeningSayaIcon}  source={iconBankCardWhite} />
-                    <Text style={styles.btnRekeningSayaLabel}>Daftar Rekening Saya</Text>
-                </TouchableOpacity>
-            </View>
+                    
+                    <View style={{flexDirection:'row', justifyContent:'space-around'}} >
+                        <TouchableOpacity style={styles.btnRekeningSaya} onPress={()=> {loadRekeningBank()} }>
+                            <Image style={styles.btnRekeningSayaIcon}  source={iconBankCardWhite} />
+                            <Text style={styles.btnRekeningSayaLabel}>Daftar Rekening Saya</Text>
+                        </TouchableOpacity>
 
+                        <TouchableOpacity style={styles.btnLogOut} onPress={()=> {
+                            signOut();
+                            getUser();
+                        }}>
+                            <Image style={styles.btnLogoutIcon}  source={iconLogOut} />
+                            <Text style={styles.btnLogOutLabel}>LogOut</Text>
+                        </TouchableOpacity>
+                    </View>
+            </View>
+            )
+        } 
+
+        {username != "" && (
             <TabView
-                //swipeEnabled={true}
-                navigationState={{ index, routes }}
-                renderScene={_renderTabs}
-                onIndexChange={setIndex}
-                initialLayout={{ width: layout.width }}
-                //renderTabBar={renderTabBar}
-                renderTabBar={renderTabBar}
+                    //swipeEnabled={true}
+                    navigationState={{ index, routes }}
+                    renderScene={_renderTabs}
+                    onIndexChange={setIndex}
+                    initialLayout={{ width: layout.width }}
+                    //renderTabBar={renderTabBar}
+                    renderTabBar={renderTabBar}
             />
-        </View>
+        )}
+                
+        </View> 
     );
     
 };
@@ -958,7 +969,6 @@ export default Profil;
 
 const styles = StyleSheet.create({
     titleWrapper:{
-        flex:0.1,
         backgroundColor:ORANGE,
         alignItems:'center',
         paddingTop:5
@@ -997,6 +1007,27 @@ const styles = StyleSheet.create({
     btnRekeningSayaIcon:{
         width:22,
         height:22,
+        alignItems:"flex-start",
+    },
+    btnLogOut : {
+        flex:0.5,
+        flexDirection:'row',
+        backgroundColor:ORANGE,
+        height:40,
+        justifyContent:"space-around",
+        paddingTop:7,
+        paddingHorizontal:10
+    },
+    btnLogoutIcon:{
+        width:22,
+        height:22,
+        alignItems:"flex-start",
+    },
+    btnLogOutLabel : {
+        flex:1,
+        fontSize:15,
+        color:'white',
+        marginLeft:10,
         alignItems:"flex-start",
     },
     settingAkunArea :{

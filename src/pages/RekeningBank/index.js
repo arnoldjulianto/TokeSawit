@@ -9,13 +9,15 @@ import iconVerified from '../../assets/icon/verified.png';
 import iconPending from '../../assets/icon/pending.png';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import NoData from '../../assets/img/no data.svg';
+import AsyncStorage from '@react-native-community/async-storage';
+
 const NAVY = CONSTANTS.COLOR.NAVY;
 const ORANGE = CONSTANTS.COLOR.ORANGE;
 const alert_title = CONSTANTS.MSG.ALERT_TITLE;
 const base_url = CONSTANTS.CONFIG.BASE_URL;
 
 const RekeningBank = ({route, navigation}) => {
-    let {username, refresh} = route.params;
+    //let {username} = route.params;
     const [searchParam, setSearchParam] = useState("");
     const [arrRekeningBankSaya, setArrRekeningBankSaya] = useState([]);
     const [showAlert, setAlert] = useState(false);
@@ -31,23 +33,46 @@ const RekeningBank = ({route, navigation}) => {
     const [confirmTextAlert, setConfirmTextAlert] = useState("");
     const [cancelTextAlert, setCancelTextAlert] = useState("");
     const [refreshing, setRefreshing] = React.useState(false);
+    const [username, setUsername] = useState();
 
     useEffect (() => {
-        //loadRekeningSaya();
+        setLoadingVisible(true);
+        getUser();
     },[])
 
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
-          loadRekeningSaya();
+            setLoadingVisible(true);
+            getUser();  
         });
         return unsubscribe;
     }, [navigation]);
 
+    const getUser = async () => {
+        try {
+          const value = await AsyncStorage.getItem('username');
+          if (value === null) {
+            // We have data!!
+            setUsername("");
+          }
+          else{
+            setUsername(value);
+            setLoadingVisible(false);
+            loadRekeningSaya();
+          }
+        } catch (error) {
+          // Error retrieving data
+          console.log(error)
+          setLoadingVisible(false);
+        }
+    };
+
     const onRefresh = React.useCallback(() => {
         setRefreshing(true);
-        loadRekeningSaya();
+        
+        getUser();
         setRefreshing(false);
-      }, [refresh]);
+      }, []);
 
     const loadRekeningSaya = () => {
         setLoadingVisible(true);

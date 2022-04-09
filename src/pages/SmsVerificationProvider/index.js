@@ -14,11 +14,11 @@ const alert_title = CONSTANTS.MSG.ALERT_TITLE;
 const base_url = CONSTANTS.CONFIG.BASE_URL;
 
 const SmsVerification = ({route, navigation}) => {
-    let {nama_lengkap, no_telepon, password, parent} = route.params;
+    let {usernameRoute, id_rekening_bank, no_rekening, atas_nama, user_new_pin, nama_bank, logo, email, nama_lengkap, no_telepon, password, parent} = route.params;
     if( no_telepon.substr(0, 1) == "0" ){
         no_telepon = "+62"+no_telepon.substr(1);
     }
-    const closeAlert = () => {
+    const closeAlert = () => () => {
         console.log("alert close");
         setAlert(false);
     }
@@ -33,11 +33,13 @@ const SmsVerification = ({route, navigation}) => {
     const [confirmTextAlert, setConfirmTextAlert] = useState("");
     const [cancelTextAlert, setCancelTextAlert] = useState("");
     const [alertConfirmTask, setAlertConfirmTask] = useState(() => closeAlert() );
+    const [alertCancelTask, setAlertCancelTask] = useState(() => closeAlert() );
     const [loadingVisible, setLoadingVisible] = useState(false);
     const [countDown, setCountDown] = useState();
     const [countDownStart, setCountDownStart] = useState(false);
-    const [username, setUsername] = useState();
+    const [username, setUsername] = useState(usernameRoute);
     const { signIn } = React.useContext(AuthContext);
+    let task;
 
     useEffect(() => {
         sendOTP(no_telepon);
@@ -173,6 +175,7 @@ const SmsVerification = ({route, navigation}) => {
         if(confirmOTP == kodeOTP){
             if(parent === 'Register') registerAkun();
             else if (parent === 'Login') signIn(username, password, no_telepon, deviceToken);
+            else if (parent === 'AddRekeningBank') addRekeningBankHandler();
         }
         else{
             setAlert(true);
@@ -181,6 +184,95 @@ const SmsVerification = ({route, navigation}) => {
             setConfirmButtonAlert(false);
             setCancelButtonAlert(true);
         }
+    }
+
+    const addRekeningBankHandler = () => {
+        setLoadingVisible(true);
+        setCancelButtonAlert(true);
+        setConfirmButtonAlert(false);
+
+        const timeout = setTimeout(() => {
+            setAlert(true);
+            setLoadingVisible(false);
+            setCancelButtonAlert(true);
+            setConfirmButtonAlert(false);
+            setCancelTextAlert("Tutup");
+            setAlertMessage("Permintaan Tidak Dapat Dipenuhi, Server Tidak Merespon");
+            task = () => loadAddRekeningBank();
+            setAlertCancelTask(task);
+        }, 30000);
+
+        const params = {
+            username,
+            id_rekening_bank,
+            no_rekening,
+            atas_nama,
+            user_pin:user_new_pin,
+        }
+        console.log(params);
+        
+        const createFormData = (body) => {
+            const data = new FormData();
+            Object.keys(body).forEach(key => {
+                data.append(key, body[key]);
+            });
+            return data;
+        }
+        const formData = createFormData(params);
+        fetch(base_url+'RekeningBank/get_api_add_rekening_bank',
+        {
+            method: 'post',
+            body: formData,
+            headers: {
+              'Content-Type': 'multipart/form-data; ',
+            },
+        })
+        .then((response) => response.json())
+        .then((json) => {
+            clearTimeout(timeout);
+            setLoadingVisible(false);
+            if(json.response == 1){
+                setAlert(true);
+                setAlertMessage(json.msg);
+                setCancelTextAlert("Tutup");
+                setConfirmButtonAlert(false);
+                setCancelButtonAlert(true);
+                task = () => loadRekeningBank();
+                setAlertCancelTask(task);
+            }
+            else{
+                setAlert(true);
+                setAlertMessage(json.msg);
+                setCancelTextAlert("Tutup");
+                setConfirmButtonAlert(false);
+                setCancelButtonAlert(true);
+                task = () => loadAddRekeningBank();
+                setAlertCancelTask(task);
+            }
+            console.log(json);
+        })
+        .catch((error) => {
+            clearTimeout(timeout);
+            setAlert(true);
+            setAlertMessage("Terjadi Kesalahan. \n"+error);
+            setCancelTextAlert("Tutup");
+            setConfirmButtonAlert(false);
+            setCancelButtonAlert(true);
+            setLoadingVisible(false);
+            console.log(error);
+            task = () => loadAddRekeningBank();
+            setAlertCancelTask(task);
+        });
+    }
+
+    const loadRekeningBank = ()=> () => {
+        setAlert(false)
+        navigation.navigate("RekeningBank", {username});
+    }
+
+    const loadAddRekeningBank = () => () => {
+        setAlert(false)
+        navigation.navigate("AddRekeningBank", {username, id_rekening_bank, nama_bank, logo});
     }
 
     const registerAkun = () => {
@@ -247,6 +339,7 @@ const SmsVerification = ({route, navigation}) => {
     const berhasilRegister = async (username) => {
         try{
             AsyncStorage.setItem("username", username);
+            AsyncStorage.setItem("no_telepon", no_telepon);
             console.log("Username Registered : "+username)
         }catch(e){
             console.log(e);
@@ -278,9 +371,7 @@ const SmsVerification = ({route, navigation}) => {
                 confirmText={confirmTextAlert}
                 confirmButtonColor={NAVY}
                 cancelButtonColor={ORANGE}
-                onCancelPressed={() => {
-                    setAlert(false);
-                }}
+                onCancelPressed={alertCancelTask}
                 onConfirmPressed={alertConfirmTask}
             />
             
