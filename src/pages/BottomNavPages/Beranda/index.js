@@ -12,21 +12,11 @@ import iconPeopleListPink from '../../../assets/icon/people-list-pink.png';
 import CONSTANTS from '../../../assets/constants';
 import SearchBar from '../../../components/SearchBar/search_bar_beranda';
 import AsyncStorage from '@react-native-community/async-storage';
-//import messaging from '@react-native-firebase/messaging';
 
 const ORANGE = CONSTANTS.COLOR.ORANGE;
 const base_url = CONSTANTS.CONFIG.BASE_URL;
 const alert_title = CONSTANTS.MSG.ALERT_TITLE;
 const Beranda = (props) => {
-    // useEffect(() => {
-    //     messaging().onNotificationOpenedApp(remoteMessage => {
-    //       console.log(
-    //         'Notification caused app to open from background state:',
-    //         remoteMessage.notification,
-    //       );
-    //       props.navigation.navigate(remoteMessage.data.type);
-    //     });
-    // },[]);
 
     const launchImageLibrary = async () => {
         const options = {

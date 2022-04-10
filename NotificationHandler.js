@@ -1,7 +1,6 @@
 /* eslint-disable prettier/prettier */
 import PushNotification from 'react-native-push-notification';
-import AsyncStorage from '@react-native-community/async-storage';
-import NavigationService from './src/services/NavigationServices';
+import messaging from '@react-native-firebase/messaging';
 
 class NotificationHandler {
   onNotification(notification) {

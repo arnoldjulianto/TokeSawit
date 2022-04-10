@@ -9,7 +9,7 @@ import iconEdit from '../../../assets/icon/edit-white.png';
 import iconLogOut from '../../../assets/icon/logout.png';
 import iconBankCardWhite from '../../../assets/icon/bank-card-white.png';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
-import Select2 from "react-native-select-two";
+import Select2 from "../../../components/SelectTwo";
 import iconIndo from '../../../assets/icon/indonesia.png';
 
 const NAVY = CONSTANTS.COLOR.NAVY;
@@ -232,7 +232,7 @@ const Profil =  ({route, navigation}) => {
                                         style={styles.textInput}
                                         cancelButtonText={"Batal"}
                                         selectButtonText={"Pilih"}
-                                        colorTheme="black"
+                                        colorTheme="darkorange"
                                         popupTitle="Pilih Provinsi"
                                         title="Pilih Provinsi"
                                         searchPlaceHolderText={"Cari disini"}
@@ -259,8 +259,7 @@ const Profil =  ({route, navigation}) => {
                                         style={styles.textInput}
                                         cancelButtonText={"Batal"}
                                         selectButtonText={"Pilih"}
-                                        colorTheme="black"
-                                        modalStyle={{color:"black"}}
+                                        colorTheme="darkorange"
                                         popupTitle="Pilih Kota/Kabupaten"
                                         title="Pilih Pilih Kota/Kabupaten"
                                         searchPlaceHolderText={"Cari disini"}
@@ -287,7 +286,7 @@ const Profil =  ({route, navigation}) => {
                                         style={styles.textInput}
                                         cancelButtonText={"Batal"}
                                         selectButtonText={"Pilih"}
-                                        colorTheme="black"
+                                        colorTheme="darkorange"
                                         popupTitle="Pilih Kecamatan"
                                         title="Pilih Pilih Kecamatan"
                                         searchPlaceHolderText={"Cari disini"}
@@ -314,7 +313,7 @@ const Profil =  ({route, navigation}) => {
                                         style={styles.textInput}
                                         cancelButtonText={"Batal"}
                                         selectButtonText={"Pilih"}
-                                        colorTheme="black"
+                                        colorTheme="darkorange"
                                         popupTitle="Pilih Kelurahan/Desa"
                                         title="Pilih Pilih Kelurahan/Desa"
                                         searchPlaceHolderText={"Cari disini"}

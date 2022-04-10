@@ -4,12 +4,13 @@ import Router from './config/router';
 import { View } from 'react-native';
 import NotifService from '../NotifService';
 import AsyncStorage from '@react-native-community/async-storage';
+import * as RootNavigation from './pages/BottomNavStackNavigatorPages/HomeStackNavigator/RootNavigation.js';
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      local_notif_status : true
+      notif_navigation : ""
     };
 
     this.notif = new NotifService(
@@ -32,13 +33,13 @@ class App extends Component {
   }
 
   onNotif(notif) {
-    console.log("DAPAT NOTIF : "+notif.title)
-    console.log("Notif :");
-    console.log(notif.bigPictureUrl);
-    if(this.state.local_notif_status == true){
-        this.notif.localNotif('sample.mp3', notif);
-        this.state.local_notif_status = false;
-        AsyncStorage.setItem("local_notif_status", "false");
+    if(typeof notif.data.navigation !=="undefined"){
+      console.log("NAVIGATION : "+notif.data.navigation)
+      this.notif_navigation = notif.data.navigation
+    }
+    if(!notif.userInteraction) this.notif.localNotif('sample.mp3', notif);
+    else{
+        RootNavigation.navigate(this.notif_navigation);
     }
   }
 
