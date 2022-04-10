@@ -1,19 +1,20 @@
 /* eslint-disable prettier/prettier */
 import PushNotification from 'react-native-push-notification';
 import AsyncStorage from '@react-native-community/async-storage';
+import NavigationService from './src/services/NavigationServices';
 
 class NotificationHandler {
   onNotification(notification) {
-    console.log('NotificationHandler:', notification);
-
+    console.log('NotificationHandler Notif Masuk:', notification);
+    
     if (typeof this._onNotification === 'function') {
       this._onNotification(notification);
     }
+    
   }
 
   async onRegister(token) {
-    console.log('NotificationHandler:', token.token);
-    AsyncStorage.setItem("deviceToken", token.token);
+    console.log('NotificationHandler Register:', token.token);
     if (typeof this._onRegister === 'function') {
       this._onRegister(token);
     }

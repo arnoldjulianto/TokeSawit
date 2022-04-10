@@ -232,7 +232,7 @@ const Profil =  ({route, navigation}) => {
                                         style={styles.textInput}
                                         cancelButtonText={"Batal"}
                                         selectButtonText={"Pilih"}
-                                        colorTheme="darkorange"
+                                        colorTheme="black"
                                         popupTitle="Pilih Provinsi"
                                         title="Pilih Provinsi"
                                         searchPlaceHolderText={"Cari disini"}
@@ -259,7 +259,8 @@ const Profil =  ({route, navigation}) => {
                                         style={styles.textInput}
                                         cancelButtonText={"Batal"}
                                         selectButtonText={"Pilih"}
-                                        colorTheme="darkorange"
+                                        colorTheme="black"
+                                        modalStyle={{color:"black"}}
                                         popupTitle="Pilih Kota/Kabupaten"
                                         title="Pilih Pilih Kota/Kabupaten"
                                         searchPlaceHolderText={"Cari disini"}
@@ -286,7 +287,7 @@ const Profil =  ({route, navigation}) => {
                                         style={styles.textInput}
                                         cancelButtonText={"Batal"}
                                         selectButtonText={"Pilih"}
-                                        colorTheme="darkorange"
+                                        colorTheme="black"
                                         popupTitle="Pilih Kecamatan"
                                         title="Pilih Pilih Kecamatan"
                                         searchPlaceHolderText={"Cari disini"}
@@ -313,7 +314,7 @@ const Profil =  ({route, navigation}) => {
                                         style={styles.textInput}
                                         cancelButtonText={"Batal"}
                                         selectButtonText={"Pilih"}
-                                        colorTheme="darkorange"
+                                        colorTheme="black"
                                         popupTitle="Pilih Kelurahan/Desa"
                                         title="Pilih Pilih Kelurahan/Desa"
                                         searchPlaceHolderText={"Cari disini"}
@@ -1173,5 +1174,9 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowRadius: 4,
         elevation: 5
+    },
+    inputKeyword: {
+        height: 40, borderRadius: 5, borderWidth: 1, borderColor: '#cacaca',
+        paddingLeft: 8, marginHorizontal: 24, marginTop: 16, color:'black'
     },
 })

@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Alert, View, ActivityIndicator, Platform } from 'react-native';
@@ -11,6 +11,10 @@ import AsyncStorage from '@react-native-community/async-storage';
 import Splash from '../../Splash';
 import CONSTANTS from '../../../assets/constants';
 import AwesomeAlert from 'react-native-awesome-alerts';
+import messaging from '@react-native-firebase/messaging';
+import { navigationRef } from './RootNavigation';
+import * as RootNavigation from './RootNavigation';
+
 const NAVY = CONSTANTS.COLOR.NAVY;
 const ORANGE = CONSTANTS.COLOR.ORANGE;
 
@@ -21,7 +25,8 @@ const DANGER = CONSTANTS.COLOR.DANGER;
 const alert_title = CONSTANTS.MSG.ALERT_TITLE;
 
 
-const HomeStackNavigator = ({navigation}) => {
+const HomeStackNavigator = () => {
+    //const navigation =useNavigation();
     const closeAlert = () => {
         console.log("alert close");
         setAlert(false);
@@ -34,6 +39,34 @@ const HomeStackNavigator = ({navigation}) => {
     const [confirmTextAlert, setConfirmTextAlert] = useState("");
     const [cancelTextAlert, setCancelTextAlert] = useState("");
     const [alertConfirmTask, setAlertConfirmTask] = useState(() => closeAlert() );
+    const [initialRoute, setInitialRoute] = useState("Home");
+
+    
+    useEffect(() => {
+        messaging()
+        .getInitialNotification()
+        .then(remoteMessage => {
+          if (remoteMessage) {
+            console.log(
+              'Notification caused app to open from quit state:',
+              remoteMessage.notification,
+            );
+            setInitialRoute("Home"); // e.g. "Settings"
+            setTimeout(()=>{
+                console.log("Go TO PAGE")
+                RootNavigation.navigate(remoteMessage.data.type);
+            },5500)
+          }
+        });
+
+        messaging().onNotificationOpenedApp(remoteMessage => {
+          console.log(
+            'Notification caused app to open from background state:',
+            remoteMessage.notification,
+          );
+          RootNavigation.navigate(remoteMessage.data.type);
+        });
+    },[]);
 
     const initialLoginState ={
         isLoading : true,
@@ -219,8 +252,8 @@ const HomeStackNavigator = ({navigation}) => {
 
     return (
         <AuthContext.Provider value={authContext}>
-            <NavigationContainer>
-                <Stack.Navigator headerMode="none" initialRouteName="Home" >
+            <NavigationContainer ref={navigationRef}>
+                <Stack.Navigator headerMode="none" initialRouteName={initialRoute} >
                     {/* {
                         loginState.userToken != null ? (
                             <Stack.Screen name="Home" component={BottomNavigation} />
