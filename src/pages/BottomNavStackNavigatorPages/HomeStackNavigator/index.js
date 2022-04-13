@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Alert, View, ActivityIndicator, Platform } from 'react-native';
 import BottomNavigation from '../../../components/BottomNavigation';
 // import { Splash } from '../../../pages';
-import { Login, Register,InputNoHp, SmsVerificationProvider, SmsVerificationAndroid, FotoKlaimDo, PreviewFotoKlaimDo, TentukanAgen, DetailJualDo, RekeningBank, PilihRekeningBank, AddRekeningBank, InputPin, BuatPinBaru } from '../';
+import { Login, Register,InputNoHp, SmsVerificationProvider, SmsVerificationAndroid, FotoKlaimDo, PreviewFotoKlaimDo, TentukanAgen, DetailJualDo, RekeningBank, PilihRekeningBank, AddRekeningBank, InputPin, BuatPinBaru, EditProfil } from '../';
 import {AuthContext} from '../../../components/Context';
 import AsyncStorage from '@react-native-community/async-storage';
 import Splash from '../../Splash';
@@ -54,7 +54,7 @@ const HomeStackNavigator = () => {
             setInitialRoute("Home"); // e.g. "Settings"
             setTimeout(()=>{
                 console.log("Go TO PAGE")
-                RootNavigation.navigate(remoteMessage.data.type);
+                RootNavigation.navigate(remoteMessage.data.navigation);
             },5500)
           }
         });
@@ -64,7 +64,7 @@ const HomeStackNavigator = () => {
             'Notification caused app to open from background state:',
             remoteMessage.notification,
           );
-          RootNavigation.navigate(remoteMessage.data.type);
+          RootNavigation.navigate(remoteMessage.data.navigation);
         });
     },[]);
 
@@ -264,6 +264,7 @@ const HomeStackNavigator = () => {
                     <Stack.Screen name="Home" component={BottomNavigation} />
                     <Stack.Screen name="Login" component={Login} />
                     <Stack.Screen name="Register" component={Register} />
+                    <Stack.Screen name="EditProfil" component={EditProfil} />
                     <Stack.Screen name="InputNoHp" component={InputNoHp} />
                     <Stack.Screen name="FotoKlaimDo" component={FotoKlaimDo} />
                     <Stack.Screen name="PreviewFotoKlaimDo" component={PreviewFotoKlaimDo} />

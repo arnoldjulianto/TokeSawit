@@ -2,6 +2,7 @@
 import HomeStackNavigator from './HomeStackNavigator';
 import Login from '../../pages/Login';
 import Register from '../../pages/Register';
+import EditProfil from '../BottomNavPages/Profil/edit';
 import InputNoHp from '../../pages/InputNoHp';
 import SmsVerificationProvider from '../../pages/SmsVerificationProvider';
 import SmsVerificationAndroid from '../../pages/SmsVerificationAndroid';
@@ -16,5 +17,5 @@ import BuatPinBaru from '../BuatPinBaru';
 import TentukanAgen from '../TentukanAgen/context_tentukan_agen';
 
 export {
-    HomeStackNavigator,  Login, Register, InputNoHp, SmsVerificationProvider, FotoKlaimDo, PreviewFotoKlaimDo, TentukanAgen, DetailJualDo, RekeningBank, PilihRekeningBank, AddRekeningBank, InputPin, BuatPinBaru, SmsVerificationAndroid
+    HomeStackNavigator,  Login, Register, InputNoHp, SmsVerificationProvider, FotoKlaimDo, PreviewFotoKlaimDo, TentukanAgen, DetailJualDo, RekeningBank, PilihRekeningBank, AddRekeningBank, InputPin, BuatPinBaru, SmsVerificationAndroid, EditProfil
 }

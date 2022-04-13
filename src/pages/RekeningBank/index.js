@@ -7,6 +7,7 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import iconNext from '../../assets/icon/next.png';
 import iconVerified from '../../assets/icon/verified.png';
 import iconPending from '../../assets/icon/pending.png';
+import iconBan from '../../assets/icon/ban.png';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import NoData from '../../assets/img/no data.svg';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -35,10 +36,10 @@ const RekeningBank = ({route, navigation}) => {
     const [refreshing, setRefreshing] = React.useState(false);
     const [username, setUsername] = useState();
 
-    useEffect (() => {
-        setLoadingVisible(true);
-        getUser();
-    },[])
+    // useEffect (() => {
+    //     setLoadingVisible(true);
+    //     getUser();
+    // },[])
 
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
@@ -57,8 +58,7 @@ const RekeningBank = ({route, navigation}) => {
           }
           else{
             setUsername(value);
-            setLoadingVisible(false);
-            loadRekeningSaya();
+            loadRekeningSaya(value);
           }
         } catch (error) {
           // Error retrieving data
@@ -69,12 +69,22 @@ const RekeningBank = ({route, navigation}) => {
 
     const onRefresh = React.useCallback(() => {
         setRefreshing(true);
-        
         getUser();
         setRefreshing(false);
       }, []);
 
-    const loadRekeningSaya = () => {
+    const loadRekeningSaya = (value) => {
+        let params;
+        if(typeof value !== "undefined"){
+            params = {
+                username:value
+            }
+        }
+        else{
+            params = {
+                username
+            }
+        }
         setLoadingVisible(true);
         setCancelButtonAlert(true);
         setConfirmButtonAlert(false);
@@ -88,9 +98,7 @@ const RekeningBank = ({route, navigation}) => {
             setAlertMessage("Permintaan Tidak Dapat Dipenuhi, Server Tidak Merespon");
         }, 30000);
 
-        const params = {
-            username
-        }
+        
         console.log(params);
         
         const createFormData = (body) => {
@@ -139,15 +147,22 @@ const RekeningBank = ({route, navigation}) => {
                         <Text style={styles.noRekeningLabel} >{item.no_rekening}</Text>
                         {item.status == 1 && (
                                 <View style={{flex:1, flexDirection: 'row', justifyContent:'space-between', alignItems:'center'}}>
-                                    <Text style={styles.verifikasiLabel} >Sudah Diverifikasi</Text>
+                                    <Text style={styles.verifikasiLabel} >Valid</Text>
                                     <Image source={iconVerified} style={styles.verifikasiLogo} />
                                 </View>
                             )
                         }
-                        {item.status != 1 && (
+                        {item.status == 0 && (
                                 <View style={{flex:1, flexDirection: 'row', justifyContent:'space-between', alignItems:'center'}}>
                                     <Text style={styles.verifikasiLabel} >Menunggu Diverifikasi</Text>
                                     <Image source={iconPending} style={styles.verifikasiLogo} />
+                                </View>
+                            )
+                        }
+                        {item.status == 2 && (
+                                <View style={{flex:1, flexDirection: 'row', justifyContent:'space-between', alignItems:'center'}}>
+                                    <Text style={styles.verifikasiLabel} >Tidak Valid</Text>
+                                    <Image source={iconBan} style={styles.verifikasiLogo} />
                                 </View>
                             )
                         }

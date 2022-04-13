@@ -81,6 +81,12 @@ const BottomNavigation = (props) => {
                         <RenderImage src={tab_status ? iconHomeActive : iconHome } lebar={26} tinggi={26} marginBawah={0} borderRadius={0} padding={0} backgroundColor={'white'} bottom={0}  />
                     );
                 } 
+                else if (route.name === 'Explore') {
+                    tab_status = focused ? true : false;
+                    return (
+                        <RenderImage src={tab_status ? iconProfileActive : iconProfile } lebar={26} tinggi={26} marginBawah={0} borderRadius={0} padding={0} backgroundColor={'white'} bottom={0} />
+                    );
+                }
                 else if (route.name === 'Profil') {
                     tab_status = focused ? true : false;
                     return (
@@ -95,6 +101,7 @@ const BottomNavigation = (props) => {
                 keyboardHidesTabBar:true
         }}>
             <Tab.Screen name="Beranda" component={Beranda} />
+            <Tab.Screen name="Explore" component={Beranda} />
             <Tab.Screen name="Profil" component={Profil}  />
         </Tab.Navigator>
     );
