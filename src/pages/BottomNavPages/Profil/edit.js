@@ -1,13 +1,15 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable prettier/prettier */
 import React,{useEffect, useState} from 'react';
-import {View, ScrollView, Text, TextInput, StyleSheet, Image, ActivityIndicator, RefreshControl, TouchableOpacity} from 'react-native';
+import {View, ScrollView, Text, TextInput, StyleSheet, Image, ActivityIndicator, RefreshControl, TouchableOpacity, Dimensions} from 'react-native';
 import CONSTANTS from '../../../assets/constants';
 import AsyncStorage from '@react-native-community/async-storage';
 import Select2 from "../../../components/SelectTwo";
 import iconIndo from '../../../assets/icon/indonesia.png';
 import iconEdit from '../../../assets/icon/edit-white.png';
 import SearchBar from '../../../components/SearchBar/search_bar_edit_profil';
+import MultipleImagePicker from '@baronha/react-native-multiple-image-picker';
+import AwesomeAlert from 'react-native-awesome-alerts';
 
 const NAVY = CONSTANTS.COLOR.NAVY;
 const ORANGE = CONSTANTS.COLOR.ORANGE;
@@ -28,6 +30,7 @@ const EditProfil =  ({route, navigation}) => {
     const [alert_message, setAlertMessage] = useState("");
     const [confirmTextAlert, setConfirmTextAlert] = useState("");
     const [cancelTextAlert, setCancelTextAlert] = useState("");
+    const [alertConfirmTask, setAlertConfirmTask] = useState(() => closeAlert() );
     //TAMPUNG EDIT
     const [usernameEdit, setUsernameEdit] = useState("");
     const [nama_lengkapEdit, setNamaLengkapEdit] = useState("");
@@ -87,10 +90,8 @@ const EditProfil =  ({route, navigation}) => {
             setUsername("");
           }
           else{
-            const timeout = setTimeout(() => {
-                loadDataUser(value);
-                clearTimeout(timeout);
-            },100)  
+            setUsername(value);  
+            loadDataUser(value);
           }
         } catch (error) {
           // Error retrieving data
@@ -165,7 +166,8 @@ const EditProfil =  ({route, navigation}) => {
                 setRTEdit(json.rt);
                 setNamaJalanEdit(json.nama_jalan);
                 setNoRumahEdit(json.no_rumah);
-                setFotoProfilEdit(json.foto_profil);
+                if(json.foto_profil == "default.png") setFotoProfilEdit(json.foto_profil);
+                else setFotoProfilEdit(json.username+"/"+json.foto_profil)
             }
             else{
                 setAlert(true);
@@ -630,8 +632,116 @@ const EditProfil =  ({route, navigation}) => {
         );
     }
 
+    const launchImageLibrary = async () => {
+        const options = {
+            usedCameraButton: true,
+            allowedVideo: false,
+            allowedPhotograph: true, // for camera : allow this option when you want to take a photos
+            allowedVideoRecording: false, //for camera : allow this option when you want to recording video.
+            maxVideoDuration: 60, //for camera : max video recording duration
+            numberOfColumn: 3,
+            maxSelectedAssets: 1,
+            singleSelectedMode: false,
+            doneTitle: 'Lanjutkan',
+            isPreview: true,
+            mediaType: 'image',
+            isExportThumbnail: true,
+        }
+        const response = await MultipleImagePicker.openPicker(options);
+        console.log(response);
+        uploadFotoProfil(response);
+    }
+
+    const uploadFotoProfil = (value) => {
+        setLoadingVisible(true);
+        setCancelButtonAlert(true);
+        setConfirmButtonAlert(false);
+
+        const timeout = setTimeout(() => {
+            setAlert(true);
+            setLoadingVisible(false);
+            setCancelButtonAlert(true);
+            setConfirmButtonAlert(false);
+            setCancelTextAlert("Tutup");
+            setAlertMessage("Permintaan Tidak Dapat Dipenuhi, Server Tidak Merespon");
+        }, 30000);
+
+        const params = {
+            id:id_user,
+            username_lama:username,
+            foto_lama:foto_profilEdit,
+        }
+        console.log("Edit params : ");
+        
+        const createFormData = (body) => {
+            const data = new FormData();
+            data.append("foto_profil", {
+                name: value[0].fileName,
+                type: 'image/gif',
+                uri: 'file://'+value[0].realPath
+            })
+            Object.keys(body).forEach(key => {
+                data.append(key, body[key]);
+            });
+            return data;
+        }
+        const formData = createFormData(params);
+        console.log(value[0]);
+        fetch(base_url+'User/get_api_upload_foto_profil',
+        {
+            method: 'post',
+            body: formData,
+            headers: {
+            'Content-Type': 'multipart/form-data; ',
+            },
+        })
+        .then((response) => response.json())
+        .then((json) => {
+            clearTimeout(timeout);
+            setLoadingVisible(false);
+            setAlertMessage(json.msg);
+            if(json.response == 1){
+                loadDataUser(json.username);
+            }
+            else{
+                setAlert(true);
+                setCancelButtonAlert(true);
+                setConfirmButtonAlert(false);
+                setCancelTextAlert("Tutup");
+            }
+        })
+        .catch((error) => {
+            clearTimeout(timeout);
+            setAlert(true);
+            setAlertMessage("Terjadi Kesalahan. \n"+error);
+            setCancelTextAlert("Tutup");
+            setConfirmButtonAlert(false);
+            setCancelButtonAlert(true);
+            setLoadingVisible(false);
+            console.log(error);
+        });
+    }
+
     return (
         <View style={{flex:1}}>
+            <AwesomeAlert
+                    show={showAlert}
+                    showProgress={false}
+                    title={alert_title}
+                    message={alert_message}
+                    closeOnTouchOutside={false}
+                    closeOnHardwareBackPress={false}
+                    showCancelButton={showCancelButtonAlert}
+                    showConfirmButton={showConfirmButtonAlert}
+                    cancelText={cancelTextAlert}
+                    confirmText={confirmTextAlert}
+                    confirmButtonColor={NAVY}
+                    cancelButtonColor={ORANGE}
+                    onCancelPressed={() => {
+                        setAlert(false);
+                    }}
+                    onConfirmPressed={alertConfirmTask}
+                />
             <SearchBar title={"Edit Profil"} navigation={navigation} refresh ={false} />
             <View style={styles.container}>
                 <ScrollView
@@ -641,6 +751,12 @@ const EditProfil =  ({route, navigation}) => {
                     onRefresh={onRefresh}
                     />
                 } >
+                    <View style={styles.segmenWrapper}>
+                        <Text style={styles.segmenTitle}>Klik Foto Untuk Mengubah Foto Profil Anda</Text>
+                        <TouchableOpacity onPress={()=> launchImageLibrary()}>
+                            <Image style={styles.fotoProfil} source={{uri : base_url+"assets/upload/file user/"+foto_profilEdit}} resizeMethod="resize" resizeMode="cover" />
+                         </TouchableOpacity> 
+                    </View>
                     <View style={styles.segmenWrapper}>
                         <Text style={styles.segmenTitle}>Biodata</Text>
                         <View style={styles.formGroup}>
@@ -696,8 +812,11 @@ const EditProfil =  ({route, navigation}) => {
                                     inputStyle={{color:"black"}}
                                     data={arrProvinsi}
                                     onSelect={data => {
-                                        if(typeof data[0] !=="undefined" ) loadKotaKabupaten(data[0]);
-                                        if(typeof data[0] !=="undefined" ) setProvinsiEdit(data[0]);
+                                        if(typeof data[0] !=="undefined" ) {
+                                            loadKotaKabupaten(data[0]);
+                                            setProvinsiEdit(data[0]);
+                                            setKotaKabupatenTitle("Tidak Ada Item Terpilih");
+                                        }
                                     }}
                                     />
                             </View>
@@ -720,8 +839,11 @@ const EditProfil =  ({route, navigation}) => {
                                     inputStyle={{color:"black"}}
                                     data={arrKotaKabupaten}
                                     onSelect={data => {
-                                        if(typeof data[0] !=="undefined" )loadKecamatan(data[0]);
-                                        if(typeof data[0] !=="undefined" ) setKotaKabupatenEdit(data[0]);
+                                        if(typeof data[0] !=="undefined" ) {
+                                            loadKecamatan(data[0]);
+                                            setKotaKabupatenEdit(data[0]);
+                                            setKecamatanTitle("Tidak Ada Item Terpilih");
+                                        }
                                     }}
                                     />
                             </View>
@@ -744,8 +866,11 @@ const EditProfil =  ({route, navigation}) => {
                                     inputStyle={{color:"black"}}
                                     data={arrKecamatan}
                                     onSelect={data => {
-                                        if(typeof data[0] !=="undefined" ) loadKelurahanDesa(data[0])
-                                        if(typeof data[0] !=="undefined" ) setKecamatanEdit(data[0]);
+                                        if(typeof data[0] !=="undefined" ) {
+                                            loadKelurahanDesa(data[0])
+                                            setKecamatanEdit(data[0]);
+                                            setKelurahanDesaTitle("Tidak Ada Item Terpilih");
+                                        }
                                     }}
                                     />
                             </View>
@@ -810,7 +935,6 @@ const EditProfil =  ({route, navigation}) => {
                     </View> 
 
                     <TouchableOpacity style={styles.btnEditProfil} onPress={()=> {editProfilHandler()} }>
-                        <Image style={styles.btnEditProfilIcon}  source={iconEdit} />
                         <Text style={styles.btnEditProfilLabel}>Edit</Text>
                     </TouchableOpacity>
 
@@ -827,6 +951,12 @@ const styles = StyleSheet.create({
         flex:1,
         paddingHorizontal:20,
         backgroundColor:'white'
+    },
+    fotoProfil :{
+        width:200,
+        height:200,
+        alignSelf:'center',
+        borderRadius:200
     },
     segmenWrapper : {
         backgroundColor:'white',

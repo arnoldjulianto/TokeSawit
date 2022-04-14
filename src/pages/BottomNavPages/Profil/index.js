@@ -49,6 +49,13 @@ const Profil =  ({route, navigation}) => {
         getUser();
     },[]);
 
+    useEffect(()=>{
+        const unsubscribe = navigation.addListener('focus', () => {
+            getUser();
+        });
+        return unsubscribe;
+    },[]);
+
     const getUser = async () => {
         try {
           const value = await AsyncStorage.getItem('username');
@@ -60,6 +67,7 @@ const Profil =  ({route, navigation}) => {
           }
           else{
             const timeout = setTimeout(() => {
+                setUsername(value);
                 loadDataUser(value);
                 clearTimeout(timeout);
             },0)  
@@ -73,9 +81,8 @@ const Profil =  ({route, navigation}) => {
 
     const [index, setIndex] = React.useState(0);
     const [routes] = React.useState([
-      { key: 'first', title: 'Etalase Saya' },
-      { key: 'second', title: 'Kerjasama Agen' },
-      { key: 'third', title: 'Pengaturan Akun' }
+      { key: 'first', title: 'Lapak Saya' },
+      { key: 'second', title: 'Pengaturan Akun' }
     ]);
 
     const layout = useWindowDimensions();
@@ -101,13 +108,6 @@ const Profil =  ({route, navigation}) => {
             )
       
           case 'second':
-            return (
-              <View>
-                  <Text>AA</Text>
-              </View>
-            )
-      
-          case 'third':
             return (
                 <View style={styles.settingAkunArea} >
                     <ScrollView keyboardShouldPersistTaps={"handled"} >
@@ -162,7 +162,7 @@ const Profil =  ({route, navigation}) => {
             return data;
         }
         const formData = createFormData(params);
-        fetch(base_url+'User/get_api_user_data',
+        fetch(base_url+'User/get_api_user_data_only',
         {
             method: 'post',
             body: formData,
@@ -181,15 +181,16 @@ const Profil =  ({route, navigation}) => {
                 setNamaLengkap(json.nama_lengkap);
                 setNoTelepon(json.no_telepon);
                 setEmail(json.email);
-                if(json.provinsi != "") setProvinsi(" , "+json.prov_name);
-                if(json.kota_kabupaten != "") setKotaKabupaten(", "+json.city_name);
-                if(json.kecamatan != "") setKecamatan(" Kec. "+json.dis_name);
-                if(json.kelurahan_desa != "") setKelurahanDesa(" Kel./Desa "+json.subdis_name+", ");
-                if(json.rw != "") setRW(" RW "+json.rw);
-                if(json.rt != "") setRT(" RT "+json.rt);
-                if(json.nama_jalan != "") setNamaJalan(json.nama_jalan+" ");
-                if(json.no_rumah != "") setNoRumah(" No. "+json.no_rumah);
-                setFotoProfil(json.foto_profil)
+                // if(json.provinsi != "") setProvinsi(" , "+json.prov_name);
+                // if(json.kota_kabupaten != "") setKotaKabupaten(", "+json.city_name);
+                // if(json.kecamatan != "") setKecamatan(" Kec. "+json.dis_name);
+                // if(json.kelurahan_desa != "") setKelurahanDesa(" Kel./Desa "+json.subdis_name+", ");
+                // if(json.rw != "") setRW(" RW "+json.rw);
+                // if(json.rt != "") setRT(" RT "+json.rt);
+                // if(json.nama_jalan != "") setNamaJalan(json.nama_jalan+" ");
+                // if(json.no_rumah != "") setNoRumah(" No. "+json.no_rumah);
+                if(json.foto_profil == 'default.png') setFotoProfil(json.foto_profil)
+                else setFotoProfil(json.username+'/'+json.foto_profil)
             }
             else{
                 setAlert(true);
@@ -258,7 +259,7 @@ const Profil =  ({route, navigation}) => {
             (
                 <View>
                     <View style={styles.profilArea}>
-                        <Image style={styles.fotoProfil} source={{uri : base_url+"assets/upload/file user/"+foto_profil}} />
+                        <Image style={styles.fotoProfil} source={{uri : base_url+"assets/upload/file user/"+foto_profil}} resizeMethod="resize" resizeMode="cover" />
                         <View style={styles.profilWrapper}> 
                             <Text style={styles.namaLengkapLabel}>{nama_lengkap}</Text>
                             {/* <Text style={styles.noHpLabel}>{no_telepon.substring(0,6)+no_telepon.substring(6,4).replace(no_telepon.substring(6,4),"****")+no_telepon.substring(10)}</Text> */}
