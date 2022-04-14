@@ -15,7 +15,12 @@ import AddRekeningBank from '../RekeningBank/add';
 import InputPin from '../InputPin';
 import BuatPinBaru from '../BuatPinBaru';
 import TentukanAgen from '../TentukanAgen/context_tentukan_agen';
+import JadiPemilikDo from '../JadiPemilikDo';
+import AddDoSaya from '../JadiPemilikDo/add';
+import InputDoPPKS from '../JadiPemilikDo/input_do_ppks';
+import BiayaBongkar from '../JadiPemilikDo/biaya_bongkar';
+import InputHargaDoPPKS from '../JadiPemilikDo/input_harga_do_ppks';
 
 export {
-    HomeStackNavigator,  Login, Register, InputNoHp, SmsVerificationProvider, FotoKlaimDo, PreviewFotoKlaimDo, TentukanAgen, DetailJualDo, RekeningBank, PilihRekeningBank, AddRekeningBank, InputPin, BuatPinBaru, SmsVerificationAndroid, EditProfil
+    HomeStackNavigator,  Login, Register, InputNoHp, SmsVerificationProvider, FotoKlaimDo, PreviewFotoKlaimDo, TentukanAgen, DetailJualDo, RekeningBank, PilihRekeningBank, AddRekeningBank, InputPin, BuatPinBaru, SmsVerificationAndroid, EditProfil, JadiPemilikDo, AddDoSaya, InputDoPPKS, BiayaBongkar
 }
