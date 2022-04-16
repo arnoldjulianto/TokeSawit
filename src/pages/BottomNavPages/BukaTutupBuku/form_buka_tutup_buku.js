@@ -112,7 +112,7 @@ const FormBukaTutupBuku = (props) => {
     const showMode = (currentMode) => {
         setShow(true);
         setMode(currentMode);
-      };
+    };
     
       const showDatePicker = (a, mode) => {
           //alert(jenis_datepicker)

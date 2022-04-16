@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
     },
     searchBarWrapper : {
         height:54,
-        backgroundColor:'black',
+        backgroundColor:ORANGE,
         justifyContent:'center'
     },
     searchBarTopWrapper : {

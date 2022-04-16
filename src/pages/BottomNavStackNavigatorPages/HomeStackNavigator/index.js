@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Alert, View, ActivityIndicator, Platform } from 'react-native';
 import BottomNavigation from '../../../components/BottomNavigation';
 // import { Splash } from '../../../pages';
-import { Login, Register,InputNoHp, SmsVerificationProvider, SmsVerificationAndroid, FotoKlaimDo, PreviewFotoKlaimDo, TentukanAgen, DetailJualDo, RekeningBank, PilihRekeningBank, AddRekeningBank, InputPin, BuatPinBaru, EditProfil, JadiPemilikDo, AddDoSaya, InputDoPPKS, BiayaBongkar, InputHargaDoPPKS } from '../';
+import { Login, Register,InputNoHp, SmsVerificationProvider, SmsVerificationAndroid, FotoKlaimDo, PreviewFotoKlaimDo, TentukanAgen, DetailJualDo, RekeningBank, PilihRekeningBank, AddRekeningBank, InputPin, BuatPinBaru, EditProfil, JadiPemilikDo, AddDoSaya, InputDoPPKS, BiayaBongkar, InputHargaDoPPKS, PreviewPemilikDo } from '../';
 import {AuthContext} from '../../../components/Context';
 import AsyncStorage from '@react-native-community/async-storage';
 import Splash from '../../Splash';
@@ -280,6 +280,7 @@ const HomeStackNavigator = () => {
                     <Stack.Screen name="InputDoPPKS" component={InputDoPPKS} />
                     <Stack.Screen name="BiayaBongkar" component={BiayaBongkar} />
                     <Stack.Screen name="InputHargaDoPPKS" component={InputHargaDoPPKS} />
+                    <Stack.Screen name="PreviewPemilikDo" component={PreviewPemilikDo} />
                     <Stack.Screen name="SmsVerificationProvider" component={SmsVerificationProvider} />
                     <Stack.Screen name="SmsVerificationAndroid" component={SmsVerificationAndroid} />
                 </Stack.Navigator>

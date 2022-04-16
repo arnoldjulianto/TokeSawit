@@ -20,7 +20,8 @@ import AddDoSaya from '../JadiPemilikDo/add';
 import InputDoPPKS from '../JadiPemilikDo/input_do_ppks';
 import BiayaBongkar from '../JadiPemilikDo/biaya_bongkar';
 import InputHargaDoPPKS from '../JadiPemilikDo/input_harga_do_ppks';
+import PreviewPemilikDo from '../JadiPemilikDo/preview_pemilik_do';
 
 export {
-    HomeStackNavigator,  Login, Register, InputNoHp, SmsVerificationProvider, FotoKlaimDo, PreviewFotoKlaimDo, TentukanAgen, DetailJualDo, RekeningBank, PilihRekeningBank, AddRekeningBank, InputPin, BuatPinBaru, SmsVerificationAndroid, EditProfil, JadiPemilikDo, AddDoSaya, InputDoPPKS, BiayaBongkar
+    HomeStackNavigator,  Login, Register, InputNoHp, SmsVerificationProvider, FotoKlaimDo, PreviewFotoKlaimDo, TentukanAgen, DetailJualDo, RekeningBank, PilihRekeningBank, AddRekeningBank, InputPin, BuatPinBaru, SmsVerificationAndroid, EditProfil, JadiPemilikDo, AddDoSaya, InputDoPPKS, BiayaBongkar, InputHargaDoPPKS, PreviewPemilikDo
 }

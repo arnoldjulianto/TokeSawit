@@ -32,7 +32,7 @@ const TentukanBiayaBongkar = ({route, navigation}) => {
             <View style={styles.container}>
                 <View style={styles.formGroup}>
                     <Text>
-                        LEWATI Jika Tidak Ada Biaya Bongkar.{"\n"}
+                        <Text style={{fontWeight:'bold'}}>LEWATI</Text> Jika Tidak Ada Biaya Bongkar.{"\n"}
                         Jika Ada, Tuliskan Pada Kolom Deskripsi.{"\n"}
                     </Text>
                     <Text>* Contoh :{"\n"}
