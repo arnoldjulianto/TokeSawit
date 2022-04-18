@@ -262,9 +262,9 @@ const Profil =  ({route, navigation}) => {
                         <Image style={styles.fotoProfil} source={{uri : base_url+"assets/upload/file user/"+foto_profil}} resizeMethod="resize" resizeMode="cover" />
                         <View style={styles.profilWrapper}> 
                             <Text style={styles.namaLengkapLabel}>{nama_lengkap}</Text>
-                            {/* <Text style={styles.noHpLabel}>{no_telepon.substring(0,6)+no_telepon.substring(6,4).replace(no_telepon.substring(6,4),"****")+no_telepon.substring(10)}</Text> */}
+                            {/* <Text style={styles.usernameLabel}>{no_telepon.substring(0,6)+no_telepon.substring(6,4).replace(no_telepon.substring(6,4),"****")+no_telepon.substring(10)}</Text> */}
 
-                            <Text style={styles.noHpLabel}>{username}</Text>
+                            <Text style={styles.usernameLabel}>{username}</Text>
                             {/* <Text style={styles.alamatLabel}>{nama_jalan+no_rumah+rw+rt+kelurahan_desa+kecamatan+kota_kabupaten+provinsi}</Text> */}
                         </View>
                     </View>
@@ -433,7 +433,7 @@ const styles = StyleSheet.create({
         color:'white',
         fontWeight:'700'
     },
-    noHpLabel :{
+    usernameLabel :{
         fontSize : 15,
         color:'white'
     },

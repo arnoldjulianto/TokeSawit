@@ -15,7 +15,7 @@ const DANGER = CONSTANTS.COLOR.DANGER;
 const base_url = CONSTANTS.CONFIG.BASE_URL;
 const alert_title = CONSTANTS.MSG.ALERT_TITLE;
 const Beranda = (props) => {
-    const [searchParam, setSearchParam] = useState("");
+    const [searchParam, setSearchParam, modal] = useState("");
     const [username, setUsername] = useState("");
     const [nama_lengkap, setNamaLengkap] = useState("");
     const [modalVisible, setModalVisible] = useState(false);
@@ -32,7 +32,8 @@ const Beranda = (props) => {
     const [alert_message, setAlertMessage] = useState("");
     const [confirmTextAlert, setConfirmTextAlert] = useState("");
     const [cancelTextAlert, setCancelTextAlert] = useState("");
-
+    if(modal) setModalVisible(true);
+    
     useEffect(() => {
         const unsubscribe = props.navigation.addListener('focus', () => {
             getUser();
@@ -50,7 +51,7 @@ const Beranda = (props) => {
           }
           else{
             setUsername(value);
-            loadDataUser(username)
+            loadDataUser(value)
           }
         } catch (error) {
           // Error retrieving data
@@ -186,7 +187,7 @@ const Beranda = (props) => {
                     </TouchableOpacity>
                 </View>
                 
-                <MenuHomeAtom username={username} klaimDo={true} beliDo={true} rekapDoSaya={true} buatInvoice={true} bayarInvoice={true} kasihDeposit={true} daftarHutang={true} menuTop={-95} />
+                <MenuHomeAtom username={username} klaimDo={true} beliDo={true} rekapDoSaya={true} buatInvoice={true} bayarInvoice={true} kasihDeposit={true} daftarHutang={true} menuTop={-95}  navigation={props.navigation} />
 
                 <View style={styles.segmenArea}>
                     <Text style={styles.segmenTitle}>Hi {nama_lengkap}, Tentukan posisi Anda</Text>

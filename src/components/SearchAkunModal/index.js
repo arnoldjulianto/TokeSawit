@@ -63,7 +63,9 @@ const SearchAkunModal = (props) => {
     }
 
     const loadLihatProfil = (currentUser, username) => {
-        props.navigation.navigate("LihatProfil", {currentUser, username});
+        //console.log(currentUser, username)
+        props.navigation.navigate("LihatProfil", {currentUser, username, setModalVisible:props.setModalVisible});
+        props.setModalVisible(false);
     }
 
     const renderItemUser = ({ item, index }) => {
