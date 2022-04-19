@@ -216,7 +216,7 @@ const LihatProfil = ({route, navigation}) => {
     }
 
     const followRequest = () => {
-        if(followingText != "" && followingText!="Diminta"){
+        if(followingText != "" && followingText == "Ikuti" ){
             setRequesting(true);
             const timeout = setTimeout(() => {
                 setRequesting(false);

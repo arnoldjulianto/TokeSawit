@@ -206,6 +206,9 @@ const Beranda = (props) => {
                                 </TouchableOpacity>
                         </View>
                     {/* </ScrollView> */}
+                    {/* <TouchableOpacity style={{marginTop:20}} onPress={() => props.navigation.navigate("Home", {screen:"Profil"})} >
+                        <Text >Pindah ke Home Tab Profil</Text>
+                    </TouchableOpacity> */}
                 </View>
                 
             </ScrollView>

@@ -10,7 +10,8 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      notif_navigation : ""
+      notif_navigation : "",
+      notif_screen : "",
     };
 
     this.notif = new NotifService(
@@ -34,12 +35,17 @@ class App extends Component {
 
   onNotif(notif) {
     if(typeof notif.data.navigation !=="undefined"){
-      console.log("NAVIGATION : "+notif.data.navigation)
       this.notif_navigation = notif.data.navigation
+    }
+    if(typeof notif.data.screen !=="undefined") {
+      this.notif_screen = notif.data.screen
     }
     if(!notif.userInteraction) this.notif.localNotif('sample.mp3', notif);
     else{
-        RootNavigation.navigate(this.notif_navigation);
+        if(this.notif_screen !="") {
+            RootNavigation.navigate(this.notif_navigation, {screen:this.notif_screen});
+        }
+        else RootNavigation.navigate(this.notif_navigation);
     }
   }
 

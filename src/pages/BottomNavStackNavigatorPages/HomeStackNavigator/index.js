@@ -54,7 +54,8 @@ const HomeStackNavigator = () => {
             setInitialRoute("Home"); // e.g. "Settings"
             setTimeout(()=>{
                 console.log("Go TO PAGE")
-                RootNavigation.navigate(remoteMessage.data.navigation);
+                if(typeof remoteMessage.data.screen !== "undefined" ) RootNavigation.navigate(remoteMessage.data.navigation, {screen:remoteMessage.data.screen});
+                else RootNavigation.navigate(remoteMessage.data.navigation);
             },5500)
           }
         });
@@ -64,7 +65,8 @@ const HomeStackNavigator = () => {
             'Notification caused app to open from background state:',
             remoteMessage.notification,
           );
-          RootNavigation.navigate(remoteMessage.data.navigation);
+          if(typeof remoteMessage.data.screen !== "undefined" ) RootNavigation.navigate(remoteMessage.data.navigation, {screen:remoteMessage.data.screen});
+          else RootNavigation.navigate(remoteMessage.data.navigation);
         });
     },[]);
 
