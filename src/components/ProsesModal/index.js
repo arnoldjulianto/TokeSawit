@@ -3,7 +3,7 @@ import React, {useEffect } from 'react';
 import { Modal, View, StyleSheet, ActivityIndicator, Text, BackHandler, Alert} from "react-native";
 import CONSTANTS from '../../assets/constants';
 
-const DANGER = CONSTANTS.COLOR.DANGER;
+const ORANGE = CONSTANTS.COLOR.ORANGE;
 
 const ProsesModal = (props) => {
     return(
@@ -18,7 +18,7 @@ const ProsesModal = (props) => {
             >
                 <View style={styles.modalView}>
                     <Text style={styles.modalTitle}></Text>
-                    <ActivityIndicator size={70} color={DANGER} />
+                    <ActivityIndicator size={70} color={ORANGE} />
                 </View>
             </Modal>   
         </View>
@@ -28,7 +28,6 @@ export default ProsesModal;
 
 const styles = StyleSheet.create({
     centeredView: {
-        flex: 1,
         justifyContent: "center",
         alignItems: "center",
         marginTop:0,

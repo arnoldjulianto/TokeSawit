@@ -31,6 +31,7 @@ const Profil =  ({route, navigation}) => {
     const [cancelTextAlert, setCancelTextAlert] = useState("");
     const [id_user, setIdUser] = useState("");
     const [username, setUsername] = useState("");
+    const [username_edit, setUsernameEdit] = useState("");
     const [nama_lengkap, setNamaLengkap] = useState("");
     const [no_telepon, setNoTelepon] = useState("");
     const [email, setEmail] = useState("");
@@ -178,6 +179,7 @@ const Profil =  ({route, navigation}) => {
             if(json.response == 1){
                 setIdUser(json.id);
                 setUsername(json.username);
+                setUsernameEdit(json.username_edit);
                 setNamaLengkap(json.nama_lengkap);
                 setNoTelepon(json.no_telepon);
                 setEmail(json.email);
@@ -264,7 +266,7 @@ const Profil =  ({route, navigation}) => {
                             <Text style={styles.namaLengkapLabel}>{nama_lengkap}</Text>
                             {/* <Text style={styles.usernameLabel}>{no_telepon.substring(0,6)+no_telepon.substring(6,4).replace(no_telepon.substring(6,4),"****")+no_telepon.substring(10)}</Text> */}
 
-                            <Text style={styles.usernameLabel}>{username}</Text>
+                            <Text style={styles.usernameLabel}>{username_edit}</Text>
                             {/* <Text style={styles.alamatLabel}>{nama_jalan+no_rumah+rw+rt+kelurahan_desa+kecamatan+kota_kabupaten+provinsi}</Text> */}
                         </View>
                     </View>

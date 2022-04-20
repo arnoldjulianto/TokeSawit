@@ -29,6 +29,7 @@ const LihatProfil = ({route, navigation}) => {
     const [confirmTextAlert, setConfirmTextAlert] = useState("");
     const [cancelTextAlert, setCancelTextAlert] = useState("");
     const [id_user, setIdUser] = useState("");
+    const [username_edit, setUsernameEdit] = useState("");
     const [nama_lengkap, setNamaLengkap] = useState("");
     const [no_telepon, setNoTelepon] = useState("");
     const [email, setEmail] = useState("");
@@ -98,6 +99,7 @@ const LihatProfil = ({route, navigation}) => {
             
             if(json.response == 1){
                 setIdUser(json.id);
+                setUsernameEdit(json.username_edit);
                 setNamaLengkap(json.nama_lengkap);
                 setNoTelepon(json.no_telepon);
                 setEmail(json.email);
@@ -309,7 +311,7 @@ const LihatProfil = ({route, navigation}) => {
 
     return(
         <View style={{flex:1}}>
-            <SearchBar refresh={false} title={username} navigation={navigation} setModalVisible={setModalVisible} />
+            <SearchBar refresh={false} title={username_edit} navigation={navigation} setModalVisible={setModalVisible} />
             <View style={styles.container}>
                     <ScrollView style={{flex:1}}>
                         <View style={styles.profilArea}>

@@ -32,7 +32,7 @@ const EditProfil =  ({route, navigation}) => {
     const [cancelTextAlert, setCancelTextAlert] = useState("");
     const [alertConfirmTask, setAlertConfirmTask] = useState(() => closeAlert() );
     //TAMPUNG EDIT
-    const [usernameEdit, setUsernameEdit] = useState("");
+    const [username_edit, setUsernameEdit] = useState("");
     const [nama_lengkapEdit, setNamaLengkapEdit] = useState("");
     const [no_teleponEdit, setNoTeleponEdit] = useState("");
     const [emailEdit, setEmailEdit] = useState("");
@@ -150,7 +150,7 @@ const EditProfil =  ({route, navigation}) => {
 
                 setIdUser(json.id);
                 setUsername(json.username);
-                setUsernameEdit(json.username);
+                setUsernameEdit(json.username_edit);
                 setNamaLengkapEdit(json.nama_lengkap);
                 setNoTeleponEdit(json.no_telepon);
                 setEmailEdit(json.email);
@@ -548,7 +548,7 @@ const EditProfil =  ({route, navigation}) => {
         const params = {
             id:id_user,
             username_lama:username,
-            username:usernameEdit,
+            username:username_edit,
             nama_lengkap:nama_lengkapEdit,
             no_telepon:no_teleponEdit,
             email:emailEdit,
@@ -760,10 +760,10 @@ const EditProfil =  ({route, navigation}) => {
                     <View style={styles.segmenWrapper}>
                         <Text style={styles.segmenTitle}>Biodata</Text>
                         <View style={styles.formGroup}>
-                            {/*<Text style={styles.formLabel}>Username</Text>
+                            <Text style={styles.formLabel}>Username</Text>
                             <View style={styles.inputWrapper}>
-                                <TextInput style={styles.textInput} placeholder={"Masukkan Username"} placeholderTextColor= 'gray' value={usernameEdit}   onChangeText = {(value) => setUsernameEdit(value)} onSubmitEditing={() => { inputNamaLengkap.focus()}} blurOnSubmit={false} returnKeyType="next"   ></TextInput>
-                            </View> */}
+                                <TextInput style={styles.textInput} placeholder={"Masukkan Username"} placeholderTextColor= 'gray' value={username_edit}   onChangeText = {(value) => setUsernameEdit(value)} onSubmitEditing={() => { inputNamaLengkap.focus()}} blurOnSubmit={false} returnKeyType="next"   ></TextInput>
+                            </View>
                         </View>
 
                         <View style={styles.formGroup}>
@@ -780,7 +780,7 @@ const EditProfil =  ({route, navigation}) => {
                             <View style={styles.inputWrapper}>
                                 <Image source={iconIndo} style={styles.logoIndo} />
                                 <Text style={styles.kodeNegaraLabel}>+62</Text>
-                                <TextInput style={styles.textInput} placeholder={"Masukkan No. Telepon"} placeholderTextColor= 'gray' value={no_teleponEdit.replace("+62","")} keyboardType="numeric" onChangeText = { (value) => resetNoTelepon(value) }  onSubmitEditing={() => { inputEmail.focus()}} ref={(input) => { setInputNoTelepon(input) }} blurOnSubmit={false} returnKeyType="next"  ></TextInput>
+                                <TextInput style={styles.textInput} placeholder={"Masukkan No. Telepon"} placeholderTextColor= 'gray' value={no_teleponEdit.replace("+62","")} keyboardType="numeric" onChangeText = { (value) => resetNoTelepon(value) }  onSubmitEditing={() => { inputEmail.focus()}} ref={(input) => { setInputNoTelepon(input) }} blurOnSubmit={false} returnKeyType="next" editable = {false}  ></TextInput>
 
                             </View>
                         </View>

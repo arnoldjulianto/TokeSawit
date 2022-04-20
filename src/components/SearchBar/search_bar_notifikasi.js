@@ -28,8 +28,9 @@ const SearchBar = (props) => {
                     {/* <TouchableOpacity onPress={ ()=> props.onBack(false) }>
                         <Image source={iconBack} style={styles.searchBarIcon}  />
                     </TouchableOpacity> */}
-                    <Text style={styles.searchBarTitle}>{props.title}{"\n"}
-                        <Text style={styles.searchBarSubtitle}>({props.notif_belum_dibaca}) Belum Dibaca</Text>
+                    <Text style={styles.searchBarTitle}>{props.title}
+                        {/* {"\n"} */}
+                        {/* <Text style={styles.searchBarSubtitle}>({props.notif_belum_dibaca}) Belum Dibaca</Text> */}
                     </Text>
                     {props.refresh != false &&
                     <View style={{flex:1,alignItems:'flex-end', justifyContent:'flex-end', right:10}}>

@@ -5,6 +5,7 @@ import CONSTANTS from '../../../assets/constants';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import SearchBar from '../../../components/SearchBar/search_bar_notifikasi';
 import AsyncStorage from '@react-native-community/async-storage';
+import ProsesModal from '../../../components/ProsesModal';
 
 const ORANGE = CONSTANTS.COLOR.ORANGE;
 const NAVY = CONSTANTS.COLOR.NAVY;
@@ -12,18 +13,23 @@ const PRIMARY = CONSTANTS.COLOR.PRIMARY;
 const base_url = CONSTANTS.CONFIG.BASE_URL;
 
 const Notifikasi = ({route, navigation}) => {
-    let notif_belum_dibaca = route.params.notif_belum_dibaca;
     const [username, setUsername] = useState("");
+    const [username_edit, setUsernameEdit] = useState("");
     const [arrPermintaanMengikuti, setArrPermintaanMengikuti] = useState([]);
     const [arrWaktuNotifikasi, setArrWaktuNotifikasi] = useState([]);
     const [arrNotifikasiHariIni, setArrNotifikasiHariIni] = useState([]);
     const [arrNotifikasiKemarin, setArrNotifikasiKemarin] = useState([]);
     const [arrNotifikasiMingguIni, setArrNotifikasiMingguIni] = useState([]);
     const [refreshing, setRefreshing] = useState(false);
+    const [modalVisible, setModalVisible] = useState(false);
+    const [hari_ini_belum_dibaca, setHariIniBelumDibaca] = useState(0);
+    const [kemarin_belum_dibaca, setKemarinBelumDibaca] = useState(0);
+    const [minggu_ini_belum_dibaca, setMingguIniBelumDibaca] = useState(0);
 
     useEffect(()=>{
         const unsubscribe = navigation.addListener('focus', () => {
             getUser();
+            setModalVisible(false);
         });
         return unsubscribe;
     },[navigation]);
@@ -43,7 +49,6 @@ const Notifikasi = ({route, navigation}) => {
           console.log(error)
         }
     };
-
     const onRefresh = React.useCallback(() => {
         setRefreshing(true);
         getUser();
@@ -95,6 +100,9 @@ const Notifikasi = ({route, navigation}) => {
             if(json.notifikasi_kemarin.length > 0) waktu.push({waktu:"Kemarin"}) 
             if(json.notifikasi_minggu_ini.length > 0) waktu.push({waktu:"Minggu Ini"}) 
             setArrWaktuNotifikasi(waktu);
+            setHariIniBelumDibaca(json.hari_ini_belum_dibaca);
+            setKemarinBelumDibaca(json.kemarin_belum_dibaca);
+            setMingguIniBelumDibaca(json.minggu_ini_belum_dibaca);
             console.log(json);
         })
         .catch((error) => {
@@ -104,7 +112,51 @@ const Notifikasi = ({route, navigation}) => {
         });
     }
 
+    const tandaiSudahDibaca = (waktu) => {
+        setModalVisible(true);
+        const timeout = setTimeout(() => {
+            setModalVisible(false);
+        }, 30000);
+        const params = {
+            username,
+            waktu,
+        }
+        console.log(params)
+        const createFormData = (body) => {
+            const data = new FormData();
+            Object.keys(body).forEach(key => {
+                data.append(key, body[key]);
+            });
+            return data;
+        }
+        const formData = createFormData(params);
+        fetch(base_url+'Notifikasi/get_api_tandai_sudah_dibaca',
+        {
+            method: 'post',
+            body: formData,
+            headers: {
+              'Content-Type': 'multipart/form-data; ',
+            },
+        })
+        .then((response) => response.json())
+        .then((json) => {
+            clearTimeout(timeout);
+            setModalVisible(false);
+            if(json.response == 1) loadNotifikasi();
+            console.log(json);
+        })
+        .catch((error) => {
+            clearTimeout(timeout);
+            setModalVisible(false);
+            console.log(error);
+        });
+    }
+
     const followReqResponse = (response, from, id_notif) => {
+        setModalVisible(true);
+        const timeout = setTimeout(() => {
+            setModalVisible(false);
+        }, 30000);
         const params = {
             username,
             response,
@@ -131,12 +183,16 @@ const Notifikasi = ({route, navigation}) => {
         })
         .then((response) => response.json())
         .then((json) => {
+            clearTimeout(timeout);
             if(json.response == 1){
                 loadNotifikasi();
                 console.log(json);
             }
+            setModalVisible(false);
         })
         .catch((error) => {
+            clearTimeout(timeout);
+            setModalVisible(false);
             console.log(error);
         });
     }
@@ -149,7 +205,7 @@ const Notifikasi = ({route, navigation}) => {
         return(
             <View style={[styles.notifWrapper,{backgroundColor:'#f0f5f5'}]}>
                 <Image style={styles.fotoProfil} source={{uri : base_url+"assets/upload/file user/"+foto_profil}} resizeMethod="resize" resizeMode="cover" />
-                <Text style={styles.notifMsg} ><Text style={styles.usernameLabel}>{item.from}</Text> meminta untuk mengikuti Anda</Text>
+                <Text style={styles.notifMsg} ><Text style={styles.usernameLabel}>{item.from}</Text> {item.message}</Text>
 
                 <TouchableOpacity style={styles.btnNotif1} onPress={()=>{
                     followReqResponse("acc", item.from, item.id);
@@ -169,7 +225,23 @@ const Notifikasi = ({route, navigation}) => {
     const renderItemWaktuNotifikasi = ({item, index}) => {
         return(
             <View style={styles.segmenWrapper}> 
-                <Text style={styles.segmenTitle}>{item.waktu}</Text>
+                <View style={{flexDirection:'row', justifyContent:'space-between'}}>
+                    <Text style={styles.segmenTitle}>{item.waktu}</Text>
+                    <TouchableOpacity onPress={()=> tandaiSudahDibaca(item.waktu) }>
+                            {item.waktu == "Hari Ini" && hari_ini_belum_dibaca > 0  && (
+                                 <Text style={styles.segmenTitle2}>Tandai Sudah Dibaca ({hari_ini_belum_dibaca})</Text>
+                            )}
+                           
+                            {item.waktu == "Kemarin" && kemarin_belum_dibaca > 0 && (
+                                 <Text style={styles.segmenTitle2}>Tandai Sudah Dibaca ({kemarin_belum_dibaca} )</Text>
+                            )}
+
+                            {item.waktu == "Minggu Ini" && minggu_ini_belum_dibaca > 0 && (
+                                 <Text style={styles.segmenTitle2}>Tandai Sudah Dibaca ({minggu_ini_belum_dibaca} )</Text>
+                            )}
+                    </TouchableOpacity>
+                </View>
+
                 {item.waktu == "Hari Ini" && (
                     <FlatList
                         data={arrNotifikasiHariIni}
@@ -190,7 +262,7 @@ const Notifikasi = ({route, navigation}) => {
                     <FlatList
                         data={arrNotifikasiMingguIni}
                         keyExtractor={(item, index) => index}
-                        renderItem={renderItemNotifikasiHariIni}
+                        renderItem={renderItemNotifikasiMingguIni}
                     />
                 )}
                 
@@ -198,22 +270,76 @@ const Notifikasi = ({route, navigation}) => {
         )
     }
 
-    const renderItemNotifikasiHariIni = () => {
-
+    const renderItemNotifikasiHariIni = ({item, index}) => {
+        let foto_profil = "";
+        if(item.foto_profil == "default.png" ) foto_profil = item.foto_profil;
+        else foto_profil = item.from+"/"+item.foto_profil
+        
+        let bgColor = 'transparent';
+        if(item.status_dibaca == 'Belum Dibaca') bgColor = '#f0f5f5'
+        return(
+            <View style={[styles.notifWrapper,{backgroundColor:bgColor}]}>
+                <TouchableOpacity onPress={() => navigation.navigate("LihatProfil", {currentUser:username, username:item.from, setModalVisible}) } >
+                    <Image style={styles.fotoProfil} source={{uri : base_url+"assets/upload/file user/"+foto_profil}} resizeMethod="resize" resizeMode="cover" />
+                </TouchableOpacity>
+                
+                <Text style={styles.notifMsg} >
+                    <TouchableOpacity onPress={() => navigation.navigate("LihatProfil", {currentUser:username, username:item.from, setModalVisible}) } >
+                        <Text style={styles.usernameLabel}>{item.username_edit}</Text> 
+                    </TouchableOpacity> 
+                    {item.message}
+                </Text>
+            </View>
+        )
     }
 
-    const renderItemNotifikasiKemarin = () => {
+    const renderItemNotifikasiKemarin = ({item,index}) => {
+        let foto_profil = "";
+        if(item.foto_profil == "default.png" ) foto_profil = item.foto_profil;
+        else foto_profil = item.from+"/"+item.foto_profil
 
+        let bgColor = 'transparent';
+        if(item.status_dibaca == 'Belum Dibaca') bgColor = '#f0f5f5'
+        return(
+            <View style={[styles.notifWrapper,{backgroundColor:bgColor}]}>
+                <TouchableOpacity onPress={() => navigation.navigate("LihatProfil", {currentUser:username, username:item.from, setModalVisible}) } >
+                    <Image style={styles.fotoProfil} source={{uri : base_url+"assets/upload/file user/"+foto_profil}} resizeMethod="resize" resizeMode="cover" />
+                </TouchableOpacity>
+                <Text style={styles.notifMsg} >
+                    <TouchableOpacity onPress={() => navigation.navigate("LihatProfil", {currentUser:username, username:item.from, setModalVisible}) } >
+                        <Text style={styles.usernameLabel}>{item.username_edit}</Text>
+                    </TouchableOpacity>
+                {item.message}</Text>
+            </View>
+        )
     }
 
-    const renderItemNotifikasiMingguIni = () => {
+    const renderItemNotifikasiMingguIni = ({item, index}) => {
+        let foto_profil = "";
+        if(item.foto_profil == "default.png" ) foto_profil = item.foto_profil;
+        else foto_profil = item.from+"/"+item.foto_profil
 
+        let bgColor = 'transparent';
+        if(item.status_dibaca == 'Belum Dibaca') bgColor = '#f0f5f5'
+        return(
+            <View style={[styles.notifWrapper,{backgroundColor:bgColor}]}>
+                <TouchableOpacity onPress={() => navigation.navigate("LihatProfil",     {currentUser:username, username:item.from, setModalVisible}) } >
+                    <Image style={styles.fotoProfil} source={{uri : base_url+"assets/upload/file user/"+foto_profil}} resizeMethod="resize" resizeMode="cover" />
+                </TouchableOpacity>    
+                <Text style={styles.notifMsg} >
+                    <TouchableOpacity onPress={() => navigation.navigate("LihatProfil",     {currentUser:username, username:item.from, setModalVisible}) } >
+                        <Text style={styles.usernameLabel}>{item.from}</Text>
+                    </TouchableOpacity> 
+                    {item.message}</Text>
+            </View>
+        )
     }
     
 
     return(
         <View style={{flex:1}}>
-            <SearchBar title={"Notifikasi"} refresh={false} onBack={""} notif_belum_dibaca={parseInt(notif_belum_dibaca)} />
+            <ProsesModal modalVisible={modalVisible} setModalVisible={setModalVisible} />
+            <SearchBar title={"Notifikasi"} refresh={false} onBack={""} notif_belum_dibaca={""} />
             <View style={styles.container}>
                 <ScrollView
                     refreshControl={
@@ -263,6 +389,11 @@ const styles = StyleSheet.create({
     segmenTitle :{
         fontSize:15,
         fontWeight:'600'
+    },
+    segmenTitle2 :{
+        fontSize:13,
+        color:ORANGE,
+        fontWeight:'400'
     },
     notifWrapper :{
         flexDirection:'row',
