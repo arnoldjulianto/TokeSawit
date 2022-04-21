@@ -9,6 +9,7 @@ import iconNextOrange from '../../../assets/icon/next-orange.png';
 import iconLogOut from '../../../assets/icon/logout.png';
 import iconBankCardWhite from '../../../assets/icon/bank-card-white.png';
 import { TabView, TabBar } from 'react-native-tab-view';
+import ProsesModal from '../../../components/ProsesModal';
 
 const NAVY = CONSTANTS.COLOR.NAVY;
 const ORANGE = CONSTANTS.COLOR.ORANGE;
@@ -44,6 +45,10 @@ const Profil =  ({route, navigation}) => {
     const [nama_jalan, setNamaJalan] = useState("");
     const [no_rumah, setNoRumah] = useState("");
     const [foto_profil, setFotoProfil] = useState("");
+    const [total_atasan, setTotalAtasan] = useState("");
+    const [total_karyawan, setTotalKaryawan] = useState("");
+    const [total_followers, setTotalFollowers] = useState("");
+    const [total_following, setTotalFollowing] = useState("");
 
     useEffect(()=>{
         setLoadingVisible(true);
@@ -69,6 +74,7 @@ const Profil =  ({route, navigation}) => {
           else{
             const timeout = setTimeout(() => {
                 setUsername(value);
+                getTotalKoneksi(value);
                 loadDataUser(value);
                 clearTimeout(timeout);
             },0)  
@@ -183,14 +189,6 @@ const Profil =  ({route, navigation}) => {
                 setNamaLengkap(json.nama_lengkap);
                 setNoTelepon(json.no_telepon);
                 setEmail(json.email);
-                // if(json.provinsi != "") setProvinsi(" , "+json.prov_name);
-                // if(json.kota_kabupaten != "") setKotaKabupaten(", "+json.city_name);
-                // if(json.kecamatan != "") setKecamatan(" Kec. "+json.dis_name);
-                // if(json.kelurahan_desa != "") setKelurahanDesa(" Kel./Desa "+json.subdis_name+", ");
-                // if(json.rw != "") setRW(" RW "+json.rw);
-                // if(json.rt != "") setRT(" RT "+json.rt);
-                // if(json.nama_jalan != "") setNamaJalan(json.nama_jalan+" ");
-                // if(json.no_rumah != "") setNoRumah(" No. "+json.no_rumah);
                 if(json.foto_profil == 'default.png') setFotoProfil(json.foto_profil)
                 else setFotoProfil(json.username+'/'+json.foto_profil)
             }
@@ -214,16 +212,51 @@ const Profil =  ({route, navigation}) => {
         });
     }
 
-    if(loadingVisible){
-        return(
-            <View style={styles.centeredView}>
-                <View style={styles.modalView}>
-                    <ActivityIndicator size={70} color="yellow" />
-                </View>  
-            </View>
-        );
-    }
+    const getTotalKoneksi = (username) => {
+        const timeout = setTimeout(() => {
+            setLoadingVisible(false);
+        }, 30000);
 
+        const params = {
+            username
+        }
+        console.log(params);
+        
+        const createFormData = (body) => {
+            const data = new FormData();
+            Object.keys(body).forEach(key => {
+                data.append(key, body[key]);
+            });
+            return data;
+        }
+        const formData = createFormData(params);
+        fetch(base_url+'Following/get_api_total_koneksi',
+        {
+            method: 'post',
+            body: formData,
+            headers: {
+              'Content-Type': 'multipart/form-data; ',
+            },
+        })
+        .then((response) => response.json())
+        .then((json) => {
+            clearTimeout(timeout);
+            if(json.response == 1){
+                setTotalAtasan(json.atasan);
+                setTotalKaryawan(json.karyawan);
+                setTotalFollowers(json.followers);
+                setTotalFollowing(json.following);
+            }  
+            setLoadingVisible(false)
+            console.log(json);
+        })
+        .catch((error) => {
+            clearTimeout(timeout);
+            setLoadingVisible(false);
+            console.log(error);
+        });
+    }
+    
     const loadRekeningBank = () => {
         const params = {
             username
@@ -233,6 +266,7 @@ const Profil =  ({route, navigation}) => {
 
     return (
         <View style={{flex:1}} >
+            <ProsesModal modalVisible={loadingVisible} setModalVisible={setLoadingVisible} />
             <AwesomeAlert
                     show={showAlert}
                     showProgress={false}
@@ -274,23 +308,23 @@ const Profil =  ({route, navigation}) => {
                     <View style={styles.followersArea}>
                         <View style={{flex:1,flexDirection:'row', justifyContent:"space-between",marginTop:10}} >
                             <View style={{flex:1, alignItems:'center'}} >
-                                <Text style={styles.countLabel} >1</Text>
+                                <Text style={styles.countLabel} >{total_atasan}</Text>
                                 <Text style={styles.ketLabel} >Atasan</Text>
                             </View>
                             <View style={{flex:1, alignItems:'center'}} >
-                                <Text style={styles.countLabel} >10</Text>
+                                <Text style={styles.countLabel} >{total_karyawan}</Text>
                                 <Text style={styles.ketLabel} >Karyawan</Text>
                             </View>
                         </View>
 
                         <View style={{flex:1,flexDirection:'row', justifyContent:"space-between",marginTop:10}} >
                             <View style={{flex:1, alignItems:'center'}} >
-                                <Text style={styles.countLabel} >670</Text>
+                                <Text style={styles.countLabel} >{total_following}</Text>
                                 <Text style={styles.ketLabel}>Mengikuti</Text>
                             </View>
 
                             <View style={{flex:1, alignItems:'center'}} >
-                                <Text style={styles.countLabel} >1170</Text>
+                                <Text style={styles.countLabel} >{total_followers}</Text>
                                 <Text style={styles.ketLabel} >Pengikut</Text>
                             </View>
                         </View>

@@ -43,7 +43,7 @@ const SearchAkunModal = (props) => {
 
         const params = {
             searchParam,
-            username:props.currentUser
+            currentUser:props.currentUser
         }
         console.log(params);
         
@@ -387,12 +387,20 @@ const SearchAkunModal = (props) => {
             case 2:
             return (
                 <View style={{flex:1}} >
+                    {arrCariTerbaru.length > 0 && (
+                        <FlatList
+                            data={arrCariTerbaru}
+                            keyExtractor={(item, index) => (item.id) + index}
+                            renderItem={renderItemCariTerbaru}
+                            maxToRenderPerBatch={5} updateCellsBatchingPeriod={20}
+                        />
+                    )}
                 </View>        
             )
 
             case 3:
             return (
-                <View style={{flex:1}}>
+                <View style={{flex:1, paddingTop:20}}>
                     <View style={styles.headerItemArea} >
                         <TouchableOpacity style={styles.headerItem1} onPress={()=> sortHeader(1) } >
                             <Text style={styles.headerLabel1}>PPKS</Text>
@@ -434,7 +442,17 @@ const SearchAkunModal = (props) => {
 
             case 4:
             return (
-                <View style={{flex:1}} >
+                <View style={{flex:1, padding:20}} >
+                    {arrNamaDo.length > 0 && (
+                    <FlatList
+                        data={arrNamaDo}
+                        keyExtractor={(item, index) => (item.id) + index}
+                        renderItem={renderItemNamaDo}
+                        maxToRenderPerBatch={5} 
+                        updateCellsBatchingPeriod={20}
+                        numColumns={4}
+                    />
+                    )}
                 </View>        
             )
 
@@ -456,8 +474,8 @@ const SearchAkunModal = (props) => {
 
     const renderItemCariTerbaru = ({item, index}) => {
         return(
-            <TouchableOpacity style={styles.renderItemTerbaruArea} key={index} >
-                <Text style={{flex:1, justifyContent:'flex-start', marginLeft:10}}>AAA</Text>
+            <TouchableOpacity style={styles.renderItemCariTerbaruArea} key={index} >
+                <Text style={{flex:1, justifyContent:'flex-start', marginLeft:10}}>{item.teks}</Text>
             </TouchableOpacity>
         )
         
@@ -525,6 +543,38 @@ const SearchAkunModal = (props) => {
         )
     }
 
+    const simpanHistory = (value) => {
+        const params = {
+            searchParam:value,
+            username:props.currentUser
+        }
+        console.log(params);
+        
+        const createFormData = (body) => {
+            const data = new FormData();
+            Object.keys(body).forEach(key => {
+                data.append(key, body[key]);
+            });
+            return data;
+        }
+        const formData = createFormData(params);
+        fetch(base_url+'Pencarian/get_api_simpan_history',
+        {
+            method: 'post',
+            body: formData,
+            headers: {
+              'Content-Type': 'multipart/form-data; ',
+            },
+        })
+        .then((response) => response.json())
+        .then((json) => {
+            console.log(json);
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+    }
+
     return(
         <View style={styles.container}>
             <Modal
@@ -540,7 +590,9 @@ const SearchAkunModal = (props) => {
                 <View style={styles.modalView}>
                     <View style={styles.inputWrapper}>
                         <Icon name="search" type="ionicon" size={20} color="gray" style={{position:"absolute", left:10,bottom:10}} />
-                        <TextInput style={styles.textInput} placeholder="Cari Sesuatu Disini . . ." placeholderTextColor= 'gray' value={searchParam} onChangeText = { (value) => {setSearchParam(value)} } autoFocus={true} 
+                        <TextInput style={styles.textInput} placeholder="Cari Sesuatu Disini . . ." placeholderTextColor= 'gray' value={searchParam} onChangeText = { (value) => {setSearchParam(value)} } onEndEditing={(e)=> {
+                            simpanHistory(e.nativeEvent.text);
+                        }} 
                         />
                     </View>
                     <TabView
@@ -603,10 +655,10 @@ const styles = StyleSheet.create({
         flex:1,
         marginHorizontal:35,
     },
-    renderItemTerbaruArea :{
+    renderItemCariTerbaruArea :{
         backgroundColor:'#fcfcfc',
         justifyContent:"space-around",
-        marginTop:10,
+        marginVertical:10,
         borderBottomWidth:0.3,
         paddingVertical:10
     },
@@ -623,10 +675,10 @@ const styles = StyleSheet.create({
         flex:1,
         backgroundColor:'transparent',
         justifyContent:"center",
-        marginTop:10,
+        marginVertical:10,
         borderWidth:0.3,
         alignItems:'center',
-        height:30,
+        height:40,
         marginHorizontal:10
     },
     renderItemUserArea :{
@@ -768,7 +820,7 @@ const styles = StyleSheet.create({
     },
     namaDoSoloLabel :{
         color:ORANGE,
-        fontSize:13,
+        fontSize:11,
         backgroundColor:"transparent",
         textAlign: "center",
         justifyContent:'center'

@@ -4,6 +4,8 @@ import { ActivityIndicator, ScrollView, StyleSheet, Text, TextInput, TouchableOp
 import CONSTANTS from '../../assets/constants';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import iconIndo from '../../assets/icon/indonesia.png';
+import ProsesModal from '../../components/ProsesModal';
+
 const DANGER = CONSTANTS.COLOR.DANGER;
 const NAVY = CONSTANTS.COLOR.NAVY;
 const ORANGE = CONSTANTS.COLOR.ORANGE;
@@ -32,69 +34,18 @@ const SmsVerification = ({route, navigation}) => {
     let task;
 
     const cekNoTelepon = () => {
-        setLoadingVisible(true);
-        setCancelButtonAlert(true);
-        setConfirmButtonAlert(false);
-
-        const timeout = setTimeout(() => {
-            setAlert(true);
-            setLoadingVisible(false);
+        if(no_telepon != "") {
+            setLoadingVisible(true);
             setCancelButtonAlert(true);
             setConfirmButtonAlert(false);
-            setCancelTextAlert("Tutup");
-            setAlertMessage("Permintaan Tidak Dapat Dipenuhi, Server Tidak Merespon");
-            if(parent == "AddRekeningBank") {
-                task = () => loadAddRekeningBank();
-                setAlertCancelTask(task);
-            }
-            else if(parent == "Login"){
-                task = () => loadLogin();
-                setAlertCancelTask(task);
-            }
-            else if(parent == "Register"){
-                task = () => loadRegister();
-                setAlertCancelTask(task);
-            }
-        }, 30000);
 
-        const params = {
-            no_telepon : "+62"+no_telepon
-        }
-        
-        const createFormData = (body) => {
-            const data = new FormData();
-            Object.keys(body).forEach(key => {
-                data.append(key, body[key]);
-            });
-            return data;
-        }
-        const formData = createFormData(params);
-        fetch(base_url+'User/get_api_cek_no_telepon',
-        {
-            method: 'post',
-            body: formData,
-            headers: {
-              'Content-Type': 'multipart/form-data; ',
-            },
-        })
-        .then((response) => response.json())
-        .then((json) => {
-            clearTimeout(timeout);
-            setAlert(true);
-            setLoadingVisible(false);
-            setAlertMessage(json.msg);
-            if(json.response == 1){
-                setConfirmButtonAlert(true);
-                setCancelButtonAlert(true);
-                task = () => loadSmsVerification();
-                setAlertConfirmTask(task);
-                setConfirmTextAlert("Kirim OTP");
-                setCancelTextAlert("Batal");
-            }
-            else{
+            const timeout = setTimeout(() => {
+                setAlert(true);
+                setLoadingVisible(false);
                 setCancelButtonAlert(true);
                 setConfirmButtonAlert(false);
-                setCancelTextAlert("Lanjutkan");
+                setCancelTextAlert("Tutup");
+                setAlertMessage("Permintaan Tidak Dapat Dipenuhi, Server Tidak Merespon");
                 if(parent == "AddRekeningBank") {
                     task = () => loadAddRekeningBank();
                     setAlertCancelTask(task);
@@ -107,31 +58,84 @@ const SmsVerification = ({route, navigation}) => {
                     task = () => loadRegister();
                     setAlertCancelTask(task);
                 }
+            }, 30000);
+
+            const params = {
+                no_telepon : "+62"+no_telepon
             }
-            console.log(json);
-        })
-        .catch((error) => {
-            clearTimeout(timeout);
-            setAlert(true);
-            setAlertMessage("Terjadi Kesalahan. \n"+error);
-            setCancelTextAlert("Tutup");
-            setConfirmButtonAlert(false);
-            setCancelButtonAlert(true);
-            setLoadingVisible(false);
-            console.log(error);
-            if(parent == "AddRekeningBank") {
-                task = () => loadAddRekeningBank();
-                setAlertCancelTask(task);
+            
+            const createFormData = (body) => {
+                const data = new FormData();
+                Object.keys(body).forEach(key => {
+                    data.append(key, body[key]);
+                });
+                return data;
             }
-            else if(parent == "Login"){
-                task = () => loadLogin();
-                setAlertCancelTask(task);
-            }
-            else if(parent == "Register"){
-                task = () => loadRegister();
-                setAlertCancelTask(task);
-            }
-        });
+            const formData = createFormData(params);
+            fetch(base_url+'User/get_api_cek_no_telepon',
+            {
+                method: 'post',
+                body: formData,
+                headers: {
+                'Content-Type': 'multipart/form-data; ',
+                },
+            })
+            .then((response) => response.json())
+            .then((json) => {
+                clearTimeout(timeout);
+                setAlert(true);
+                setLoadingVisible(false);
+                setAlertMessage(json.msg);
+                if(json.response == 1){
+                    setConfirmButtonAlert(true);
+                    setCancelButtonAlert(true);
+                    task = () => loadSmsVerification();
+                    setAlertConfirmTask(task);
+                    setConfirmTextAlert("Kirim OTP");
+                    setCancelTextAlert("Batal");
+                }
+                else{
+                    setCancelButtonAlert(true);
+                    setConfirmButtonAlert(false);
+                    setCancelTextAlert("Tutup");
+                    if(parent == "AddRekeningBank") {
+                        task = () => loadAddRekeningBank();
+                        setAlertCancelTask(task);
+                    }
+                    else if(parent == "Login"){
+                        task = () => loadLogin();
+                        setAlertCancelTask(task);
+                    }
+                    else if(parent == "Register"){
+                        task = () => loadRegister();
+                        setAlertCancelTask(task);
+                    }
+                }
+                console.log(parent);
+            })
+            .catch((error) => {
+                clearTimeout(timeout);
+                setAlert(true);
+                setAlertMessage("Terjadi Kesalahan. \n"+error);
+                setCancelTextAlert("Tutup");
+                setConfirmButtonAlert(false);
+                setCancelButtonAlert(true);
+                setLoadingVisible(false);
+                console.log(error);
+                if(parent == "AddRekeningBank") {
+                    task = () => loadAddRekeningBank();
+                    setAlertCancelTask(task);
+                }
+                else if(parent == "Login"){
+                    task = () => loadLogin();
+                    setAlertCancelTask(task);
+                }
+                else if(parent == "Register"){
+                    task = () => loadRegister();
+                    setAlertCancelTask(task);
+                }
+            });
+        }
     } 
 
     const loadSmsVerification = () => () => {
@@ -156,8 +160,8 @@ const SmsVerification = ({route, navigation}) => {
     }
 
     const loadLogin = () => () => {
-        setAlert(false);
         navigation.navigate('Login');
+        setAlert(false);
     }
 
     const loadAddRekeningBank = () => () => {
@@ -173,18 +177,9 @@ const SmsVerification = ({route, navigation}) => {
         setNoTelepon(value)
     }
 
-    if(loadingVisible){
-        return(
-            <View style={styles.centeredView}>
-                <View style={styles.modalView}>
-                    <ActivityIndicator size={70} color="yellow" />
-                </View>  
-            </View>
-        );
-    }
-
     return (
         <View style={styles.container}>
+            <ProsesModal modalVisible={loadingVisible} setModalVisible={setLoadingVisible} />
             <AwesomeAlert
                 show={showAlert}
                 showProgress={false}
@@ -198,9 +193,7 @@ const SmsVerification = ({route, navigation}) => {
                 confirmText={confirmTextAlert}
                 confirmButtonColor={NAVY}
                 cancelButtonColor={ORANGE}
-                onCancelPressed={() => {
-                    setAlert(false)
-                }}
+                onCancelPressed={alertCancelTask}
                 onConfirmPressed={alertConfirmTask}
             />
             

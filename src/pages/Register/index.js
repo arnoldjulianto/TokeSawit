@@ -8,6 +8,8 @@ const DANGER = CONSTANTS.COLOR.DANGER;
 const NAVY = CONSTANTS.COLOR.NAVY;
 const ORANGE = CONSTANTS.COLOR.ORANGE;
 import Icon from 'react-native-vector-icons/FontAwesome5';
+import ProsesModal from '../../components/ProsesModal';
+
 const alert_title = CONSTANTS.MSG.ALERT_TITLE;
 const base_url = CONSTANTS.CONFIG.BASE_URL;
 
@@ -196,20 +198,9 @@ const Register = ({navigation}) => {
         
     }
 
-    if(loadingVisible){
-        return(
-            <View style={styles.centeredView}>
-                <View style={styles.modalView}>
-                    <ActivityIndicator size={70} color="yellow" />
-                </View>  
-            </View>
-        );
-    }
-
-    
-
     return (
         <View style={styles.container}>
+            <ProsesModal modalVisible={loadingVisible} setModalVisible={setLoadingVisible} />
             <AwesomeAlert
                 show={showAlert}
                 showProgress={false}

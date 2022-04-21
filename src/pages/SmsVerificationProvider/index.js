@@ -6,6 +6,7 @@ import CONSTANTS from '../../assets/constants';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import AsyncStorage from '@react-native-community/async-storage';
 import { AuthContext } from '../../components/Context';
+import SmsAndroid from 'react-native-get-sms-android';
 
 const DANGER = CONSTANTS.COLOR.DANGER;
 const NAVY = CONSTANTS.COLOR.NAVY;
@@ -38,13 +39,49 @@ const SmsVerification = ({route, navigation}) => {
     const [countDown, setCountDown] = useState();
     const [countDownStart, setCountDownStart] = useState(false);
     const [username, setUsername] = useState(usernameRoute);
+    const [processConfirm, setProcessConfirm] = useState(usernameRoute);
     const { signIn } = React.useContext(AuthContext);
+    
+    const cekSMS = () => {
+        var minDate = new Date("01/01/2022 00:00:00").getTime();
+        var maxDate = Date.now();
+        var filter = {
+            box: 'inbox',
+            minDate, // timestamp (in milliseconds since UNIX epoch)
+            maxDate, // timestamp (in milliseconds since UNIX epoch)
+            bodyRegex: '(.*)'+kodeOTP+'(.*)', // content regex to match
+            read: 0, // 0 for unread SMS, 1 for SMS already read
+            address: '+19124613391', // sender's phone number
+            body: kodeOTP, // content to match
+            indexFrom: 0, // start from index 0
+            maxCount: 10, // count of SMS to return each time
+        };
+        SmsAndroid.list(
+            JSON.stringify(filter),
+            (fail) => {
+                console.log('Failed with this error: ' + fail);
+            },
+            (count, smsList) => {
+                if(count == 1) {
+                    setProcessConfirm(true);
+                    setConfirmOTP(kodeOTP);
+                }
+            },
+        );
+    }
+
     let task;
 
     useEffect(() => {
         sendOTP(no_telepon);
         getDeviceToken();
     }, []);
+
+    useEffect(() => {
+        if(processConfirm){
+            confirmCode()
+        }
+    },[confirmOTP])
 
     useEffect (() => {
         countDownTimer();
@@ -70,7 +107,7 @@ const SmsVerification = ({route, navigation}) => {
     
     const countDownTimer = () => {
         if(countDownStart){
-            var countDownDate = new Date().getTime()+ 1000 * 60;
+            var countDownDate = new Date().getTime()+ 1500 * 60;
             // Update the count down every 1 second
             var x = setInterval(function() {
 
@@ -101,6 +138,7 @@ const SmsVerification = ({route, navigation}) => {
                     setKodeOTP(Math.floor(Math.random() * (1000000 - 1 + 1) ) + 1);
                     setCountDownStart(false);
                 }
+                cekSMS();
             }, 1000);
         }
     }
@@ -414,7 +452,7 @@ const SmsVerification = ({route, navigation}) => {
                 </View>
                 {
                     countDownStart && ( 
-                        <TouchableOpacity style={styles.btnLanjutkan} onPress={()=> {confirmCode()} } > 
+                        <TouchableOpacity style={styles.btnLanjutkan} onPress={()=> {setProcessConfirm(true)} } > 
                             <Text style={styles.btnLanjutkanLabel}>Lanjutkan</Text>
                         </TouchableOpacity>
                     )

@@ -60,17 +60,11 @@ const Beranda = (props) => {
     };
 
     const loadDataUser = (username) => {
-        //setLoadingVisible(true);
         setCancelButtonAlert(true);
         setConfirmButtonAlert(false);
 
         const timeout = setTimeout(() => {
-            setAlert(true);
             setLoadingVisible(false);
-            setCancelButtonAlert(true);
-            setConfirmButtonAlert(false);
-            setCancelTextAlert("Tutup");
-            setAlertMessage("Permintaan Tidak Dapat Dipenuhi, Server Tidak Merespon");
         }, 30000);
         const params = {
             username
@@ -102,23 +96,11 @@ const Beranda = (props) => {
                 setUsername(json.username);
                 const pecah_nama = json.nama_lengkap.split(" ")
                 setNamaLengkap(pecah_nama[0]+" "+pecah_nama[1]);
-            }
-            else{
-                setAlert(true);
-                setCancelButtonAlert(true);
-                setConfirmButtonAlert(false);
-                setCancelTextAlert("Tutup");
-            }        
+            }      
             console.log(json);
         })
         .catch((error) => {
             clearTimeout(timeout);
-            setAlert(true);
-            setAlertMessage("Terjadi Kesalahan. \n"+error);
-            setCancelTextAlert("Tutup");
-            setConfirmButtonAlert(false);
-            setCancelButtonAlert(true);
-            setLoadingVisible(false);
             console.log(error);
         });
     }
@@ -141,9 +123,9 @@ const Beranda = (props) => {
     const konfirmasiBantuRekapDo = () => {
         
     }
-
     const loadPemilikDo = () => ()=> {
-        props.navigation.navigate("JadiPemilikDo", {username} );
+        if(username == "")  props.navigation.navigate("Login");
+        else props.navigation.navigate("JadiPemilikDo", {username} );
         setAlert(false);
     }
 
@@ -182,7 +164,7 @@ const Beranda = (props) => {
                     <TouchableOpacity onPress={()=>setModalVisible(true)}>
                         <View style={styles.inputWrapper}>
                             <Icon name="search" type="ionicon" size={20} color="gray" style={{position:"absolute", left:10,bottom:10}} />
-                            <Text style={styles.textInput}>Ikuti PPKS, Pemilik Do, atau Agen</Text>
+                            <Text style={styles.textInput}>Cari Sesuatu Disini . . .</Text>
                         </View>
                     </TouchableOpacity>
                 </View>
@@ -190,7 +172,9 @@ const Beranda = (props) => {
                 <MenuHomeAtom username={username} klaimDo={true} beliDo={true} rekapDoSaya={true} buatInvoice={true} bayarInvoice={true} kasihDeposit={true} daftarHutang={true} menuTop={-95}  navigation={props.navigation} />
 
                 <View style={styles.segmenArea}>
-                    <Text style={styles.segmenTitle}>Hi {nama_lengkap}, Tentukan posisi Anda</Text>
+                    {nama_lengkap != "" &&(
+                        <Text style={styles.segmenTitle}>Hi {nama_lengkap}, Tentukan posisi Anda</Text>
+                    )}
                     {/* <ScrollView horizontal={true}> */}
                         <View style={styles.segmenWrapper}>
                                 <TouchableOpacity style={styles.btnPemilikDo} onPress={()=> konfirmasiPemilikDo()} >
@@ -210,7 +194,6 @@ const Beranda = (props) => {
                         <Text >Pindah ke Home Tab Profil</Text>
                     </TouchableOpacity> */}
                 </View>
-                
             </ScrollView>
         </View>
     )

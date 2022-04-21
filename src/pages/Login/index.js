@@ -8,6 +8,7 @@ import AwesomeAlert from 'react-native-awesome-alerts';
 import AsyncStorage from '@react-native-community/async-storage';
 import { useRoute } from '@react-navigation/native';
 
+import ProsesModal from '../../components/ProsesModal';
 const NAVY = CONSTANTS.COLOR.NAVY;
 const ORANGE = CONSTANTS.COLOR.ORANGE;
 const alert_title = CONSTANTS.MSG.ALERT_TITLE;

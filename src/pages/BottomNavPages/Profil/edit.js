@@ -10,6 +10,7 @@ import iconEdit from '../../../assets/icon/edit-white.png';
 import SearchBar from '../../../components/SearchBar/search_bar_edit_profil';
 import MultipleImagePicker from '@baronha/react-native-multiple-image-picker';
 import AwesomeAlert from 'react-native-awesome-alerts';
+import ProsesModal from '../../../components/ProsesModal';
 
 const NAVY = CONSTANTS.COLOR.NAVY;
 const ORANGE = CONSTANTS.COLOR.ORANGE;
@@ -67,7 +68,6 @@ const EditProfil =  ({route, navigation}) => {
 
     useEffect(()=>{
         const unsubscribe = navigation.addListener('focus', () => {
-            setLoadingVisible(true);
             getUser();  
         });
         return unsubscribe;
@@ -138,7 +138,7 @@ const EditProfil =  ({route, navigation}) => {
         .then((response) => response.json())
         .then((json) => {
             clearTimeout(timeout);
-            setLoadingVisible(false);
+            //setLoadingVisible(false);
             setAlertMessage(json.msg);
             if(json.response == 1){
                 setTimeout(()=>{
@@ -583,7 +583,7 @@ const EditProfil =  ({route, navigation}) => {
         .then((response) => response.json())
         .then((json) => {
             clearTimeout(timeout);
-            setLoadingVisible(false);
+            //setLoadingVisible(false);
             setAlertMessage(json.msg);
             if(json.response == 1){
                 setAlert(false);
@@ -620,16 +620,6 @@ const EditProfil =  ({route, navigation}) => {
             value = "";
         }
         setNoTeleponEdit(value.replace("+62",""))
-    }
-
-    if(loadingVisible){
-        return(
-            <View style={styles.centeredView}>
-                <View style={styles.modalView}>
-                    <ActivityIndicator size={70} color="yellow" />
-                </View>  
-            </View>
-        );
     }
 
     const launchImageLibrary = async () => {
@@ -724,6 +714,7 @@ const EditProfil =  ({route, navigation}) => {
 
     return (
         <View style={{flex:1}}>
+            <ProsesModal modalVisible={loadingVisible} setModalVisible={setLoadingVisible} />
             <AwesomeAlert
                     show={showAlert}
                     showProgress={false}
