@@ -20,14 +20,6 @@ class App extends Component {
     );
   }
 
-  // componentDidMount(){
-  //   const unsubscribe = messaging().setBackgroundMessageHandler(async (remoteMessage) => {
-  //     console.log('Your message was handled in background');
-  //   });
-  //   return unsubscribe;
-  // }
-
-
   onRegister(token) {
     this.setState({registerToken: token.token, fcmRegistered: true});
     AsyncStorage.setItem("deviceToken", token.token);

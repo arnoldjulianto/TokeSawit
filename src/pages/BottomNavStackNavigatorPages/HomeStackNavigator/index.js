@@ -2,7 +2,7 @@
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Alert, View, ActivityIndicator, Platform } from 'react-native';
+import { StyleSheet, Alert, View, ActivityIndicator, Platform, PermissionsAndroid} from 'react-native';
 import BottomNavigation from '../../../components/BottomNavigation';
 // import { Splash } from '../../../pages';
 import { Login, Register,InputNoHp, SmsVerificationProvider, SmsVerificationAndroid, FotoKlaimDo, PreviewFotoKlaimDo, TentukanAgen, DetailJualDo, RekeningBank, PilihRekeningBank, AddRekeningBank, InputPin, BuatPinBaru, EditProfil, JadiPemilikDo, AddDoSaya, InputDoPPKS, BiayaBongkar, InputHargaDoPPKS, PreviewPemilikDo, LihatProfil } from '../';
@@ -41,6 +41,11 @@ const HomeStackNavigator = () => {
     const [alertConfirmTask, setAlertConfirmTask] = useState(() => closeAlert() );
     const [initialRoute, setInitialRoute] = useState("Home");
 
+    const initialLoginState ={
+        isLoading : true,
+        userName : null,
+        userToken : null
+    };
     
     useEffect(() => {
         messaging()
@@ -70,11 +75,38 @@ const HomeStackNavigator = () => {
         });
     },[]);
 
-    const initialLoginState ={
-        isLoading : true,
-        userName : null,
-        userToken : null
+    useEffect(()=>{
+        requestPermission();
+    },[])
+
+    const requestPermission = async () => {
+        if (Platform.OS === 'android') {
+            try {
+                const granted = await PermissionsAndroid.requestMultiple([
+                    PermissionsAndroid.PERMISSIONS.CAMERA,
+                    PermissionsAndroid.PERMISSIONS.READ_SMS,
+                    PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+                    PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+                ],
+                    {
+                        title: "TokeSawit Izin Akses",
+                        message:
+                        "TokeSawit Meminta Untuk Mengakses Kamera ",
+                        buttonNegative: "Cancel",
+                        buttonPositive: "OK"
+                    }
+                );
+                if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                    console.log("You can use the camera");
+                } else {
+                    console.log("Camera permission denied");
+                }
+            } catch (err) {
+                console.warn(err);
+            }
+        }
     };
+
 
     const loginReducer = (prevState, action) => {
         switch ( action.type ) {

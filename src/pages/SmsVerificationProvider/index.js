@@ -51,7 +51,7 @@ const SmsVerification = ({route, navigation}) => {
             maxDate, // timestamp (in milliseconds since UNIX epoch)
             bodyRegex: '(.*)'+kodeOTP+'(.*)', // content regex to match
             read: 0, // 0 for unread SMS, 1 for SMS already read
-            address: '+19124613391', // sender's phone number
+            //address: '+19124613391', // sender's phone number
             body: kodeOTP, // content to match
             indexFrom: 0, // start from index 0
             maxCount: 10, // count of SMS to return each time
@@ -172,7 +172,7 @@ const SmsVerification = ({route, navigation}) => {
             return data;
         }
         const formData = createFormData(params);
-        fetch(base_url+'User/get_api_send_sms_otp_twilio',
+        fetch(base_url+'User/get_api_send_sms_otp_nusasms',
         {
             method: 'post',
             body: formData,
