@@ -12,6 +12,6 @@ module.exports = {
     MSG :{
       ALERT_TITLE : "Pesan Dari TokeSawit",
     },
-    //CONFIG :{ BASE_URL : 'http://192.168.188.30/TokeSawitAPI/' },
-    CONFIG :{ BASE_URL : 'https://tokesawitapi.sbskarim.com/' },
+    CONFIG :{ BASE_URL : 'http://192.168.188.30/TokeSawitAPI/' },
+    //CONFIG :{ BASE_URL : 'https://tokesawitapi.sbskarim.com/' },
 };

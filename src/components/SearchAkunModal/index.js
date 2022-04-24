@@ -25,17 +25,20 @@ const SearchAkunModal = (props) => {
     useEffect(()=>{
         if(searchParam != ""){
             console.log(searchParam)
-            loadAllData()
+            setArrCariTerbaru([]);
+            setArrProduk([]);
+            setArrNamaDo([]);
+            setArrUser([]);
+            const delayDebounceFn = setTimeout(() => {
+                loadAllData()
+            }, 1000)
+            return () => clearTimeout(delayDebounceFn)
         }
     },[searchParam])
 
 
     const loadAllData = () => {
         setLoadingVisible(true);
-        setArrCariTerbaru([]);
-        setArrProduk([]);
-        setArrNamaDo([]);
-        setArrUser([]);
 
         const timeout = setTimeout(() => {
             setLoadingVisible(false);
@@ -320,28 +323,28 @@ const SearchAkunModal = (props) => {
                                 <TouchableOpacity style={styles.headerItem1} onPress={()=> sortHeader(1) } >
                                     <Text style={styles.headerLabel1}>PPKS</Text>
                                     {header1focus && (
-                                        <Icon name={iconSort} type="ionicon" size={20} color="black"  />
+                                        <Icon name={iconSort} type="ionicon" size={20} color="white"  />
                                     )}
                                 </TouchableOpacity>
 
                                 <TouchableOpacity style={styles.headerItem2} onPress={()=> sortHeader(2) } >
                                     <Text style={styles.headerLabel2}>Nama Do</Text>
                                     {header2focus && (
-                                        <Icon name={iconSort}  type="ionicon" size={20} color="black"  />
+                                        <Icon name={iconSort}  type="ionicon" size={20} color="white"  />
                                     )}
                                 </TouchableOpacity>
 
                                 <TouchableOpacity style={styles.headerItem3} onPress={()=> sortHeader(3) } >
                                     <Text style={styles.headerLabel3}>Harga </Text>
                                     {header3focus && (
-                                        <Icon name={iconSort}  type="ionicon" size={20} color="black"  />
+                                        <Icon name={iconSort}  type="ionicon" size={20} color="white"  />
                                     )}
                                 </TouchableOpacity>   
 
-                                <TouchableOpacity style={styles.headerItem4} onPress={()=> sortHeader(3) } >
+                                <TouchableOpacity style={styles.headerItem4} onPress={()=> {} } >
                                     <Text style={styles.headerLabel3}>Pemilik Do </Text>
                                     {header4focus && (
-                                        <Icon name={iconSort}  type="ionicon" size={20} color="black"  />
+                                        <Icon name={iconSort}  type="ionicon" size={20} color="white"  />
                                     )}
                                 </TouchableOpacity>  
                             </View>
@@ -405,28 +408,28 @@ const SearchAkunModal = (props) => {
                         <TouchableOpacity style={styles.headerItem1} onPress={()=> sortHeader(1) } >
                             <Text style={styles.headerLabel1}>PPKS</Text>
                             {header1focus && (
-                                <Icon name={iconSort} type="ionicon" size={20} color="black"  />
+                                <Icon name={iconSort} type="ionicon" size={20} color="white"  />
                             )}
                         </TouchableOpacity>
 
                         <TouchableOpacity style={styles.headerItem2} onPress={()=> sortHeader(2) } >
                             <Text style={styles.headerLabel2}>Nama Do</Text>
                             {header2focus && (
-                                <Icon name={iconSort}  type="ionicon" size={20} color="black"  />
+                                <Icon name={iconSort}  type="ionicon" size={20} color="white"  />
                             )}
                         </TouchableOpacity>
 
                         <TouchableOpacity style={styles.headerItem3} onPress={()=> sortHeader(3) } >
                             <Text style={styles.headerLabel3}>Harga </Text>
                             {header3focus && (
-                                <Icon name={iconSort}  type="ionicon" size={20} color="black"  />
+                                <Icon name={iconSort}  type="ionicon" size={20} color="white"  />
                             )}
                         </TouchableOpacity>   
 
-                        <TouchableOpacity style={styles.headerItem4} onPress={()=> sortHeader(3) } >
+                        <TouchableOpacity style={styles.headerItem4} onPress={()=> {}} >
                             <Text style={styles.headerLabel3}>Pemilik Do </Text>
                             {header4focus && (
-                                <Icon name={iconSort}  type="ionicon" size={20} color="black"  />
+                                <Icon name={iconSort}  type="ionicon" size={20} color="white"  />
                             )}
                         </TouchableOpacity>  
                     </View>
@@ -474,7 +477,7 @@ const SearchAkunModal = (props) => {
 
     const renderItemCariTerbaru = ({item, index}) => {
         return(
-            <TouchableOpacity style={styles.renderItemCariTerbaruArea} key={index} >
+            <TouchableOpacity style={styles.renderItemCariTerbaruArea} key={index} onPress={() => setSearchParam(item.teks) } >
                 <Text style={{flex:1, justifyContent:'flex-start', marginLeft:10}}>{item.teks}</Text>
             </TouchableOpacity>
         )
@@ -667,6 +670,7 @@ const styles = StyleSheet.create({
         backgroundColor:'#fcfcfc',
         justifyContent:"space-between",
         marginTop:10,
+        marginBottom:5,
         borderBottomWidth:0.3,
         paddingVertical:5,
         alignItems:'center',
@@ -737,7 +741,9 @@ const styles = StyleSheet.create({
     headerItemArea:{
         flexDirection:'row',
         justifyContent:'space-around',
-        backgroundColor:'lightgrey',
+        backgroundColor:ORANGE,
+        borderTopLeftRadius:5,
+        borderTopRightRadius:5
     },
     headerItem1 : {
         flex:0.8,
@@ -773,7 +779,7 @@ const styles = StyleSheet.create({
     },  
     headerLabel1 :{
         flex:0.8,
-        color:'black',
+        color:'white',
         fontSize:12,
         fontWeight:'600',
         textAlign: "center",
@@ -781,7 +787,7 @@ const styles = StyleSheet.create({
     },
     headerLabel2 :{
         flex:0.8,
-        color:'black',
+        color:'white',
         fontSize:12,
         fontWeight:'600',
         textAlign: "center",
@@ -789,7 +795,7 @@ const styles = StyleSheet.create({
     },
     headerLabel3 :{
         flex:0.6,
-        color:'black',
+        color:'white',
         fontSize:12,
         fontWeight:'600',
         textAlign: "center",
@@ -797,7 +803,7 @@ const styles = StyleSheet.create({
     },
     headerLabel4 :{
         flex:1,
-        color:'black',
+        color:'white',
         fontSize:12,
         fontWeight:'600',
         textAlign: "center",

@@ -662,6 +662,7 @@ const EditProfil =  ({route, navigation}) => {
             foto_lama:foto_profilEdit,
         }
         console.log("Edit params : ");
+        console.log(params);
         
         const createFormData = (body) => {
             const data = new FormData();
@@ -676,7 +677,6 @@ const EditProfil =  ({route, navigation}) => {
             return data;
         }
         const formData = createFormData(params);
-        console.log(value[0]);
         fetch(base_url+'User/get_api_upload_foto_profil',
         {
             method: 'post',

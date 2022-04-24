@@ -95,7 +95,7 @@ const Beranda = (props) => {
             if(json.response == 1){
                 setUsername(json.username);
                 const pecah_nama = json.nama_lengkap.split(" ")
-                setNamaLengkap(pecah_nama[0]+" "+pecah_nama[1]);
+                setNamaLengkap("Hi, "+pecah_nama[0]+" "+pecah_nama[1]+ " Tentukan posisi Anda");
             }      
             console.log(json);
         })
@@ -172,9 +172,9 @@ const Beranda = (props) => {
                 <MenuHomeAtom username={username} klaimDo={true} beliDo={true} rekapDoSaya={true} buatInvoice={true} bayarInvoice={true} kasihDeposit={true} daftarHutang={true} menuTop={-95}  navigation={props.navigation} />
 
                 <View style={styles.segmenArea}>
-                    {nama_lengkap != "" &&(
-                        <Text style={styles.segmenTitle}>Hi {nama_lengkap}, Tentukan posisi Anda</Text>
-                    )}
+                    <Text style={styles.segmenTitle}>
+                        {nama_lengkap}
+                    </Text>
                     {/* <ScrollView horizontal={true}> */}
                         <View style={styles.segmenWrapper}>
                                 <TouchableOpacity style={styles.btnPemilikDo} onPress={()=> konfirmasiPemilikDo()} >
@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
     },
     segmenWrapper :{
         flexDirection : "row",
-        justifyContent : "space-around",
+        justifyContent : "space-between",
     },
     btnAgen :{
         width:80,

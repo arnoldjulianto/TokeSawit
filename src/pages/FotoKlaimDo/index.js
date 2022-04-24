@@ -3,7 +3,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, Image, FlatList, TouchableOpacity, Dimensions, ScrollView} from 'react-native';
 import CONSTANTS from '../../assets/constants';
 import iconNext from '../../assets/icon/next.png';
-import iconAdd from '../../assets/icon/add.png';
+import iconAddWhite from '../../assets/icon/add-white.png';
+import iconImageWhite from '../../assets/icon/image-white.png';
 import iconTrash from '../../assets/icon/trash.png';
 import SearchBar from '../../components/SearchBar/search_bar_klaim_do';
 import MultipleImagePicker from '@baronha/react-native-multiple-image-picker';
@@ -30,6 +31,7 @@ const FotoKlaimDo =({route, navigation})=> {
     const [cancelTextAlert, setCancelTextAlert] = useState("");
     const [alertConfirmTask, setAlertConfirmTask] = useState(() => closeAlert() );
     const [alertCancelTask, setAlertCancelTask] = useState(() => closeAlert() );
+    
     useEffect (() => {
         arrFileKlaimDo.forEach((data) => {
             console.log(data.fileName);
@@ -165,8 +167,8 @@ const FotoKlaimDo =({route, navigation})=> {
                 }}
             />
             
-            <SearchBar navigation={navigation}  title={"Foto Klaim Do"} />
-                <ScrollView style={{marginBottom:150}}>
+            <SearchBar navigation={navigation}  title={"Foto Bukti Timbang"} />
+                <ScrollView style={{marginBottom:0}}>
                     <View style={styles.tampungFotoWrapper}>
                         <FlatList
                             data={arrFileKlaimDo}
@@ -176,23 +178,16 @@ const FotoKlaimDo =({route, navigation})=> {
                         />
                     </View>
                 </ScrollView>
+                
+                <View style={{justifyContent: 'flex-end',flexDirection:'row'}}>
+                    <TouchableOpacity style={styles.btnAddFoto} onPress={()=> {addFoto()} }>
+                            <Text style={styles.btnAddFotoLabel}>TAMBAH FOTO</Text>
+                            <Image source={iconImageWhite} style={styles.btnLanjutkanIcon}  />
+                    </TouchableOpacity>
 
-                <TouchableOpacity
-                    activeOpacity={0.7}
-                    onPress={()=> addFoto() }
-                    style={styles.FloatingActionButtonStyle}>
-                        <Image
-                        source={iconAdd}   
-                        style={styles.FloatingActionButtonImageStyle}
-                        />
-                </TouchableOpacity>
-
-                <View style={{flex:1,justifyContent: 'flex-end',paddingHorizontal:12}}>
                     <TouchableOpacity style={styles.btnLanjutkan} onPress={()=> {submitHandler()} }>
-                        <View style={{flexDirection:"row",justifyContent:'center'}}>
-                            <Text style={styles.btnLanjutkanLabel}>LANJUTKAN</Text>
+                            <Text style={styles.btnLanjutkanLabel}>LANJUTKAN {"\n"} ( {arrFileKlaimDo.length} ) File  </Text>
                             <Image source={iconNext} style={styles.btnLanjutkanIcon}  />
-                        </View>
                     </TouchableOpacity>
                 </View>
         </View>
@@ -217,23 +212,49 @@ const styles = StyleSheet.create({
         padding:20
     },
     btnLanjutkan: {
-        backgroundColor:NAVY,
+        flex:1,
+        flexDirection:'row',
+        backgroundColor:ORANGE,
         alignItems:"center",
-        height:40,
-        width:Dimensions.get('window').width,
-        borderRadius:10,
+        height:45,
+        width:Dimensions.get('window').width / 2,
+        borderRadius:5,
         justifyContent:"center",
         bottom: 10,
-        position: 'absolute',
+        marginHorizontal:5,
+        paddingHorizontal:10,
     },
     btnLanjutkanIcon : {
         width:23,
         height:23,
         marginHorizontal:6,
-        marginTop:1
+        marginTop:1,
     },
     btnLanjutkanLabel : {
-        fontSize:15,
+        fontSize:13,
+        color:'white'
+    },
+    btnAddFoto: {
+        flex:1,
+        flexDirection:'row',
+        backgroundColor:'teal',
+        alignItems:"center",
+        height:45,
+        width:Dimensions.get('window').width / 2,
+        borderRadius:5,
+        justifyContent:"center",
+        bottom: 10,
+        marginHorizontal:5,
+        paddingHorizontal:10
+    },
+    btnAddFotoIcon : {
+        width:23,
+        height:23,
+        marginHorizontal:6,
+        marginTop:1
+    },
+    btnAddFotoLabel : {
+        fontSize:13,
         color:'white'
     },
     btnHapusFoto : {

@@ -366,23 +366,23 @@ const JadiPemilikDo = ({route, navigation}) => {
                         <TouchableOpacity style={styles.headerItem1} onPress={()=> sortHeader(1) } >
                             <Text style={styles.headerLabel1}>PPKS</Text>
                             {header1focus && (
-                                <Icon name={iconSort} type="ionicon" size={20} color="black"  />
+                                <Icon name={iconSort} type="ionicon" size={20} color="white"  />
                             )}
                         </TouchableOpacity>
 
                         <TouchableOpacity style={styles.headerItem2} onPress={()=> sortHeader(2) } >
                             <Text style={styles.headerLabel2}>Nama Do</Text>
                             {header2focus && (
-                                <Icon name={iconSort}  type="ionicon" size={20} color="black"  />
+                                <Icon name={iconSort}  type="ionicon" size={20} color="white"  />
                             )}
                         </TouchableOpacity>
 
                         <TouchableOpacity style={styles.headerItem3} onPress={()=> sortHeader(3) } >
                             <Text style={styles.headerLabel3}>Harga </Text>
                             {header3focus && (
-                                <Icon name={iconSort}  type="ionicon" size={20} color="black"  />
+                                <Icon name={iconSort}  type="ionicon" size={20} color="white"  />
                             )}
-                        </TouchableOpacity>    
+                        </TouchableOpacity>     
                     </View>
                     {loadingVisible && (
                         <View >
@@ -423,7 +423,9 @@ const styles = StyleSheet.create({
     headerItemArea:{
         flexDirection:'row',
         justifyContent:'space-around',
-        backgroundColor:'lightgrey',
+        backgroundColor:ORANGE,
+        borderTopLeftRadius:5,
+        borderTopRightRadius:5,
     },
     headerItem1 : {
         flex:0.8,
@@ -451,7 +453,7 @@ const styles = StyleSheet.create({
     },  
     headerLabel1 :{
         flex:0.8,
-        color:'black',
+        color:'white',
         fontSize:14,
         fontWeight:'600',
         textAlign: "center",
@@ -459,7 +461,7 @@ const styles = StyleSheet.create({
     },
     headerLabel2 :{
         flex:0.8,
-        color:'black',
+        color:'white',
         fontSize:14,
         fontWeight:'600',
         textAlign: "center",
@@ -467,7 +469,7 @@ const styles = StyleSheet.create({
     },
     headerLabel3 :{
         flex:0.6,
-        color:'black',
+        color:'white',
         fontSize:14,
         fontWeight:'600',
         textAlign: "center",
@@ -537,9 +539,10 @@ const styles = StyleSheet.create({
         backgroundColor:NAVY,
         alignItems:"center",
         height:40,
-        width:Dimensions.get('window').width,
+        width:Dimensions.get('window').width / 1.5,
         borderRadius:10,
         justifyContent:"center",
+        left: Dimensions.get('window').width / 6,
         bottom: 15,
         position: 'absolute',
         

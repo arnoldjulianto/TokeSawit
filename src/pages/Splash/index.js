@@ -21,14 +21,13 @@ const Splash = ({navigation}) => {
             <View style={styles.titleContainer}>
                 <View style={styles.content}>
                     <Image source={iconTokeSawit} style={styles.logo} />
-                    <View style={styles.splashText}>
-                        <Text style={styles.splashTitle1}>Toke</Text>
-                        <Text style={styles.splashTitle2}>Sawit</Text> 
-                    </View>
                 </View>
             </View>
              
             <Text style={styles.splashSubTitle}></Text>
+            <View style={styles.splashText}>
+                <Text style={styles.splashTitle1}>Version Beta 1.0.0</Text> 
+            </View>
         </View>
     )
 }
@@ -50,15 +49,17 @@ const styles = StyleSheet.create({
         justifyContent: 'center'
     },
     splashText :{
+        position:'absolute',
         flexDirection:"row",
-        alignItems:'center',
-        justifyContent: 'center'
+        alignItems:'flex-end',
+        justifyContent: 'flex-end',
+        bottom:15
     },
     titleContainer : {
         flexDirection: 'row',
     },
     splashTitle1 : {
-        fontSize : 28,
+        fontSize : 15,
         color :'#FFFF',
     },
     splashTitle2 : {

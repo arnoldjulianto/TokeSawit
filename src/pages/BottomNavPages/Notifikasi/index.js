@@ -28,6 +28,7 @@ const Notifikasi = ({route, navigation}) => {
 
     useEffect(()=>{
         const unsubscribe = navigation.addListener('focus', () => {
+            setRefreshing(true);
             getUser();
             setModalVisible(false);
         });
@@ -349,6 +350,12 @@ const Notifikasi = ({route, navigation}) => {
                         />
                     }
                 >
+                {arrPermintaanMengikuti.length == 0 && arrWaktuNotifikasi.length == 0 && (
+                        <View style={{flex:1, justifyContent:'center', alignItems:'center'}}>
+                            <Text style={{color:ORANGE}} >Tidak Ada Notifikasi</Text>
+                        </View>
+                    )
+                }    
                     {arrPermintaanMengikuti.length > 0 && (
                         <View style={styles.segmenWrapper}> 
                             <Text style={styles.segmenTitle}>Permintaan Mengikuti</Text>

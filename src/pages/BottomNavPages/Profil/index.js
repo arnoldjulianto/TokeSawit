@@ -10,6 +10,7 @@ import iconLogOut from '../../../assets/icon/logout.png';
 import iconBankCardWhite from '../../../assets/icon/bank-card-white.png';
 import { TabView, TabBar } from 'react-native-tab-view';
 import ProsesModal from '../../../components/ProsesModal';
+import NoData from '../../../assets/img/no data.svg';
 
 const NAVY = CONSTANTS.COLOR.NAVY;
 const ORANGE = CONSTANTS.COLOR.ORANGE;
@@ -51,7 +52,6 @@ const Profil =  ({route, navigation}) => {
     const [total_following, setTotalFollowing] = useState("");
 
     useEffect(()=>{
-        setLoadingVisible(true);
         getUser();
     },[]);
 
@@ -63,11 +63,12 @@ const Profil =  ({route, navigation}) => {
     },[]);
 
     const getUser = async () => {
+        setLoadingVisible(true);
         try {
           const value = await AsyncStorage.getItem('username');
           if (value === null) {
             // We have data!!
-            navigation.navigate("Login");
+            //navigation.navigate("Login");
             setLoadingVisible(false);
             setUsername("");
           }
@@ -286,9 +287,17 @@ const Profil =  ({route, navigation}) => {
                     onConfirmPressed={alertConfirmTask}
                 />
             {username == "" &&(
-                <TouchableOpacity style={styles.titleWrapper} onPress={()=>{navigation.navigate("Login")}}>
-                    <Text style={styles.titleLabel}>Klik Disini Untuk Login</Text>
-                </TouchableOpacity>
+                <View style={styles.noDataWrapper}>
+                    <NoData width={250} height={150} />
+                    <Text style={styles.noDataText1}>Tidak Dapat Mengambil Informasi Anda</Text>
+                    <Text style={styles.noDataText2}></Text>
+                    <TouchableOpacity style={styles.btnReloadUser} onPress={()=>{getUser()}}>
+                        <Text style={styles.btnLoginLabel}>Coba Lagi</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.btnLogin} onPress={()=>{navigation.navigate("Login")}}>
+                        <Text style={styles.btnLoginLabel}>Login</Text>
+                    </TouchableOpacity>
+                </View>
             )}    
 
         {username != "" &&
@@ -517,4 +526,45 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
         elevation: 5
     },
+    noDataWrapper:{
+        flex:1,
+        alignItems:"center", 
+        justifyContent:"center",
+        paddingTop:50
+    },
+    noDataText1:{
+        fontSize:16,
+        color:ORANGE,
+        textAlign:"center",
+        marginTop:20
+    },
+    noDataText2:{
+        width:300,
+        textAlign:"center",
+        fontSize:12,
+        color:"gray"
+    },
+    btnReloadUser : {
+        marginTop:10,
+        marginBottom:10,
+        height: 40,
+        backgroundColor:'grey',
+        justifyContent:'center',
+        alignItems:'center',
+        width:250,
+        borderRadius:10
+    },
+    btnLogin : {
+        marginTop:10,
+        height: 40,
+        backgroundColor:ORANGE,
+        justifyContent:'center',
+        alignItems:'center',
+        width:250,
+        borderRadius:10
+    },
+    btnLoginLabel:{
+        fontSize:15,
+        color:'white'
+    }
 })

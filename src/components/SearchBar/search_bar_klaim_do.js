@@ -29,6 +29,7 @@ const SearchBarKlaimDo = (props) => {
                     </TouchableOpacity>
                     <Text style={styles.searchBarTitle}>{props.title}</Text>
                 </View>
+                
             </View>
         </View>
     );
@@ -63,6 +64,15 @@ const styles = StyleSheet.create({
         fontSize:20,
         marginLeft:20,
         marginTop:3,
+        fontFamily : 'arial',
+        fontWeight : '800',
+        color : 'white',
+    },
+    searchBarSubTitle : {
+        flex:1,
+        fontSize:15,
+        marginLeft:20,
+        marginTop:8,
         fontFamily : 'arial',
         fontWeight : '800',
         color : 'white',

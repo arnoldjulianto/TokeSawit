@@ -81,7 +81,7 @@ const MenuHomeAtom = (props) => {
                             <TouchableOpacity style={styles.btnMenu} onPress={()=> {launchImageLibrary()} }>
                                 <View style={styles.btnMenu}>
                                     <Image source={iconCameraPurple} style={styles.btnMenuIcon}  />
-                                    <Text style={styles.btnMenuLabel}>Klaim Do</Text>
+                                    <Text style={styles.btnMenuLabel}>Jual Do</Text>
                                 </View>
                             </TouchableOpacity>
                         )}
