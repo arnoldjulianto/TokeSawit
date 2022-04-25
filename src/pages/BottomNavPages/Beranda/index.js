@@ -120,7 +120,7 @@ const Beranda = (props) => {
         
     }
 
-    const konfirmasiBantuRekapDo = () => {
+    const konfirmasiAdmin = () => {
         
     }
     const loadPemilikDo = () => ()=> {
@@ -175,25 +175,24 @@ const Beranda = (props) => {
                     <Text style={styles.segmenTitle}>
                         {nama_lengkap}
                     </Text>
-                    {/* <ScrollView horizontal={true}> */}
                         <View style={styles.segmenWrapper}>
                                 <TouchableOpacity style={styles.btnPemilikDo} onPress={()=> konfirmasiPemilikDo()} >
-                                    <Text style={styles.btnPemilikDoLabel}>Pemilik Do</Text>
+                                    <Text style={styles.btnPemilikDoLabel}>Pemilik DO</Text>
                                 </TouchableOpacity>
 
                                 <TouchableOpacity style={styles.btnAgen} onPress={()=> konfirmasiAgenDo()} >
-                                    <Text style={styles.btnAgenLabel}>Agen Do</Text>
-                                </TouchableOpacity>
-
-                                <TouchableOpacity style={styles.btnBantuRekapDo} onPress={()=> konfirmasiBantuRekapDo()} >
-                                    <Text style={styles.btnBantuRekapDoLabel}>Bantu Rekap Do</Text>
+                                    <Text style={styles.btnAgenLabel}>Agen DO</Text>
                                 </TouchableOpacity>
                         </View>
-                    {/* </ScrollView> */}
-                    {/* <TouchableOpacity style={{marginTop:20}} onPress={() => props.navigation.navigate("Home", {screen:"Profil"})} >
-                        <Text >Pindah ke Home Tab Profil</Text>
-                    </TouchableOpacity> */}
+
+                        <View style={styles.segmenWrapper}>
+                                <TouchableOpacity style={styles.btnAdmin} onPress={()=> konfirmasiAdmin()} >
+                                    <Text style={styles.btnAdminLabel}>Admin DO</Text>
+                                </TouchableOpacity>
+                        </View>
                 </View>
+
+                
             </ScrollView>
         </View>
     )
@@ -231,45 +230,54 @@ const styles = StyleSheet.create({
         justifyContent : "space-between",
     },
     btnAgen :{
-        width:80,
-        backgroundColor:NAVY,
-        justifyContent:"center",
+        flex:1,
+        flexDirection:'row',
+        backgroundColor:'#f5f5f0',
+        justifyContent:"space-between",
         alignItems:'center',
-        height:50,
+        height:45,
         marginRight:5,
-        borderRadius:10
+        borderRadius:5,
+        marginBottom:10
     },  
     btnAgenLabel :{
-        fontSize:12,
-        color:'white',
-
-    },
-    btnPemilikDo :{
-        width:120,
-        backgroundColor:ORANGE,
-        justifyContent:"center",
-        alignItems:'center',
-        height:50,
-        marginRight:5,
-        borderRadius:10
-    },  
-    btnPemilikDoLabel :{
-        fontSize:12,
-        color:'white',
+        flex:1,
+        fontSize:15,
+        color:ORANGE,
         textAlign:'center'
     },
-    btnBantuRekapDo :{
-        width:120,
-        backgroundColor:DANGER,
-        justifyContent:"center",
+    btnPemilikDo :{
+        flex:1,
+        flexDirection:'row',
+        backgroundColor:'#f5f5f0',
+        justifyContent:"space-between",
         alignItems:'center',
-        height:50,
-        marginRight:10,
-        borderRadius:10
+        height:45,
+        marginRight:5,
+        borderRadius:5,
+        marginBottom:10
     },  
-    btnBantuRekapDoLabel :{
-        fontSize:12,
-        color:'white',
+    btnPemilikDoLabel :{
+        flex:1,
+        fontSize:15,
+        color:ORANGE,
+        textAlign:'center'
+    },
+    btnAdmin :{
+        flex:1,
+        flexDirection:'row',
+        backgroundColor:'#f5f5f0',
+        justifyContent:"space-between",
+        alignItems:'center',
+        height:45,
+        marginRight:5,
+        borderRadius:5,
+        marginBottom:10
+    },  
+    btnAdminLabel :{
+        flex:1,
+        fontSize:15,
+        color:ORANGE,
         textAlign:'center'
     },
     noDataWrapper:{

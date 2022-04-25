@@ -6,7 +6,7 @@ import { View, Text,  StyleSheet, TouchableOpacity, ActivityIndicator,RefreshCon
 import iconNext from '../../assets/icon/next.png';
 import CONSTANTS from '../../assets/constants';
 import AwesomeAlert from 'react-native-awesome-alerts';
-
+import RadioForm, { RadioButton, RadioButtonInput, RadioButtonLabel } from 'react-native-simple-radio-button';
 
 const ORANGE = CONSTANTS.COLOR.ORANGE;
 const NAVY = CONSTANTS.COLOR.NAVY;
@@ -42,10 +42,24 @@ const DetailPemilikDo = (props) => {
     else if(bulan == "10") bulan = "Oktober";
     else if(bulan == "11") bulan = "November";
     else if(bulan == "12") bulan = "Desember";
+    const[privasiHarga, setPrivasiHarga] = useState("Pengikut");
 
     useEffect(()=>{
         loadDetailPPKS()
     },[])
+
+    useEffect(() => {
+        if(privasiHarga == "Pengikut_kecuali"){
+            console.log(privasiHarga)
+            props.navigation.navigate("ShowHargaKecuali", {currentUser:props.username});
+            props.setModalVisible(false);
+        }
+        else if(privasiHarga == "Hanya_pada"){
+            console.log(privasiHarga)
+            props.navigation.navigate("ShowHargaKepada", {});
+            props.setModalVisible(false);
+        }
+    },[privasiHarga])
 
     const loadDetailPPKS = () => {
         setLoadingVisible(true);
@@ -107,7 +121,17 @@ const DetailPemilikDo = (props) => {
             clearTimeout(timeout);
         }, 30000);
 
-        const params = {username:props.username, id_ppks:props.id_ppks, nama_do:props.nama_do, tanggal_perubahan_harga:props.tanggal_perubahan_harga, hargaDoPPKS:props.hargaDoPPKS, keterangan_biaya_bongkar:props.keterangan_biaya_bongkar, keterangan_harga:props.keterangan_harga}
+        const params = {
+            id_do_ppks:props.id_do_ppks, 
+            username:props.username, 
+            id_ppks:props.id_ppks, 
+            nama_do:props.nama_do, 
+            tanggal_perubahan_harga:props.tanggal_perubahan_harga, 
+            hargaDoPPKS:props.hargaDoPPKS, 
+            keterangan_biaya_bongkar:props.keterangan_biaya_bongkar, 
+            keterangan_harga:props.keterangan_harga, 
+            edit:props.edit
+        }
         console.log(params);
         
         const createFormData = (body) => {
@@ -148,6 +172,18 @@ const DetailPemilikDo = (props) => {
             console.log(error);
         });
     }
+
+    const loadEditPemilikDo = (page) => {
+        if(props.edit){
+            if(page == "harga") props.navigation.navigate("EditHarga", {id_do_ppks:props.id_do_ppks});
+        }
+    }
+
+    const radio_props1 = [
+        {label: 'Pengikut Saya', value: 'Pengikut' },
+        {label: 'Pengikut Saya Kecuali ...', value: 'Pengikut_kecuali' },
+        {label: 'Hanya Pada ...', value: 'Hanya_pada' },
+    ];
 
     return (
         <View style={styles.container}>
@@ -197,27 +233,68 @@ const DetailPemilikDo = (props) => {
                                     <Text style={styles.formLabel}>Biaya Bongkar</Text>
                                     <Text style={styles.formSeparator}>:</Text>
                                     <Text style={styles.ketLabel}>{props.keterangan_biaya_bongkar}</Text>
+                                    <View style={{flex:0.3}}></View>
                                 </View>
 
-                                <View style={styles.formGroup}>
+                                <TouchableOpacity style={styles.formGroup} onPress={()=> loadEditPemilikDo("harga") }>
                                     <Text style={styles.formLabel}>Harga</Text>
                                     <Text style={styles.formSeparator}>:</Text>
-                                    <Text style={styles.ketBoldLabel}>Rp {props.hargaDoPPKS+" / Kg"+"\n"} <Text style={{color:ORANGE,fontSize:13,fontWeight:"600"}}>update terakhir {props.tanggal_perubahan_harga.substr(8,2)+" "+bulan+" "+props.tanggal_perubahan_harga.substr(0,4)}</Text>  </Text>
-                                </View>
+                                    <Text style={styles.ketBoldLabel}>Rp {props.hargaDoPPKS+" / Kg"+"\n"} <Text style={{color:ORANGE,fontSize:13,fontWeight:"600"}}>update terakhir {props.tanggal_perubahan_harga.substr(8,2)+" "+bulan+" "+props.tanggal_perubahan_harga.substr(0,4)}</Text> </Text>
+                                </TouchableOpacity>
 
                                 <View style={styles.formGroup}>
                                     <Text style={styles.formLabel}>Catatan</Text>
                                     <Text style={styles.formSeparator}>:</Text>
                                     <Text style={styles.ketLabel}>{props.keterangan_harga}</Text>
                                 </View>
-                                {!props.edit && (
+                                
+                                <View style={styles.privasiHarga}>
+                                    <Text style={styles.formLabel}>Privasi Harga</Text>
+                                    <View>
+                                        <Text style={[{marginBottom:20}]}>Siapa saja yang dapat melihat perubahan harga</Text>
+                                        <RadioForm
+                                            formHorizontal={false}
+                                            animation={true}
+                                            >
+                                            {
+                                                radio_props1.map((obj, i) => (
+                                                <RadioButton labelHorizontal={true} key={i} style={{marginBottom:20}} >
+                                                    <RadioButtonInput
+                                                    obj={obj}
+                                                    index={i}
+                                                    isSelected={privasiHarga === obj.value }
+                                                    onPress={(value) => setPrivasiHarga(value)}
+                                                    borderWidth={1}
+                                                    buttonInnerColor={ORANGE}
+                                                    buttonOuterColor={privasiHarga === obj.value ? ORANGE : '#000'}
+                                                    buttonSize={15}
+                                                    buttonOuterSize={30}
+                                                    buttonStyle={{}}
+                                                    buttonWrapStyle={{borderColor:ORANGE,marginLeft: 10}}
+                                                    />
+                                                    <RadioButtonLabel
+                                                    obj={obj}
+                                                    index={i}
+                                                    labelHorizontal={true}
+                                                    onPress={(value) => setPrivasiHarga(value)}
+                                                    labelStyle={{fontSize: 15, color: 'black'}}
+                                                    labelWrapStyle={{}}
+                                                    />
+                                                </RadioButton>
+                                                ))
+                                            }  
+                                            </RadioForm>
+                                    </View>
+                                </View>
+
+                                {/* {!props.edit && ( */}
                                         <TouchableOpacity style={styles.btnLanjutkan} onPress={()=> {submitHandler()} }>
                                         <View style={{flexDirection:"row",justifyContent:'center'}}>
                                             <Text style={styles.btnLanjutkanLabel}>Simpan</Text>
                                             <Image source={iconNext} style={styles.btnLanjutkanIcon}  />
                                         </View>
                                     </TouchableOpacity>
-                                )}
+                                {/* )} */}
                                 
                             </View>
                         )}
@@ -285,6 +362,19 @@ const styles = StyleSheet.create({
     },
     btnLanjutkanLabel : {
         fontSize:15,
+        color:'white'
+    },
+    btnEdit: {
+        flex:0.3,
+        backgroundColor:'teal',
+        alignItems:"center",
+        height:30,
+        borderRadius:5,
+        justifyContent:"center",
+        marginLeft:10
+    },
+    btnEditLabel : {
+        fontSize:14,
         color:'white'
     },
 })

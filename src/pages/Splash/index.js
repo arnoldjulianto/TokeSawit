@@ -26,7 +26,7 @@ const Splash = ({navigation}) => {
              
             <Text style={styles.splashSubTitle}></Text>
             <View style={styles.splashText}>
-                <Text style={styles.splashTitle1}>Version Beta 1.0.0</Text> 
+                <Text style={styles.splashTitle1}>Alpha Version 1.0.0</Text> 
             </View>
         </View>
     )

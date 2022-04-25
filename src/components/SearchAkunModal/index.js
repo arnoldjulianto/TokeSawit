@@ -31,7 +31,7 @@ const SearchAkunModal = (props) => {
             setArrUser([]);
             const delayDebounceFn = setTimeout(() => {
                 loadAllData()
-            }, 1000)
+            }, 500)
             return () => clearTimeout(delayDebounceFn)
         }
     },[searchParam])

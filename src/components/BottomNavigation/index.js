@@ -1,8 +1,9 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable prettier/prettier */
 /* eslint-disable prettier/prettier */
 
-import React, { Component, useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
+import React, { Component, useState, useEffect, useRef } from 'react';
+import { StyleSheet, Text, View, Image, TouchableOpacity, AppState } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import iconHome from '../../assets/icon/home.png';
 import iconHomeActive from '../../assets/icon/home-active.png';
@@ -48,16 +49,46 @@ const BottomNavigation = (props) => {
     const [alertCancelTask, setAlertCancelTask] = useState(() => closeAlert() );
     const [tabBarBadge, setTabBarBadge] = useState(null);
     const [notif_belum_dibaca, setNotifBelumDibaca] = useState(null);
-    
+    const appState = useRef(AppState.currentState);
+    const [username, setUsername] = useState("");
+
+    let myInterval = null;
     useEffect(() => {
+        clearInterval(myInterval);
         getUser();
     },[])
+
+    useEffect(() => {
+        const subscription = AppState.addEventListener("change", nextAppState => {
+          if (
+            appState.current.match(/inactive|background/) &&
+            nextAppState === "active"
+          ) {
+            console.log("App has come to the foreground!");
+            getUser()
+          }
+          appState.current = nextAppState;
+          if(appState.current == 'background'){
+            clearInterval(myInterval);
+          }
+          console.log("AppState", appState.current);
+        });
+    
+        return () => {
+          subscription.remove();
+        };
+      }, []);
 
     const getNotifBelumDibaca =  (value) => {
         let params;
         if(typeof value !== "undefined" ){
             params = {
                 username:value
+            }
+        }
+        else{
+            params = {
+                username
             }
         }
         console.log(params);
@@ -100,10 +131,11 @@ const BottomNavigation = (props) => {
           if (value === null) {
             // We have data!!
           }
-          else{
-            setInterval(() => {
-                getNotifBelumDibaca(value)
-            },2000)  
+          else{  
+            setUsername(value);
+            myInterval = setInterval(() => {
+                getNotifBelumDibaca(value);
+            },2000)
           }
         } catch (error) {
           // Error retrieving data

@@ -356,7 +356,7 @@ const JadiPemilikDo = ({route, navigation}) => {
 
     return(
         <View style={{flex:1}}>
-            <EditPemilikDoModal setModalVisible={setModalVisible} modalVisible={modalVisible} navigation={navigation} username={username} id_ppks={id_ppks} nama_do={nama_do} tanggal_perubahan_harga={tanggal_perubahan_harga} hargaDoPPKS={hargaDoPPKS} keterangan_biaya_bongkar={keterangan_biaya_bongkar} keterangan_harga={keterangan_harga}  />
+            <EditPemilikDoModal setModalVisible={setModalVisible} modalVisible={modalVisible} navigation={navigation} id_do_ppks={id_do_ppks} username={username} id_ppks={id_ppks} nama_do={nama_do} tanggal_perubahan_harga={tanggal_perubahan_harga} hargaDoPPKS={hargaDoPPKS} keterangan_biaya_bongkar={keterangan_biaya_bongkar} keterangan_harga={keterangan_harga}  />
 
             <SearchBar title={"Menu Pemilik Do"} refresh={()=> loadListDoSaya()} navigation={navigation} />
             <View style={styles.container}>
