@@ -25,7 +25,10 @@ const SearchBar = (props) => {
         <View style={styles.searchBarWrapper}>
             <View style={styles.searchBarTopWrapper}>
                 <View style={styles.searchBarTitleWrapper}>
-                    <TouchableOpacity onPress={ ()=> props.navigation.goBack() }>
+                    <TouchableOpacity onPress={ ()=> {
+                         props.navigation.goBack();
+                         props.setModalVisible(true);
+                    }}>
                         <Image source={iconBack} style={styles.searchBarIcon}  />
                     </TouchableOpacity>
                     <Text style={styles.searchBarTitle}>{props.title}</Text>

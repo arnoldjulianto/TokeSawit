@@ -5,7 +5,11 @@ import React, { useEffect, useState } from 'react';
 import { View, Text,  StyleSheet, TouchableOpacity, ActivityIndicator,RefreshControl, Image, ScrollView,  FlatList, TextInput } from 'react-native';
 import CONSTANTS from '../../assets/constants';
 import SearchBar from '../../components/SearchBar/search_bar_privasi_harga';
+import ProsesModal from '../../components/ProsesModal';
 import Icon from 'react-native-vector-icons/FontAwesome5';
+import CheckBox from '@react-native-community/checkbox';
+import iconDoneWhite from '../../assets/icon/done-white.png';
+import AwesomeAlert from 'react-native-awesome-alerts';
 
 const ORANGE = CONSTANTS.COLOR.ORANGE;
 const NAVY = CONSTANTS.COLOR.NAVY;
@@ -14,27 +18,60 @@ const base_url = CONSTANTS.CONFIG.BASE_URL;
 const alert_title = CONSTANTS.MSG.ALERT_TITLE;
 
 const ShowHargaKecuali = ({route, navigation}) => {
-    let {currentUser} = route.params;
+    const [showAlert, setAlert] = useState(false);
+    let {id_do_ppks, currentUser, showEditPemilikDoModal} = route.params;
+    const closeAlert = () => {
+        console.log("alert close");
+        setAlert(false);
+    }
+    const [showCancelButtonAlert, setCancelButtonAlert] = useState(true);
+    const [showConfirmButtonAlert, setConfirmButtonAlert] = useState(false);
+    const [alert_message, setAlertMessage] = useState("");
+    const [confirmTextAlert, setConfirmTextAlert] = useState("");
+    const [cancelTextAlert, setCancelTextAlert] = useState("");
+    const [alertConfirmTask, setAlertConfirmTask] = useState(() => closeAlert() );
     const [searchParam, setSearchParam] = useState("");
     const [arrFollowers, setArrFollowers] = useState([]);
+    const [arrSembunyikanDari, setArrSembunyikanDari] = useState([]);
     const [loadingVisible, setLoadingVisible] = useState(false);
+    const [modalVisible, setModalVisible] = useState(false);
+    const [checkedAll, setCheckedAll] = useState(false);
 
     useEffect(()=>{
         console.log(searchParam)
         setArrFollowers([]);
         const delayDebounceFn = setTimeout(() => {
-            loadFollowers()
+            loadSembunyikanDari()
         }, 500)
         return () => clearTimeout(delayDebounceFn)
     },[searchParam])
 
-    const loadFollowers = () => {
+    useEffect(
+        () =>
+          navigation.addListener('beforeRemove', (e) => {
+            e.preventDefault();
+            navigation.dispatch(e.data.action);
+            showEditPemilikDoModal(true);
+          }),
+        [navigation]
+    );
+
+    useEffect(() => {
+        if(arrSembunyikanDari.length > 0){
+            const cek = cekJumlahChecked();
+            if(!cek) setCheckedAll(false);
+            else if(cek) setCheckedAll(true);
+        }
+    },[arrSembunyikanDari])
+
+    const loadSembunyikanDari = () => {
         setLoadingVisible(true);
         const timeout = setTimeout(() => {
             setLoadingVisible(false);
         }, 30000);
 
         const params = {
+            id_do_ppks,
             searchParam,
             currentUser
         }
@@ -48,7 +85,7 @@ const ShowHargaKecuali = ({route, navigation}) => {
             return data;
         }
         const formData = createFormData(params);
-        fetch(base_url+'Pencarian/get_api_all_followers',
+        fetch(base_url+'PrivasiHarga/get_api_sembunyikan_harga_dari',
         {
             method: 'post',
             body: formData,
@@ -60,6 +97,14 @@ const ShowHargaKecuali = ({route, navigation}) => {
         .then((json) => {
             clearTimeout(timeout);
             setLoadingVisible(false);
+            if(arrSembunyikanDari.length == 0) {
+                setArrSembunyikanDari(json.arrSembunyikanDari)
+            }
+            else{
+                arrSembunyikanDari.forEach((value, index) => {
+                    if(!value.isChecked) value.isChecked = json.arrSembunyikanDari[index].isChecked
+                })
+            }
             setArrFollowers(json.followers);
             console.log(json);
         })
@@ -70,31 +115,154 @@ const ShowHargaKecuali = ({route, navigation}) => {
         });
     }
 
+    const submitHandler = () => {
+        setModalVisible(true);
+        const timeout = setTimeout(() => {
+            setModalVisible(false);
+            setAlert(true);
+            setCancelButtonAlert(true);
+            setConfirmButtonAlert(false);
+            setCancelTextAlert("Tutup");
+            setAlertMessage("Permintaan Tidak Dapat Dipenuhi, Server Tidak Merespon");
+        }, 30000);
+
+        const params = {
+            id_do_ppks,
+            pemilik_do_ppks:currentUser,
+            arrSembunyikanDari:JSON.stringify(arrSembunyikanDari)
+        }
+        console.log(params);
+        
+        const createFormData = (body) => {
+            const data = new FormData();
+            Object.keys(body).forEach(key => {
+                data.append(key, body[key]);
+            });
+            return data;
+        }
+        const formData = createFormData(params);
+        fetch(base_url+'PrivasiHarga/get_api_add_sembunyikan_harga_dari',
+        {
+            method: 'post',
+            body: formData,
+            headers: {
+              'Content-Type': 'multipart/form-data; ',
+            },
+        })
+        .then((response) => response.json())
+        .then((json) => {
+            clearTimeout(timeout);
+            setModalVisible(false);
+            if(json.response == 1){
+                showEditPemilikDoModal(true)
+                navigation.goBack();
+            }
+            console.log(json);
+        })
+        .catch((error) => {
+            clearTimeout(timeout);
+            setModalVisible(false);
+            setAlert(true);
+            setCancelButtonAlert(true);
+            setConfirmButtonAlert(false);
+            setCancelTextAlert("Tutup");
+            setAlertMessage("Terjadi Kesalahan. \n"+error);
+            console.log(error);
+        });
+    }
+
+    const checkAll = () =>{
+        let temp = arrSembunyikanDari.map((value) => {
+            if(value.isChecked) value.isChecked = false;
+            else if(!value.isChecked) value.isChecked = true;
+            return value;
+        });
+        setArrSembunyikanDari(temp);
+        const cek = cekJumlahChecked();
+        if(!cek) setCheckedAll(false);
+        else if(cek) setCheckedAll(true);
+    }
+
+    const handleChange = (id) => {
+        let temp = arrSembunyikanDari.map((value) => {
+          if (id === value.username) {
+            return { ...value, isChecked: !value.isChecked };
+          }
+          return value;
+        });
+        setArrSembunyikanDari(temp);
+        const cek = cekJumlahChecked();
+        if(!cek) setCheckedAll(true);
+        else if(cek) setCheckedAll(false);
+    };
+
+    const cekJumlahChecked = () =>{
+        let x = true;
+        for (var i = 0; i < arrSembunyikanDari.length; i++){
+            if(!arrSembunyikanDari[i].isChecked) {
+                x = false;
+                break;
+            }
+        }
+        return x;
+    }
+
     const renderItemFollowers = ({item,index}) => {
         let uri = '';
         if(item.foto_profil == 'default.png') uri = base_url+"assets/upload/file user/"+item.foto_profil;
         else uri = base_url+"assets/upload/file user/"+item.username+"/"+item.foto_profil;
+
         return (
             <TouchableOpacity style={styles.renderItemUserArea} key={item.username+index} onPress={()=>{
-                
+                handleChange(item.username)
             }} >
                 <Image style={styles.fotoProfil} source={{uri}} resizeMode="cover" resizeMethod="resize" />
                 <View style={styles.detailUser}>
                     <Text style={styles.usernameLabel} >{item.username_edit}</Text>
                     <Text style={styles.namaLengkapLabel} >{item.nama_lengkap}</Text>
                 </View>
+                <CheckBox
+                    disabled={false}
+                    value={arrSembunyikanDari[parseInt(index)].isChecked}
+                    tintColors={{ true: ORANGE, false: 'black' }}
+                    onChange={(newValue) => {
+                        handleChange(item.username)
+                    }}
+                />
             </TouchableOpacity>
         )
     }
 
+    
+
     return(
-        <View>
-            <SearchBar title={"Sembunyikan Harga Dari..."} navigation={navigation} />
+        <View style={{flex:1}}>
+            <ProsesModal modalVisible={modalVisible} setModalVisible={setModalVisible} />
+            <AwesomeAlert
+                show={showAlert}
+                showProgress={false}
+                title={alert_title}
+                message={alert_message}
+                closeOnTouchOutside={false}
+                closeOnHardwareBackPress={false}
+                showCancelButton={showCancelButtonAlert}
+                showConfirmButton={showConfirmButtonAlert}
+                cancelText={cancelTextAlert}
+                confirmText={confirmTextAlert}
+                confirmButtonColor={NAVY}
+                cancelButtonColor={ORANGE}
+                onCancelPressed={() => {
+                    setAlert(false);
+                }}
+                onConfirmPressed={alertConfirmTask}
+            />
+            <SearchBar title={"Sembunyikan Harga Dari..."} navigation={navigation} setModalVisible={showEditPemilikDoModal} />
             <View style={styles.container} >
                 <View style={styles.inputWrapper}>
                     <Icon name="search" type="ionicon" size={20} color="gray" style={{position:"absolute", left:10,bottom:10}} />
                     <TextInput style={styles.textInput} placeholder="Cari ..." placeholderTextColor= 'gray' value={searchParam} onChangeText = { (value) => {setSearchParam(value)} } 
                     />
+                    
                 </View>
 
                 <View style={styles.segmenWrapper}>
@@ -103,14 +271,49 @@ const ShowHargaKecuali = ({route, navigation}) => {
                             <ActivityIndicator size={50} color={ORANGE} />
                         </View>
                     )}
-                    <FlatList
-                        data={arrFollowers}
-                        keyExtractor={(item, index) => index}
-                        renderItem={renderItemFollowers}
-                        maxToRenderPerBatch={5} updateCellsBatchingPeriod={20}
-                    /> 
+                    {!loadingVisible && (
+                        <View>
+                            <TouchableOpacity style={{flexDirection:'row',justifyContent:'space-around', marginBottom:15}} onPress={() =>{
+                                checkAll();
+                            }}>
+                                <View style={{flex:1}}>
+                                    <CheckBox
+                                        disabled={false}
+                                        value={checkedAll}
+                                        tintColors={{ true: ORANGE, false: 'black' }}
+                                        onChange={(newValue) => {
+                                            checkAll()
+                                        }}
+                                        style={{alignSelf:'flex-end'}}
+                                    />
+                                </View>
+
+                                <View style={{flex:0.5}}>
+                                    <Text style={{marginTop:5,alignSelf:'flex-start'}}>Centang Semua</Text>
+                                </View>
+                            </TouchableOpacity>
+
+                            <FlatList
+                                data={arrFollowers}
+                                keyExtractor={(item, index) => index}
+                                renderItem={renderItemFollowers}
+                                maxToRenderPerBatch={5} updateCellsBatchingPeriod={20}
+                            /> 
+                        </View>
+                    )}    
                 </View>
-            </View>    
+                
+            </View> 
+
+            <TouchableOpacity
+                    activeOpacity={0.7}
+                    onPress={() =>{submitHandler()}}
+                    style={styles.touchableOpacityStyle}>
+                    <Image
+                        source={iconDoneWhite}
+                        style={styles.floatingButtonStyle}
+                    />
+            </TouchableOpacity>
         </View>
     )
 }
@@ -129,6 +332,7 @@ const styles = StyleSheet.create({
         height:45,
         justifyContent:"center",
         color:"black",
+        borderBottomWidth:1,
     },
     textInput:{
         borderColor:"black",
@@ -137,7 +341,6 @@ const styles = StyleSheet.create({
         fontSize:13,
         flex:1,
         marginLeft:35,
-        borderBottomWidth:1,
     },
     segmenWrapper : {
         backgroundColor:'white',
@@ -184,4 +387,21 @@ const styles = StyleSheet.create({
         borderRadius:120/2,
         alignItems:"flex-start",
     },
+    touchableOpacityStyle: {
+        position: 'absolute',
+        width: 60,
+        height: 60,
+        alignItems: 'center',
+        justifyContent: 'center',
+        right: 30,
+        bottom: 30,
+        backgroundColor:ORANGE,
+        borderRadius:60
+    },
+    floatingButtonStyle: {
+        resizeMode: 'contain',
+        width: 30,
+        height: 30,
+        //backgroundColor:'black'
+    }
 })

@@ -42,24 +42,12 @@ const DetailPemilikDo = (props) => {
     else if(bulan == "10") bulan = "Oktober";
     else if(bulan == "11") bulan = "November";
     else if(bulan == "12") bulan = "Desember";
-    const[privasiHarga, setPrivasiHarga] = useState("Pengikut");
+    const[privasiHarga, setPrivasiHarga] = useState("");
 
     useEffect(()=>{
+        console.log(props.id_do_ppks)
         loadDetailPPKS()
     },[])
-
-    useEffect(() => {
-        if(privasiHarga == "Pengikut_kecuali"){
-            console.log(privasiHarga)
-            props.navigation.navigate("ShowHargaKecuali", {currentUser:props.username});
-            props.setModalVisible(false);
-        }
-        else if(privasiHarga == "Hanya_pada"){
-            console.log(privasiHarga)
-            props.navigation.navigate("ShowHargaKepada", {});
-            props.setModalVisible(false);
-        }
-    },[privasiHarga])
 
     const loadDetailPPKS = () => {
         setLoadingVisible(true);
@@ -91,8 +79,89 @@ const DetailPemilikDo = (props) => {
         .then((response) => response.json())
         .then((json) => {
             clearTimeout(timeout);
-            setLoadingVisible(false);
             setNamaPPKS(json[0].nama_ppks)
+            setLoadingVisible(false);
+            if(props.edit) cekPrivasiHarga()
+        })
+        .catch((error) => {
+            clearTimeout(timeout);
+            setLoadingVisible(false);
+            console.log(error);
+        });
+    }
+
+    const cekPrivasiHarga = () => {
+        setLoadingVisible(true);
+        const timeout = setTimeout(() => {
+            setLoadingVisible(false);
+        }, 30000);
+
+        const params = {
+            id_do_ppks:props.id_do_ppks
+        }
+        console.log(params);
+        
+        const createFormData = (body) => {
+            const data = new FormData();
+            Object.keys(body).forEach(key => {
+                data.append(key, body[key]);
+            });
+            return data;
+        }
+        const formData = createFormData(params);
+        fetch(base_url+'PrivasiHarga/get_api_cek_privasi_harga',
+        {
+            method: 'post',
+            body: formData,
+            headers: {
+              'Content-Type': 'multipart/form-data; ',
+            },
+        })
+        .then((response) => response.json())
+        .then((json) => {
+            clearTimeout(timeout);
+            setLoadingVisible(false);
+            setPrivasiHarga(json.privasi_harga)
+        })
+        .catch((error) => {
+            clearTimeout(timeout);
+            setLoadingVisible(false);
+            console.log(error);
+        });
+    }
+
+    const updatePrivasiHarga = (value) => {
+        setLoadingVisible(true);
+        const timeout = setTimeout(() => {
+            setLoadingVisible(false);
+        }, 30000);
+
+        const params = {
+            id_do_ppks:props.id_do_ppks,
+            privasi_harga:value,
+        }
+        console.log(params);
+        
+        const createFormData = (body) => {
+            const data = new FormData();
+            Object.keys(body).forEach(key => {
+                data.append(key, body[key]);
+            });
+            return data;
+        }
+        const formData = createFormData(params);
+        fetch(base_url+'PemilikDo/get_api_update_privasi_harga',
+        {
+            method: 'post',
+            body: formData,
+            headers: {
+              'Content-Type': 'multipart/form-data; ',
+            },
+        })
+        .then((response) => response.json())
+        .then((json) => {
+            clearTimeout(timeout);
+            cekPrivasiHarga();
         })
         .catch((error) => {
             clearTimeout(timeout);
@@ -130,6 +199,7 @@ const DetailPemilikDo = (props) => {
             hargaDoPPKS:props.hargaDoPPKS, 
             keterangan_biaya_bongkar:props.keterangan_biaya_bongkar, 
             keterangan_harga:props.keterangan_harga, 
+            privasi_harga:privasiHarga, 
             edit:props.edit
         }
         console.log(params);
@@ -175,14 +245,14 @@ const DetailPemilikDo = (props) => {
 
     const loadEditPemilikDo = (page) => {
         if(props.edit){
-            if(page == "harga") props.navigation.navigate("EditHarga", {id_do_ppks:props.id_do_ppks});
+            if(page == "harga") props.navigation.navigate("EditHarga", {id_do_ppks:props.id_do_ppks, showEditPemilikDoModal:props.setModalVisible});
         }
     }
 
     const radio_props1 = [
-        {label: 'Pengikut Saya', value: 'Pengikut' },
+        {label: 'Pengikut Saya', value: '' },
         {label: 'Pengikut Saya Kecuali ...', value: 'Pengikut_kecuali' },
-        {label: 'Hanya Pada ...', value: 'Hanya_pada' },
+        {label: 'Hanya Kepada ...', value: 'Hanya_kepada' },
     ];
 
     return (
@@ -215,7 +285,7 @@ const DetailPemilikDo = (props) => {
                         {loadingVisible && (
                             <ActivityIndicator size={50} color={ORANGE} />
                         )}
-                        {!loadingVisible && (
+                        {!loadingVisible  &&(
                             <View>
                                 <View style={styles.formGroup}>
                                     <Text style={styles.formLabel}>Nama PPKS</Text>
@@ -233,7 +303,6 @@ const DetailPemilikDo = (props) => {
                                     <Text style={styles.formLabel}>Biaya Bongkar</Text>
                                     <Text style={styles.formSeparator}>:</Text>
                                     <Text style={styles.ketLabel}>{props.keterangan_biaya_bongkar}</Text>
-                                    <View style={{flex:0.3}}></View>
                                 </View>
 
                                 <TouchableOpacity style={styles.formGroup} onPress={()=> loadEditPemilikDo("harga") }>
@@ -251,7 +320,8 @@ const DetailPemilikDo = (props) => {
                                 <View style={styles.privasiHarga}>
                                     <Text style={styles.formLabel}>Privasi Harga</Text>
                                     <View>
-                                        <Text style={[{marginBottom:20}]}>Siapa saja yang dapat melihat perubahan harga</Text>
+                                        <Text style={[{marginBottom:20}]}>Siapa saja yang dapat melihat dan mengetahui perubahan harga dari DO ini</Text>
+                                        {privasiHarga != null && (
                                         <RadioForm
                                             formHorizontal={false}
                                             animation={true}
@@ -263,7 +333,20 @@ const DetailPemilikDo = (props) => {
                                                     obj={obj}
                                                     index={i}
                                                     isSelected={privasiHarga === obj.value }
-                                                    onPress={(value) => setPrivasiHarga(value)}
+                                                    onPress={(value) => {
+                                                        setPrivasiHarga(value)
+                                                        if(i == 0){
+                                                            updatePrivasiHarga("");
+                                                        }
+                                                        else if(i == 1){
+                                                            props.navigation.navigate("ShowHargaKecuali", {id_do_ppks:props.id_do_ppks, currentUser:props.username,showEditPemilikDoModal:props.setModalVisible});
+                                                            props.setModalVisible(false);
+                                                        }
+                                                        else if(i == 2){
+                                                            props.navigation.navigate("ShowHargaKepada", {id_do_ppks:props.id_do_ppks, currentUser:props.username,showEditPemilikDoModal:props.setModalVisible});
+                                                            props.setModalVisible(false);
+                                                        }
+                                                    }}
                                                     borderWidth={1}
                                                     buttonInnerColor={ORANGE}
                                                     buttonOuterColor={privasiHarga === obj.value ? ORANGE : '#000'}
@@ -276,7 +359,20 @@ const DetailPemilikDo = (props) => {
                                                     obj={obj}
                                                     index={i}
                                                     labelHorizontal={true}
-                                                    onPress={(value) => setPrivasiHarga(value)}
+                                                    onPress={(value) => {
+                                                        setPrivasiHarga(value)
+                                                        if(i == 0){
+                                                            updatePrivasiHarga("");
+                                                        }
+                                                        else if(i == 1){
+                                                            props.navigation.navigate("ShowHargaKecuali", {id_do_ppks:props.id_do_ppks, currentUser:props.username,showEditPemilikDoModal:props.setModalVisible});
+                                                            props.setModalVisible(false);
+                                                        }
+                                                        else if(i == 2){
+                                                            props.navigation.navigate("ShowHargaKepada", {id_do_ppks:props.id_do_ppks, currentUser:props.username,showEditPemilikDoModal:props.setModalVisible});
+                                                            props.setModalVisible(false);
+                                                        }
+                                                    }}
                                                     labelStyle={{fontSize: 15, color: 'black'}}
                                                     labelWrapStyle={{}}
                                                     />
@@ -284,17 +380,32 @@ const DetailPemilikDo = (props) => {
                                                 ))
                                             }  
                                             </RadioForm>
+                                        )}    
                                     </View>
                                 </View>
 
-                                {/* {!props.edit && ( */}
-                                        <TouchableOpacity style={styles.btnLanjutkan} onPress={()=> {submitHandler()} }>
+                                {!props.edit && (
+                                    <TouchableOpacity style={styles.btnLanjutkan} onPress={()=> {submitHandler()} }>
                                         <View style={{flexDirection:"row",justifyContent:'center'}}>
                                             <Text style={styles.btnLanjutkanLabel}>Simpan</Text>
                                             <Image source={iconNext} style={styles.btnLanjutkanIcon}  />
                                         </View>
                                     </TouchableOpacity>
-                                {/* )} */}
+                                )}
+
+                                {privasiHarga == null && (
+                                        <TouchableOpacity onPress={()=> {cekPrivasiHarga()} }>
+                                        <View style={{flexDirection:"row",justifyContent:'center'}}>
+                                            <Text style={{color:ORANGE}}>Gagal Mengambil Privasi Harga,
+                                            {"\n"} Klik Disini Untuk Mencoba Kembali</Text>
+                                        </View>
+                                        <View style={styles.btnLanjutkan} onPress={()=> {submitHandler()} }>
+                                            <View style={{flexDirection:"row",justifyContent:'center'}}>
+                                                <Text style={styles.btnLanjutkanLabel}>Coba Lagi</Text>
+                                            </View>
+                                        </View>
+                                    </TouchableOpacity>
+                                )}
                                 
                             </View>
                         )}

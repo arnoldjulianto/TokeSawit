@@ -20,8 +20,6 @@ const EditPemilikDoModal = (props) => {
     const [detailDoFlex, setDetailDoFlex] = useState(1);
     const [tabViewFlex, setTabViewFlex] = useState(0.5);
     const [textShowEdit, setTextShowEdit] = useState("Tampilan Penuh");
-
-    
     
 
     const showEdit = () => {
@@ -48,10 +46,10 @@ const EditPemilikDoModal = (props) => {
                     props.setModalVisible(false); 
                 }}
             >
-                <SearchBar title={"Detail Do"} refresh={false} onBack={props.setModalVisible} />
+                <SearchBar title={"Pengaturan DO"} refresh={false} onBack={props.setModalVisible} />
                 <View style={styles.modalView}>
                     <View style={{flex:detailDoFlex}}>
-                        <DetailPemilikDo setModalVisible={props.setModalVisible} username={props.username} id_ppks={props.id_ppks} nama_do={props.nama_do} tanggal_perubahan_harga={props.tanggal_perubahan_harga} hargaDoPPKS={props.hargaDoPPKS} keterangan_biaya_bongkar={props.keterangan_biaya_bongkar} keterangan_harga={props.keterangan_harga} navigation={props.navigation} edit={true} />
+                        <DetailPemilikDo setModalVisible={props.setModalVisible} id_do_ppks={props.id_do_ppks} username={props.username} id_ppks={props.id_ppks} nama_do={props.nama_do} tanggal_perubahan_harga={props.tanggal_perubahan_harga} hargaDoPPKS={props.hargaDoPPKS} keterangan_biaya_bongkar={props.keterangan_biaya_bongkar} keterangan_harga={props.keterangan_harga} privasi_harga={props.privasi_harga} navigation={props.navigation} edit={true} />
                     </View>
                 </View>
             </Modal>   

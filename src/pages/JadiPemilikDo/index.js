@@ -46,6 +46,7 @@ const JadiPemilikDo = ({route, navigation}) => {
     const [hargaDoPPKS, setHargaDoPPKS] = useState("");
     const [keterangan_biaya_bongkar, setKetBiayaBongkar] = useState("");
     const [keterangan_harga, setKetHargaDoPPKS] = useState("");
+    const [privasi_harga, setPrivasiHarga] = useState("");
 
     useEffect(()=>{
         const unsubscribe = navigation.addListener('focus', () => {
@@ -104,7 +105,7 @@ const JadiPemilikDo = ({route, navigation}) => {
                 const data = [];
                 json.list_do.forEach((value)=>{
                     data.push({
-                        id : value.id,    
+                        id_do_ppks : value.id_do_ppks,    
                         id_ppks : value.id_ppks,    
                         nama_ppks : value.nama_ppks,    
                         nama_do : value.nama_do,    
@@ -112,6 +113,7 @@ const JadiPemilikDo = ({route, navigation}) => {
                         keterangan_harga : value.keterangan_harga,    
                         harga : value.harga,    
                         tanggal_perubahan_harga : value.tanggal_perubahan_harga,    
+                        privasi_harga : value.privasi_harga,    
                     });
                 })
                 setArrListDo(data);
@@ -181,6 +183,7 @@ const JadiPemilikDo = ({route, navigation}) => {
                     setKetHargaDoPPKS(item.keterangan_harga)
                     setHargaDoPPKS(formatRupiah(item.harga))
                     setTanggalPerubahanHarga(item.tanggal_perubahan_harga)
+                    setPrivasiHarga(item.privasi_harga)
                     setModalVisible(true)
                 }} >
                 <Text style={styles.namaPPKSLabel}>{item.nama_ppks.toUpperCase()}</Text>
@@ -356,7 +359,7 @@ const JadiPemilikDo = ({route, navigation}) => {
 
     return(
         <View style={{flex:1}}>
-            <EditPemilikDoModal setModalVisible={setModalVisible} modalVisible={modalVisible} navigation={navigation} id_do_ppks={id_do_ppks} username={username} id_ppks={id_ppks} nama_do={nama_do} tanggal_perubahan_harga={tanggal_perubahan_harga} hargaDoPPKS={hargaDoPPKS} keterangan_biaya_bongkar={keterangan_biaya_bongkar} keterangan_harga={keterangan_harga}  />
+            <EditPemilikDoModal setModalVisible={setModalVisible} modalVisible={modalVisible} navigation={navigation} id_do_ppks={id_do_ppks} username={username} id_ppks={id_ppks} nama_do={nama_do} tanggal_perubahan_harga={tanggal_perubahan_harga} hargaDoPPKS={hargaDoPPKS} keterangan_biaya_bongkar={keterangan_biaya_bongkar} keterangan_harga={keterangan_harga} privasi_harga={privasi_harga} />
 
             <SearchBar title={"Menu Pemilik Do"} refresh={()=> loadListDoSaya()} navigation={navigation} />
             <View style={styles.container}>
@@ -394,7 +397,7 @@ const JadiPemilikDo = ({route, navigation}) => {
                         <FlatList
                             data={arrListDo}
                             extraData={arrListDo}
-                            keyExtractor={(item, index) => (item.id) + index}
+                            keyExtractor={(item, index) => (item.id_do_ppks) + index}
                             renderItem={renderItemListDo}
                         />
                     )}
