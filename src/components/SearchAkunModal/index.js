@@ -22,6 +22,21 @@ const SearchAkunModal = (props) => {
     const [header4focus, setHeader4Focus] = useState(false);
     const [iconSort, setIconSort] = useState("sort-alpha-down");
 
+    useEffect(() => {
+        if(props.modalVisible){
+            setSearchParam("");
+            console.log(searchParam)
+            setArrCariTerbaru([]);
+            setArrProduk([]);
+            setArrNamaDo([]);
+            setArrUser([]);
+            const delayDebounceFn = setTimeout(() => {
+                loadCariTerbaru()
+            }, 500)
+            return () => clearTimeout(delayDebounceFn)
+        }
+    },[props.modalVisible])
+
     useEffect(()=>{
         if(searchParam != ""){
             console.log(searchParam)
@@ -34,8 +49,62 @@ const SearchAkunModal = (props) => {
             }, 500)
             return () => clearTimeout(delayDebounceFn)
         }
+        else{
+            console.log(searchParam)
+            setArrCariTerbaru([]);
+            setArrProduk([]);
+            setArrNamaDo([]);
+            setArrUser([]);
+            const delayDebounceFn = setTimeout(() => {
+                loadCariTerbaru()
+            }, 500)
+            return () => clearTimeout(delayDebounceFn)
+        }
     },[searchParam])
 
+
+    const loadCariTerbaru = () => {
+        setLoadingVisible(true);
+
+        const timeout = setTimeout(() => {
+            setLoadingVisible(false);
+        }, 30000);
+
+        const params = {
+            searchParam,
+            currentUser:props.currentUser
+        }
+        console.log(params);
+        
+        const createFormData = (body) => {
+            const data = new FormData();
+            Object.keys(body).forEach(key => {
+                data.append(key, body[key]);
+            });
+            return data;
+        }
+        const formData = createFormData(params);
+        fetch(base_url+'Pencarian/get_api_history_pencarian',
+        {
+            method: 'post',
+            body: formData,
+            headers: {
+              'Content-Type': 'multipart/form-data; ',
+            },
+        })
+        .then((response) => response.json())
+        .then((json) => {
+            clearTimeout(timeout);
+            setLoadingVisible(false);
+            setArrCariTerbaru(json.cari_terbaru);
+            console.log(json);
+        })
+        .catch((error) => {
+            clearTimeout(timeout);
+            setLoadingVisible(false);
+            console.log(error);
+        });
+    }
 
     const loadAllData = () => {
         setLoadingVisible(true);
@@ -70,7 +139,6 @@ const SearchAkunModal = (props) => {
         .then((json) => {
             clearTimeout(timeout);
             setLoadingVisible(false);
-            setArrCariTerbaru(json.cari_terbaru);
             setArrProduk(json.produk);
             setArrNamaDo(json.nama_do);
             setArrUser(json.user);
@@ -116,10 +184,9 @@ const SearchAkunModal = (props) => {
     const [index, setIndex] = React.useState(0);
     const [routes] = React.useState([
       { key: 1, title: 'Semua' },
-      { key: 2, title: 'Terbaru' },
-      { key: 3, title: 'Produk' },
-      { key: 4, title: 'Nama Do' },
-      { key: 5, title: 'Orang' },
+      { key: 2, title: 'Produk' },
+      { key: 3, title: 'Nama Do' },
+      { key: 4, title: 'Orang' },
     ]);
 
     const layout = useWindowDimensions();
@@ -387,21 +454,21 @@ const SearchAkunModal = (props) => {
                 </ScrollView>    
             )
             
-            case 2:
-            return (
-                <View style={{flex:1}} >
-                    {arrCariTerbaru.length > 0 && (
-                        <FlatList
-                            data={arrCariTerbaru}
-                            keyExtractor={(item, index) => (item.id) + index}
-                            renderItem={renderItemCariTerbaru}
-                            maxToRenderPerBatch={5} updateCellsBatchingPeriod={20}
-                        />
-                    )}
-                </View>        
-            )
+            // case 2:
+            // return (
+            //     <View style={{flex:1}} >
+            //         {arrCariTerbaru.length > 0 && (
+            //             <FlatList
+            //                 data={arrCariTerbaru}
+            //                 keyExtractor={(item, index) => (item.id) + index}
+            //                 renderItem={renderItemCariTerbaru}
+            //                 maxToRenderPerBatch={5} updateCellsBatchingPeriod={20}
+            //             />
+            //         )}
+            //     </View>        
+            // )
 
-            case 3:
+            case 2:
             return (
                 <View style={{flex:1, paddingTop:20}}>
                     <View style={styles.headerItemArea} >
@@ -443,7 +510,7 @@ const SearchAkunModal = (props) => {
                 </View>  
             )
 
-            case 4:
+            case 3:
             return (
                 <View style={{flex:1, padding:20}} >
                     {arrNamaDo.length > 0 && (
@@ -459,7 +526,7 @@ const SearchAkunModal = (props) => {
                 </View>        
             )
 
-            case 5:
+            case 4:
             return (
                 <View style={{flex:1}} >
                     {arrUser.length > 0 && (
@@ -507,10 +574,19 @@ const SearchAkunModal = (props) => {
             }} >
                 <Text style={styles.namaPPKSLabel}>{item.nama_ppks.toUpperCase()}</Text>
                 <Text style={styles.namaDoLabel}>{item.nama_do}</Text>
-                <Text style={styles.hargaLabel}>Rp {formatRupiah(item.harga)}
-                    {"\n"}
-                    <Text style={{marginTop:5, color:ORANGE}}>{item.tanggal_perubahan_harga.substr(8,2)+" "+bulan+" "+item.tanggal_perubahan_harga.substr(2,2)}</Text>
-                </Text>
+                {item.harga != '0' && (
+                    <View>
+                        <Text style={styles.hargaLabel}>Rp {formatRupiah(item.harga)}
+                            {"\n"}
+                            <Text style={{marginTop:5, color:ORANGE}}>{item.tanggal_perubahan_harga.substr(8,2)+" "+bulan+" "+item.tanggal_perubahan_harga.substr(2,2)}</Text>
+                        </Text>
+                    </View>
+                )}
+
+                {item.harga == '0' && (
+                    <Text style={styles.hargaLabel}>
+                    </Text>
+                )}
 
                 <View style={styles.detailUserSm}>
                     <Image style={styles.fotoProfilSm} source={{uri}} resizeMode="cover" resizeMethod="resize" />
@@ -711,8 +787,8 @@ const styles = StyleSheet.create({
         fontWeight:'700'
     },
     fotoProfil:{
-        width:60,
-        height:60,
+        width:50,
+        height:50,
         borderRadius:120/2,
         alignItems:"flex-start",
     },
