@@ -335,7 +335,7 @@ const DetailPemilikDo = (props) => {
                                                     isSelected={privasiHarga === obj.value }
                                                     onPress={(value) => {
                                                         setPrivasiHarga(value)
-                                                        if(i == 0){
+                                                        if(i == 0 && props.edit){
                                                             updatePrivasiHarga("");
                                                         }
                                                         else if(i == 1){
