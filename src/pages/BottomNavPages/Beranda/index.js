@@ -8,6 +8,9 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import SearchAkunModal from '../../../components/SearchAkunModal';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import MenuHomeAtom from '../../../components/MenuHomeAtom';
+import iconPemilikDo from '../../../assets/icon/pemilik-do.png';
+import iconAgenDo from '../../../assets/icon/agen-do.png';
+import iconAdminDo from '../../../assets/icon/admin-do.png';
 
 const ORANGE = CONSTANTS.COLOR.ORANGE;
 const NAVY = CONSTANTS.COLOR.NAVY;
@@ -95,7 +98,7 @@ const Beranda = (props) => {
             if(json.response == 1){
                 setUsername(json.username);
                 const pecah_nama = json.nama_lengkap.split(" ")
-                setNamaLengkap("Hi, "+pecah_nama[0]+" "+pecah_nama[1]+ " Tentukan posisi Anda");
+                setNamaLengkap("Selamat Datang, "+pecah_nama[0]+" "+pecah_nama[1]+" ! ");
             }      
             console.log(json);
         })
@@ -160,6 +163,7 @@ const Beranda = (props) => {
             <SearchAkunModal setModalVisible={setModalVisible} modalVisible={modalVisible} currentUser={username} navigation={props.navigation} />
             <SearchBar />
             <ScrollView style={styles.container}>
+                
                 <View style={styles.topArea}>
                     <TouchableOpacity onPress={()=>setModalVisible(true)}>
                         <View style={styles.inputWrapper}>
@@ -167,30 +171,36 @@ const Beranda = (props) => {
                             <Text style={styles.textInput}>Cari Sesuatu Disini . . .</Text>
                         </View>
                     </TouchableOpacity>
-                </View>
-                
-                <MenuHomeAtom username={username} klaimDo={true} beliDo={true} rekapDoSaya={true} buatInvoice={true} bayarInvoice={true} kasihDeposit={true} daftarHutang={true} menuTop={-95}  navigation={props.navigation} />
 
-                <View style={styles.segmenArea}>
-                    <Text style={styles.segmenTitle}>
+                    <Text style={styles.topAreaTitle}>
                         {nama_lengkap}
                     </Text>
-                        <View style={styles.segmenWrapper}>
-                                <TouchableOpacity style={styles.btnPemilikDo} onPress={()=> konfirmasiPemilikDo()} >
-                                    <Text style={styles.btnPemilikDoLabel}>Pemilik DO</Text>
-                                </TouchableOpacity>
 
-                                <TouchableOpacity style={styles.btnAgen} onPress={()=> konfirmasiAgenDo()} >
-                                    <Text style={styles.btnAgenLabel}>Agen DO</Text>
-                                </TouchableOpacity>
-                        </View>
+                    <Text style={styles.topAreaSubTitle}>
+                        Tentukan posisi Anda sebagai
+                    </Text>
 
-                        <View style={styles.segmenWrapper}>
-                                <TouchableOpacity style={styles.btnAdmin} onPress={()=> konfirmasiAdmin()} >
-                                    <Text style={styles.btnAdminLabel}>Admin DO</Text>
-                                </TouchableOpacity>
-                        </View>
+                    <View style={styles.topButtonWrapper}>
+                        <TouchableOpacity style={styles.btnPemilikDo} onPress={()=> konfirmasiPemilikDo()} >
+                            <Image source={iconPemilikDo} style={styles.btnTopAreaIcon} />
+                            <Text style={styles.btnPemilikDoLabel}>Pemilik DO</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity style={styles.btnAgen} onPress={()=> konfirmasiAgenDo()} >
+                            <Image source={iconAgenDo} style={styles.btnTopAreaIcon} />
+                            <Text style={styles.btnAgenLabel}>Agen DO</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity style={styles.btnAdmin} onPress={()=> konfirmasiAdmin()} >
+                            <Image source={iconAdminDo} style={styles.btnTopAreaIcon} />
+                            <Text style={styles.btnAdminLabel}>Admin DO</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
+
+                <MenuHomeAtom username={username} klaimDo={true} beliDo={true} rekapDoSaya={true} buatInvoice={true} bayarInvoice={true} kasihDeposit={true} daftarHutang={true} menuTop={-100}  navigation={props.navigation} /> 
+
+                        
 
                 
             </ScrollView>
@@ -205,11 +215,23 @@ const styles = StyleSheet.create({
     },
     topArea:{
         backgroundColor:ORANGE,
-        flex:1,
+        flex:0.5,
         paddingTop:0,
         paddingBottom:90,
         paddingHorizontal:15
-        
+    },
+    topAreaTitle :{
+        fontSize:18,
+        fontWeight:'500',
+        marginTop:10,
+        marginBottom:5,
+        color:'white'
+    },
+    topAreaSubTitle :{
+        fontSize:13,
+        fontWeight:'400',
+        marginBottom:10,
+        color:'white'
     },
     segmenArea :{
         marginTop:-80,
@@ -225,59 +247,65 @@ const styles = StyleSheet.create({
         marginTop:10,
         marginBottom:10,
     },
-    segmenWrapper :{
+    topButtonWrapper :{
         flexDirection : "row",
         justifyContent : "space-between",
     },
+    segmenWrapper :{
+        padding:10
+    },
+    btnTopAreaIcon : {
+        width:45,
+        height:45
+    },
     btnAgen :{
         flex:1,
-        flexDirection:'row',
-        backgroundColor:'#f5f5f0',
-        justifyContent:"space-between",
+        flexDirection:'column',
+        backgroundColor:'white',
+        justifyContent:"center",
         alignItems:'center',
-        height:45,
-        marginRight:5,
+        height:90,
+        marginHorizontal:8,
         borderRadius:5,
-        marginBottom:10
+        marginBottom:10,
+        paddingTop:10
     },  
     btnAgenLabel :{
         flex:1,
         fontSize:15,
-        color:ORANGE,
+        color:'grey',
         textAlign:'center'
     },
     btnPemilikDo :{
         flex:1,
-        flexDirection:'row',
-        backgroundColor:'#f5f5f0',
-        justifyContent:"space-between",
+        backgroundColor:'white',
+        justifyContent:"center",
         alignItems:'center',
-        height:45,
-        marginRight:5,
+        height:90,
         borderRadius:5,
-        marginBottom:10
+        marginBottom:10,
+        paddingTop:10
     },  
     btnPemilikDoLabel :{
         flex:1,
         fontSize:15,
-        color:ORANGE,
+        color:'grey',
         textAlign:'center'
     },
     btnAdmin :{
         flex:1,
-        flexDirection:'row',
-        backgroundColor:'#f5f5f0',
-        justifyContent:"space-between",
+        backgroundColor:'white',
+        justifyContent:"center",
         alignItems:'center',
-        height:45,
-        marginRight:5,
+        height:90,
         borderRadius:5,
-        marginBottom:10
+        marginBottom:10,
+        paddingTop:10
     },  
     btnAdminLabel :{
         flex:1,
         fontSize:15,
-        color:ORANGE,
+        color:'grey',
         textAlign:'center'
     },
     noDataWrapper:{

@@ -13,12 +13,9 @@ import iconProfile from '../../assets/icon/profile.png';
 import iconProfileActive from '../../assets/icon/profile-active.png';
 import CONSTANTS from '../../assets/constants';
 import { Beranda, Notifikasi, Profil} from '../../pages';
-import * as ImagePicker from 'react-native-image-picker';
 import AwesomeAlert from 'react-native-awesome-alerts';
-import MultipleImagePicker from '@baronha/react-native-multiple-image-picker';
 import AsyncStorage from '@react-native-community/async-storage';
 
-const DANGER = CONSTANTS.COLOR.DANGER;
 const ORANGE = CONSTANTS.COLOR.ORANGE;
 const NAVY = CONSTANTS.COLOR.NAVY;
 const alert_title = "";

@@ -50,6 +50,9 @@ const Profil =  ({route, navigation}) => {
     const [total_karyawan, setTotalKaryawan] = useState("");
     const [total_followers, setTotalFollowers] = useState("");
     const [total_following, setTotalFollowing] = useState("");
+    const [showCobaLagi, setShowCobaLagi] = useState(false);
+    const [showLogin, setShowLogin] = useState(false);
+    const [noDataText, setNoDataText] = useState(false);
 
     useEffect(()=>{
         getUser();
@@ -70,7 +73,8 @@ const Profil =  ({route, navigation}) => {
             // We have data!!
             //navigation.navigate("Login");
             setLoadingVisible(false);
-            setUsername("");
+            setShowLogin(true);
+            setNoDataText("Silahkan Login Telebih Dahulu")
           }
           else{
             const timeout = setTimeout(() => {
@@ -149,12 +153,8 @@ const Profil =  ({route, navigation}) => {
         setConfirmButtonAlert(false);
 
         const timeout = setTimeout(() => {
-            setAlert(true);
             setLoadingVisible(false);
-            setCancelButtonAlert(true);
-            setConfirmButtonAlert(false);
-            setCancelTextAlert("Tutup");
-            setAlertMessage("Permintaan Tidak Dapat Dipenuhi, Server Tidak Merespon");
+            setNoDataText("Tidak Dapat Mengambil Informasi Anda")
         }, 30000);
 
         const params = {
@@ -203,11 +203,7 @@ const Profil =  ({route, navigation}) => {
         })
         .catch((error) => {
             clearTimeout(timeout);
-            setAlert(true);
-            setAlertMessage("Terjadi Kesalahan. \n"+error);
-            setCancelTextAlert("Tutup");
-            setConfirmButtonAlert(false);
-            setCancelButtonAlert(true);
+            setNoDataText("Tidak Dapat Mengambil Informasi Anda")
             setLoadingVisible(false);
             console.log(error);
         });
@@ -286,17 +282,22 @@ const Profil =  ({route, navigation}) => {
                     }}
                     onConfirmPressed={alertConfirmTask}
                 />
-            {username == "" &&(
+            {showCobaLagi || showLogin &&(
                 <View style={styles.noDataWrapper}>
                     <NoData width={250} height={150} />
-                    <Text style={styles.noDataText1}>Tidak Dapat Mengambil Informasi Anda</Text>
+                    <Text style={styles.noDataText1}>{noDataText}</Text>
                     <Text style={styles.noDataText2}></Text>
-                    <TouchableOpacity style={styles.btnReloadUser} onPress={()=>{getUser()}}>
-                        <Text style={styles.btnLoginLabel}>Coba Lagi</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.btnLogin} onPress={()=>{navigation.navigate("Login")}}>
-                        <Text style={styles.btnLoginLabel}>Login</Text>
-                    </TouchableOpacity>
+                    {showCobaLagi &&(
+                        <TouchableOpacity style={styles.btnReloadUser} onPress={()=>{getUser()}}>
+                            <Text style={styles.btnLoginLabel}>Coba Lagi</Text>
+                        </TouchableOpacity>
+                    )}
+
+                    {showLogin && (
+                         <TouchableOpacity style={styles.btnLogin} onPress={()=>{navigation.navigate("Login")}}>
+                            <Text style={styles.btnLoginLabel}>Login</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
             )}    
 
