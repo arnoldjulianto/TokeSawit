@@ -233,7 +233,7 @@ const HomeStackNavigator = () => {
         setTimeout( async() => {
             let userToken = null;
             try{
-                userToken = await AsyncStorage.getItem("userToken");
+                userToken = await AsyncStorage.getItem("username");
             }catch(e){
                 console.log(e);
             }
