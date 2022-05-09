@@ -34,7 +34,7 @@ export default class NotifService {
         channelDescription: "A Toke Sawit channel", // (optional) default: undefined.
         soundName: "default", // (optional) See `soundName` parameter of `localNotification` function
         importance: Importance.HIGH, // (optional) default: Importance.HIGH. Int value of the Android notification importance
-        vibrate: false, // (optional) default: true. Creates the default vibration pattern if true.
+        vibrate: true, // (optional) default: true. Creates the default vibration pattern if true.
         vibration: 1000,
         subText: "Hai, arnoldjulianto97", // (optional) default: none
         largeIcon: 'ic_launcher'
