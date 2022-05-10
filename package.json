@@ -1,6 +1,6 @@
 {
   "name": "TokeSawit",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
@@ -22,8 +22,10 @@
     "@react-navigation/bottom-tabs": "^5.11.11",
     "@react-navigation/native": "^6.0.10",
     "@react-navigation/stack": "^5.14.5",
+    "appcenter-cli": "^2.10.10",
     "axios": "^0.26.1",
     "firebase": "^9.6.9",
+    "global": "^4.4.0",
     "i": "^0.3.6",
     "link": "^0.1.5",
     "npm": "^7.20.6",
@@ -34,6 +36,7 @@
     "react-native-awesome-alerts": "^1.5.2",
     "react-native-background-task": "^0.2.1",
     "react-native-clear-app-cache": "^1.0.4",
+    "react-native-code-push": "^7.0.4",
     "react-native-device-info": "^8.6.0",
     "react-native-firebase-auth": "^1.0.1",
     "react-native-fit-image": "^1.5.5",

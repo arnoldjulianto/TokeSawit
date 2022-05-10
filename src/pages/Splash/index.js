@@ -3,6 +3,7 @@ import React, {useEffect} from 'react';
 import { StyleSheet, Text, View, Image } from 'react-native';
 import CONSTANTS from '../../assets/constants';
 import iconTokeSawit from '../../assets/icon/logo.png';
+import packageJson from '../../../package.json';
 
 const DANGER = CONSTANTS.COLOR.DANGER;
 const NAVY = CONSTANTS.COLOR.NAVY;
@@ -26,7 +27,7 @@ const Splash = ({navigation}) => {
              
             <Text style={styles.splashSubTitle}></Text>
             <View style={styles.splashText}>
-                <Text style={styles.splashTitle1}>Alpha Version 1.0.0</Text> 
+                <Text style={styles.splashTitle1}>Version {packageJson.version}</Text> 
             </View>
         </View>
     )

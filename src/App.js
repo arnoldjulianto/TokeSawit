@@ -5,6 +5,8 @@ import { View } from 'react-native';
 import NotifService from '../NotifService';
 import AsyncStorage from '@react-native-community/async-storage';
 import * as RootNavigation from './pages/BottomNavStackNavigatorPages/HomeStackNavigator/RootNavigation.js';
+import codePush from "react-native-code-push";
+let codePushOptions = { checkFrequency: codePush.CheckFrequency.ON_APP_RESUME };
 
 class App extends Component {
   constructor(props) {
@@ -18,6 +20,13 @@ class App extends Component {
       this.onRegister.bind(this),
       this.onNotif.bind(this),
     );
+  }
+
+  componentDidMount(){
+    codePush.sync({
+      updateDialog: true,
+      installMode: codePush.InstallMode.IMMEDIATE
+    });
   }
 
   onRegister(token) {
@@ -52,4 +61,4 @@ class App extends Component {
 
 
 
-export default App;
+export default codePush(codePushOptions)(App);

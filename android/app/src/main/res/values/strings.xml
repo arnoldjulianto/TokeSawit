@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">TokeSawit</string>
+    <string moduleConfig="true" name="CodePushDeploymentKey">TY_LdyTYpj6Un56OlWh3flpq7mKcwm2snUBfK</string>
 </resources>
