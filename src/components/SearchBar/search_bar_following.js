@@ -1,73 +1,59 @@
 /* eslint-disable prettier/prettier */
 import { useRoute } from '@react-navigation/native';
-import React, { useState, useRef, useEffect} from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View, Animated, TextInput } from 'react-native';
-import iconAdd from '../../assets/icon/add.png';
-import iconSearch from '../../assets/icon/search.png';
+import iconBack from '../../assets/icon/back.png';
+import iconRefreshWhite from '../../assets/icon/refresh-white.png';
 import CONSTANTS from '../../assets/constants';
-import { BerandaContext } from '../Context';
-const ORANGE = CONSTANTS.COLOR.ORANGE;
+const DANGER = CONSTANTS.COLOR.DANGER;
 const NAVY = CONSTANTS.COLOR.NAVY;
+const ORANGE = CONSTANTS.COLOR.ORANGE;
 const alert_title = CONSTANTS.MSG.ALERT_TITLE;
-import Icon from 'react-native-vector-icons/FontAwesome5';
-import ContentLoader, { Rect, Circle } from 'react-content-loader/native'
 
 const TopIcon = (props) => {
     return(
         <View>
             <View style={styles.searchBarTopIconWrapper}>
                 <Image  style={styles.searchBarTopIcon}/>
-                <TouchableOpacity onPress={() => props.navigation.navigate('ContextBukaTutupBuku', {
-                    no_buka_tutup_buku1: '',
-                    title: 'History DO'
-                    }) } style={styles.topBarAddButton} >
-                <Image source={iconAdd} style={styles.searchBarTopIcon} />
-            </TouchableOpacity>
             </View>
         </View>
     );
 }
 
-const MyLoader = () => (
-    <ContentLoader 
-        viewBox="0 0 400 50" 
-        foregroundColor="grey"
-        style={{backgroundColor:"transparent", height:54}}
-    >
-      <Rect x="5" y="0" rx="3" ry="3" width="150" height="20" />
-    </ContentLoader>
-)
-
-const SearchBarBeranda = (props) => {
-    const route = useRoute();
-    
+const SearchBar = (props) => {
     return (
         <View style={styles.searchBarWrapper}>
-            {props.loadingVisible && (
-                <MyLoader  />
-            )}
-            {!props.loadingVisible && (
-                <View style={styles.searchBarTopWrapper}>
-                    <Text style={styles.searchBarTitle}>Rp 250.000.000</Text>
+            <View style={styles.searchBarTopWrapper}>
+                <View style={styles.searchBarTitleWrapper}>
+                    <TouchableOpacity onPress={ ()=> props.navigation.goBack() }>
+                        <Image source={iconBack} style={styles.searchBarIcon}  />
+                    </TouchableOpacity>
+                    <Text style={styles.searchBarTitle}>{props.title}</Text>
+                    {props.refresh != false &&
+                    <View style={{flex:1,alignItems:'flex-end', justifyContent:'flex-end', right:10}}>
+                        <TouchableOpacity style={{justifyContent:'flex-end'}}  onPress={ ()=> {props.refresh()} }>
+                            <Image source={iconRefreshWhite} style={styles.searchBarIcon}  />
+                        </TouchableOpacity>
+                    </View>
+                    }
                 </View>
-            )}
+            </View>
         </View>
     );
+    
 };
 
-
-
-export default SearchBarBeranda;
+export default SearchBar;
 
 const styles = StyleSheet.create({
     cartegoryArea : {
-        backgroundColor:ORANGE,
+        backgroundColor:DANGER,
         height:200
     },
     searchBarWrapper : {
-        height:56,
+        height:54,
         backgroundColor:ORANGE,
-        padding:10,
+        justifyContent:'center'
     },
     searchBarTopWrapper : {
         flexDirection : 'row',
@@ -79,11 +65,14 @@ const styles = StyleSheet.create({
     },
     searchBarTitleWrapper : {
         flex:1,
+        flexDirection: 'row',
     },
     searchBarTitle : {
-        fontSize:17,
+        fontSize:20,
+        marginLeft:20,
+        marginTop:3,
         fontFamily : 'arial',
-        fontWeight : '500',
+        fontWeight : '800',
         color : 'white',
     },
     searchBarTopIcon : {
@@ -98,21 +87,19 @@ const styles = StyleSheet.create({
         borderRadius:3,
         backgroundColor:"#fff",
         height:35,
-        flex:1
+        width:330
     },
     searchBarIcon : {
-        marginLeft:10,
-        height: 20,
-        width: 20,
-        position:'relative',
+        height: 40,
+        width: 40,
     },
     searchBarInput : {
+        flex:1,
         fontSize:14,
         fontWeight : '100',
         color:NAVY,
         paddingLeft:10,
-        height:45,
-        left:20
+        height:45
     },
     topBarAddButton :{
         backgroundColor:NAVY,

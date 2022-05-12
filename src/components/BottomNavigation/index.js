@@ -88,7 +88,7 @@ const BottomNavigation = (props) => {
                 username
             }
         }
-        console.log(params);
+        //console.log(params);
         const createFormData = (body) => {
             const data = new FormData();
             Object.keys(body).forEach(key => {
@@ -115,7 +115,7 @@ const BottomNavigation = (props) => {
                 setNotifBelumDibaca(0);
                 setTabBarBadge(null);
             }
-            console.log(json);
+            //console.log(json);
         })
         .catch((error) => {
             console.log(error);

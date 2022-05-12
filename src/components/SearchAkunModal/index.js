@@ -184,9 +184,9 @@ const SearchAkunModal = (props) => {
     const [index, setIndex] = React.useState(0);
     const [routes] = React.useState([
       { key: 1, title: 'Semua' },
-      { key: 2, title: 'Produk' },
-      { key: 3, title: 'Nama Do' },
-      { key: 4, title: 'Orang' },
+      { key: 2, title: 'Orang' },
+      { key: 3, title: 'Produk' },
+    //   { key: 3, title: 'Nama Do' },
     ]);
 
     const layout = useWindowDimensions();
@@ -382,6 +382,18 @@ const SearchAkunModal = (props) => {
                             />
                         </View>
                     )}
+
+                    {arrUser.length > 0 && (
+                        <View style={styles.segmenWrapper}>
+                            <Text style={styles.segmenTitle}>Orang</Text>
+                                <FlatList
+                                    data={arrUser}
+                                    keyExtractor={(item, index) => (item.id) + index}
+                                    renderItem={renderItemUser}
+                                    maxToRenderPerBatch={5} updateCellsBatchingPeriod={20}
+                                />
+                        </View>
+                    )}
                     
                     {arrProduk.length > 0 && (
                         <View style={styles.segmenWrapper}>
@@ -426,7 +438,7 @@ const SearchAkunModal = (props) => {
                         </View>
                     )}
 
-                    {arrNamaDo.length > 0 && (
+                    {/* {arrNamaDo.length > 0 && (
                         <View style={styles.segmenWrapper}>
                             <Text style={styles.segmenTitle}>Nama Do</Text>
                             <FlatList
@@ -438,19 +450,9 @@ const SearchAkunModal = (props) => {
                                 numColumns={4}
                             />
                         </View>
-                    )}
+                    )} */}
 
-                    {arrUser.length > 0 && (
-                        <View style={styles.segmenWrapper}>
-                            <Text style={styles.segmenTitle}>Orang</Text>
-                                <FlatList
-                                    data={arrUser}
-                                    keyExtractor={(item, index) => (item.id) + index}
-                                    renderItem={renderItemUser}
-                                    maxToRenderPerBatch={5} updateCellsBatchingPeriod={20}
-                                />
-                        </View>
-                    )}
+                    
                 </ScrollView>    
             )
             
@@ -469,6 +471,37 @@ const SearchAkunModal = (props) => {
             // )
 
             case 2:
+            return (
+                <View style={{flex:1}} >
+                    {arrUser.length > 0 && (
+                        <FlatList
+                            data={arrUser}
+                            keyExtractor={(item, index) => (item.id) + index}
+                            renderItem={renderItemUser}
+                            maxToRenderPerBatch={5} updateCellsBatchingPeriod={20}
+                        />
+                    )}
+                </View>        
+            )
+
+            // case 3:
+            // return (
+            //     <View style={{flex:1, padding:20}} >
+            //         {arrNamaDo.length > 0 && (
+            //         <FlatList
+            //             data={arrNamaDo}
+            //             keyExtractor={(item, index) => (item.id) + index}
+            //             renderItem={renderItemNamaDo}
+            //             maxToRenderPerBatch={5} 
+            //             updateCellsBatchingPeriod={20}
+            //             numColumns={4}
+            //         />
+            //         )}
+            //     </View>        
+            // )
+
+            case 3:
+            
             return (
                 <View style={{flex:1, paddingTop:20}}>
                     <View style={styles.headerItemArea} >
@@ -508,36 +541,6 @@ const SearchAkunModal = (props) => {
                         maxToRenderPerBatch={5} updateCellsBatchingPeriod={20}
                     /> 
                 </View>  
-            )
-
-            case 3:
-            return (
-                <View style={{flex:1, padding:20}} >
-                    {arrNamaDo.length > 0 && (
-                    <FlatList
-                        data={arrNamaDo}
-                        keyExtractor={(item, index) => (item.id) + index}
-                        renderItem={renderItemNamaDo}
-                        maxToRenderPerBatch={5} 
-                        updateCellsBatchingPeriod={20}
-                        numColumns={4}
-                    />
-                    )}
-                </View>        
-            )
-
-            case 4:
-            return (
-                <View style={{flex:1}} >
-                    {arrUser.length > 0 && (
-                        <FlatList
-                            data={arrUser}
-                            keyExtractor={(item, index) => (item.id) + index}
-                            renderItem={renderItemUser}
-                            maxToRenderPerBatch={5} updateCellsBatchingPeriod={20}
-                        />
-                    )}
-                </View>        
             )
         }
     }
@@ -765,7 +768,8 @@ const styles = StyleSheet.create({
         flexDirection:'row',
         backgroundColor:'#fcfcfc',
         justifyContent:"space-around",
-        marginTop:12,
+        marginTop:10,
+        marginBottom:10,
         borderWidth:0.3,
         paddingVertical:10,
         borderRadius:10

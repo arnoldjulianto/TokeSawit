@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Alert, View, ActivityIndicator, Platform, PermissionsAndroid} from 'react-native';
 import BottomNavigation from '../../../components/BottomNavigation';
 // import { Splash } from '../../../pages';
-import { Login, Register,InputNoHp, SmsVerificationProvider, SmsVerificationAndroid, FotoKlaimDo, PreviewFotoKlaimDo, TentukanAgen, DetailJualDo, RekeningBank, PilihRekeningBank, AddRekeningBank, InputPin, BuatPinBaru, EditProfil, JadiPemilikDo, AddDoSaya, InputDoPPKS, BiayaBongkar, InputHargaDoPPKS, PreviewPemilikDo, LihatProfil, ShowHargaKecuali, ShowHargaKepada } from '../';
+import { Login, Register,InputNoHp, SmsVerificationProvider, SmsVerificationAndroid, FotoKlaimDo, PreviewFotoKlaimDo, TentukanAgen, DetailJualDo, RekeningBank, PilihRekeningBank, AddRekeningBank, InputPin, BuatPinBaru, EditProfil, JadiPemilikDo, AddDoSaya, InputDoPPKS, BiayaBongkar, InputHargaDoPPKS, PreviewPemilikDo, LihatProfil, Following, ShowHargaKecuali, ShowHargaKepada } from '../';
 import {AuthContext} from '../../../components/Context';
 import AsyncStorage from '@react-native-community/async-storage';
 import Splash from '../../Splash';
@@ -14,6 +14,7 @@ import AwesomeAlert from 'react-native-awesome-alerts';
 import messaging from '@react-native-firebase/messaging';
 import { navigationRef } from './RootNavigation';
 import * as RootNavigation from './RootNavigation';
+import codePush from "react-native-code-push";
 
 const NAVY = CONSTANTS.COLOR.NAVY;
 const ORANGE = CONSTANTS.COLOR.ORANGE;
@@ -24,9 +25,11 @@ const base_url = CONSTANTS.CONFIG.BASE_URL;
 const DANGER = CONSTANTS.COLOR.DANGER;
 const alert_title = CONSTANTS.MSG.ALERT_TITLE;
 
+let codePushOptions = { checkFrequency: codePush.CheckFrequency.MANUAL };
 
-const HomeStackNavigator = () => {
-    //const navigation =useNavigation();
+
+
+const HomeStackNavigator =  () =>  {
     const closeAlert = () => {
         console.log("alert close");
         setAlert(false);
@@ -40,73 +43,13 @@ const HomeStackNavigator = () => {
     const [cancelTextAlert, setCancelTextAlert] = useState("");
     const [alertConfirmTask, setAlertConfirmTask] = useState(() => closeAlert() );
     const [initialRoute, setInitialRoute] = useState("Home");
+    const [updateAppStatus, setUpdateAppStatus] = useState("");
 
     const initialLoginState ={
         isLoading : true,
         userName : null,
         userToken : null
     };
-    
-    useEffect(() => {
-        messaging()
-        .getInitialNotification()
-        .then(remoteMessage => {
-          if (remoteMessage) {
-            console.log(
-              'Notification caused app to open from quit state:',
-              remoteMessage.notification,
-            );
-            setInitialRoute("Home"); // e.g. "Settings"
-            setTimeout(()=>{
-                console.log("Go TO PAGE")
-                if(typeof remoteMessage.data.screen !== "undefined" ) RootNavigation.navigate(remoteMessage.data.navigation, {screen:remoteMessage.data.screen});
-                else RootNavigation.navigate(remoteMessage.data.navigation);
-            },5500)
-          }
-        });
-
-        messaging().onNotificationOpenedApp(remoteMessage => {
-          console.log(
-            'Notification caused app to open from background state:',
-            remoteMessage.notification,
-          );
-          if(typeof remoteMessage.data.screen !== "undefined" ) RootNavigation.navigate(remoteMessage.data.navigation, {screen:remoteMessage.data.screen});
-          else RootNavigation.navigate(remoteMessage.data.navigation);
-        });
-    },[]);
-
-    useEffect(()=>{
-        requestPermission();
-    },[])
-
-    const requestPermission = async () => {
-        if (Platform.OS === 'android') {
-            try {
-                const granted = await PermissionsAndroid.requestMultiple([
-                    PermissionsAndroid.PERMISSIONS.CAMERA,
-                    PermissionsAndroid.PERMISSIONS.READ_SMS,
-                    PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-                    PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-                ],
-                    {
-                        title: "TokeSawit Izin Akses",
-                        message:
-                        "TokeSawit Meminta Untuk Mengakses Kamera ",
-                        buttonNegative: "Cancel",
-                        buttonPositive: "OK"
-                    }
-                );
-                if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-                    console.log("You can use the camera");
-                } else {
-                    console.log("Camera permission denied");
-                }
-            } catch (err) {
-                console.warn(err);
-            }
-        }
-    };
-
 
     const loginReducer = (prevState, action) => {
         switch ( action.type ) {
@@ -136,10 +79,16 @@ const HomeStackNavigator = () => {
                     userName : action.id,
                     userToken : action.token,
                     isLoading : false,
-                };              
+                };  
+            case 'APP_UPDATE' :
+                return {
+                    ...prevState,
+                    userName : action.id,
+                    userToken : action.token,
+                    isLoading : false,
+                };                
         }
     }
-
     const [loginState, dispatch] = React.useReducer(loginReducer, initialLoginState);
 
     const authContext = React.useMemo(() => ({
@@ -228,23 +177,136 @@ const HomeStackNavigator = () => {
             
         },
     }),[]);
-
+    
     useEffect(() => {
-        setTimeout( async() => {
+        if(!loginState.isLoading){
+                messaging()
+                .getInitialNotification()
+                .then(remoteMessage => {
+                if (remoteMessage) {
+                    console.log(
+                    'Notification caused app to open from quit state:',
+                    remoteMessage.notification,
+                    );
+                    setInitialRoute("Home"); // e.g. "Settings"
+                    //setTimeout(()=>{
+                        console.log("Go TO PAGE")
+                        if(typeof remoteMessage.data.screen !== "undefined" ) RootNavigation.navigate(remoteMessage.data.navigation, {screen:remoteMessage.data.screen});
+                        else RootNavigation.navigate(remoteMessage.data.navigation);
+                    //},5500)
+                }
+                });
+
+                messaging().onNotificationOpenedApp(remoteMessage => {
+                console.log(
+                    'Notification caused app to open from background state:',
+                    remoteMessage.notification,
+                );
+                if(typeof remoteMessage.data.screen !== "undefined" ) RootNavigation.navigate(remoteMessage.data.navigation, {screen:remoteMessage.data.screen});
+                else RootNavigation.navigate(remoteMessage.data.navigation);
+                });
+        }
+    },[loginState]);
+
+    useEffect(()=>{
+        if(!loginState.isLoading){
+            requestPermission();
+        }
+    },[loginState])
+
+    const requestPermission = async () => {
+        if (Platform.OS === 'android') {
+            try {
+                const granted = await PermissionsAndroid.requestMultiple([
+                    PermissionsAndroid.PERMISSIONS.CAMERA,
+                    PermissionsAndroid.PERMISSIONS.READ_SMS,
+                    PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+                    PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+                ],
+                    {
+                        title: "TokeSawit Izin Akses",
+                        message:
+                        "TokeSawit Meminta Untuk Mengakses Kamera ",
+                        buttonNegative: "Cancel",
+                        buttonPositive: "OK"
+                    }
+                );
+                if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                    console.log("You can use the camera");
+                } else {
+                    console.log("Camera permission denied");
+                }
+            } catch (err) {
+                console.warn(err);
+            }
+        }
+    };
+
+    
+    //PROSESING
+    useEffect(() => {
+        setTimeout(()=>{
             let userToken = null;
             try{
-                userToken = await AsyncStorage.getItem("username");
+                userToken = AsyncStorage.getItem("username");
+                dispatch({type:'APP_UPDATE', token:userToken});
             }catch(e){
-                console.log(e);
+                console.log("ERORR GET TOKEN");
             }
-            dispatch({type:'RETRIEVE_TOKEN', token:userToken});
-        }, 3000)
+            codePush.sync({
+                updateDialog: false,
+                installMode: codePush.InstallMode.IMMEDIATE
+            },onSyncStatusChange);
+        },2000)
     },[]);
-    
-    if( loginState.isLoading ){
+    //PROSESING
+
+    const onSyncStatusChange = (SyncStatus) => {
+        switch (SyncStatus) {
+            case 5:
+                console.log("MEMERIKSA UPDATE")
+                setUpdateAppStatus("MEMERIKSA UPDATE");
+                break;
+            case 6:
+                console.log("MENUNGGU USER ACTION")
+                setUpdateAppStatus("MENUNGGU USER ACTION");
+                break;
+            case 7:
+                console.log("MENGUNDUH PACKAGE UPDATE");
+                setUpdateAppStatus("MENGUNDUH PACKAGE UPDATE");
+                break;
+            case 8:
+                console.log("MENGINSTALL UPDATE");
+                setUpdateAppStatus("MENGINSTALL UPDATE");
+                break;
+            case 4:
+                console.log("PROSES SINKRONISASI UPDATE");
+                setUpdateAppStatus("PROSES SINKRONISASI UPDATE");
+                break; 
+            case 3:
+                console.log("TERJADI KESALAHAN UPDATE APP")
+                setUpdateAppStatus("TERJADI KESALAHAN UPDATE APP");
+                break;  
+            case 2:
+                console.log("UPDATE DIABAIKAN")
+                setUpdateAppStatus("UPDATE DIABAIKAN");
+                break;      
+            case 1:
+                console.log("UPDATE TERINSTALL")
+                setUpdateAppStatus("UPDATE TERINSTALL");
+                break;   
+            case 0:
+                console.log("APLIKASI SUDAH TERUPDATE")
+                setUpdateAppStatus("APLIKASI SUDAH TERUPDATE");
+                break;            
+        }
+    }
+    // {"AWAITING_USER_ACTION": 6, "CHECKING_FOR_UPDATE": 5, "DOWNLOADING_PACKAGE": 7, "INSTALLING_UPDATE": 8, "SYNC_IN_PROGRESS": 4, "UNKNOWN_ERROR": 3, "UPDATE_IGNORED": 2, "UPDATE_INSTALLED": 1, "UP_TO_DATE": 0}
+
+    if( updateAppStatus != "APLIKASI SUDAH TERUPDATE" ){
         return(
             <View style={{flex:1}} >
-                <Splash />
+                <Splash updateAppStatus={updateAppStatus} />
             </View>
         );
     }
@@ -316,6 +378,7 @@ const HomeStackNavigator = () => {
                     <Stack.Screen name="InputHargaDoPPKS" component={InputHargaDoPPKS} />
                     <Stack.Screen name="PreviewPemilikDo" component={PreviewPemilikDo} />
                     <Stack.Screen name="LihatProfil" component={LihatProfil} />
+                    <Stack.Screen name="Following" component={Following} />
                     <Stack.Screen name="ShowHargaKecuali" component={ShowHargaKecuali} />
                     <Stack.Screen name="ShowHargaKepada" component={ShowHargaKepada} />
                     <Stack.Screen name="SmsVerificationProvider" component={SmsVerificationProvider} />
@@ -327,7 +390,7 @@ const HomeStackNavigator = () => {
     
 };
 
-export default HomeStackNavigator;
+export default codePush(codePushOptions)(HomeStackNavigator);
 
 const styles = StyleSheet.create({
     centeredView: {

@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import React, { useEffect, useState } from 'react';
-import { View, Text,  StyleSheet, ScrollView, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text,  StyleSheet, ScrollView, Image, TouchableOpacity, RefreshControl, ActivityIndicator } from 'react-native';
 import CONSTANTS from '../../../assets/constants';
 import SearchBar from '../../../components/SearchBar/search_bar_beranda';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -11,6 +11,7 @@ import MenuHomeAtom from '../../../components/MenuHomeAtom';
 import iconPemilikDo from '../../../assets/icon/pemilik-do.png';
 import iconAgenDo from '../../../assets/icon/agen-do.png';
 import iconAdminDo from '../../../assets/icon/admin-do.png';
+import ContentLoader, { Rect, Circle } from 'react-content-loader/native'
 
 const ORANGE = CONSTANTS.COLOR.ORANGE;
 const NAVY = CONSTANTS.COLOR.NAVY;
@@ -22,7 +23,7 @@ const Beranda = (props) => {
     const [username, setUsername] = useState("");
     const [nama_lengkap, setNamaLengkap] = useState("");
     const [modalVisible, setModalVisible] = useState(false);
-    const [loadingVisible, setLoadingVisible] = useState(false);
+    const [loadingVisible, setLoadingVisible] = useState(true);
     const [showAlert, setAlert] = useState(false);
     const closeAlert = () => () => {
         console.log("alert close");
@@ -35,24 +36,38 @@ const Beranda = (props) => {
     const [alert_message, setAlertMessage] = useState("");
     const [confirmTextAlert, setConfirmTextAlert] = useState("");
     const [cancelTextAlert, setCancelTextAlert] = useState("");
+    
     if(modal) setModalVisible(true);
     
     useEffect(() => {
+        setLoadingVisible(true);
+        getUser();
+    },[])
+
+    useEffect(() => {
         const unsubscribe = props.navigation.addListener('focus', () => {
+            //setLoadingVisible(true);
             getUser();
         });
         return unsubscribe;
-    })
+    },[])
 
-   
+    const onRefresh = React.useCallback(() => {
+        setLoadingVisible(true);
+        getUser();
+      }, []);
 
     const getUser = async () => {
         try {
           const value = await AsyncStorage.getItem('username');
           if (value === null) {
             // We have data!!
+            setLoadingVisible(false)
+            setUsername("");
+            setNamaLengkap("");
           }
           else{
+            setLoadingVisible(false)
             setUsername(value);
             loadDataUser(value)
           }
@@ -63,6 +78,7 @@ const Beranda = (props) => {
     };
 
     const loadDataUser = (username) => {
+        //setLoadingVisible(true);
         setCancelButtonAlert(true);
         setConfirmButtonAlert(false);
 
@@ -104,6 +120,7 @@ const Beranda = (props) => {
         })
         .catch((error) => {
             clearTimeout(timeout);
+            setLoadingVisible(false);
             console.log(error);
         });
     }
@@ -126,21 +143,23 @@ const Beranda = (props) => {
     const konfirmasiAdmin = () => {
         
     }
-    const loadPemilikDo = () => ()=> {
+    const loadPemilikDo = ()=> {
         if(username == "")  props.navigation.navigate("Login");
         else props.navigation.navigate("JadiPemilikDo", {username} );
         setAlert(false);
     }
 
-    if(loadingVisible){
-        return(
-            <View style={styles.centeredView}>
-                <View style={styles.modalView}>
-                    <ActivityIndicator size={70} color="yellow" />
-                </View>  
-            </View>
-        );
-    }
+
+    const MyLoader = () => (
+        <ContentLoader 
+            viewBox="0 0 400 50" 
+            foregroundColor="grey"
+            style={{backgroundColor:"transparent", height:73}}
+        >
+          <Rect x="0" y="5" rx="3" ry="0" width="300" height="18" />
+          <Rect x="0" y="35" rx="3" ry="0" width="180" height="13" />
+        </ContentLoader>
+    )
 
     return(
         <View>
@@ -160,9 +179,17 @@ const Beranda = (props) => {
                     onCancelPressed={alertCancelTask}
                     onConfirmPressed={alertConfirmTask}
             />
-            <SearchAkunModal setModalVisible={setModalVisible} modalVisible={modalVisible} currentUser={username} navigation={props.navigation} />
-            <SearchBar />
-            <ScrollView style={styles.container}>
+            <SearchAkunModal setModalVisible={setModalVisible} modalVisible={modalVisible}  currentUser={username} navigation={props.navigation} />
+            <SearchBar setLoadingVisible={setLoadingVisible} loadingVisible={loadingVisible}  />
+            <ScrollView 
+                style={styles.container}
+                refreshControl={
+                    <RefreshControl
+                    refreshing={loadingVisible}
+                    onRefresh={onRefresh}
+                    />
+                }
+            >
                 
                 <View style={styles.topArea}>
                     <TouchableOpacity onPress={()=>setModalVisible(true)}>
@@ -172,21 +199,30 @@ const Beranda = (props) => {
                         </View>
                     </TouchableOpacity>
 
-                    <Text style={styles.topAreaTitle}>
-                        {nama_lengkap}
-                    </Text>
+                    {loadingVisible && (
+                        <MyLoader />
+                    )}
+                    {!loadingVisible && (
+                        <View>
+                            <Text style={styles.topAreaTitle}>
+                                {nama_lengkap}
+                            </Text>
 
-                    <Text style={styles.topAreaSubTitle}>
-                        Tentukan posisi Anda sebagai
-                    </Text>
+                            <Text style={styles.topAreaSubTitle}>
+                                Tentukan posisi Anda sebagai
+                            </Text>
+                        </View>
+                    )}
 
                     <View style={styles.topButtonWrapper}>
-                        <TouchableOpacity style={styles.btnPemilikDo} onPress={()=> konfirmasiPemilikDo()} >
+                        {/* <TouchableOpacity style={styles.btnPemilikDo} onPress={()=> konfirmasiPemilikDo()} >
                             <Image source={iconPemilikDo} style={styles.btnTopAreaIcon} />
                             <Text style={styles.btnPemilikDoLabel}>Pemilik DO</Text>
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
 
-                        <TouchableOpacity style={styles.btnAgen} onPress={()=> konfirmasiAgenDo()} >
+                        <TouchableOpacity style={styles.btnAgen} onPress={()=> {
+                            loadPemilikDo();
+                        }} >
                             <Image source={iconAgenDo} style={styles.btnTopAreaIcon} />
                             <Text style={styles.btnAgenLabel}>Agen DO</Text>
                         </TouchableOpacity>

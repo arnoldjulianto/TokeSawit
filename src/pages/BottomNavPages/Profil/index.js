@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import React,{useEffect, useState} from 'react';
-import {View, ScrollView, Text, TextInput, StyleSheet, Image, ActivityIndicator, useWindowDimensions, TouchableOpacity} from 'react-native';
+import {View, ScrollView, Text, TextInput, StyleSheet, Image, ActivityIndicator, useWindowDimensions, TouchableOpacity, RefreshControl} from 'react-native';
 import {AuthContext} from '../../../components/Context';
 import CONSTANTS from '../../../assets/constants';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -11,6 +11,7 @@ import iconBankCardWhite from '../../../assets/icon/bank-card-white.png';
 import { TabView, TabBar } from 'react-native-tab-view';
 import ProsesModal from '../../../components/ProsesModal';
 import NoData from '../../../assets/img/no data.svg';
+import ContentLoader, { Rect, Circle } from 'react-content-loader/native'
 
 const NAVY = CONSTANTS.COLOR.NAVY;
 const ORANGE = CONSTANTS.COLOR.ORANGE;
@@ -58,12 +59,12 @@ const Profil =  ({route, navigation}) => {
         getUser();
     },[]);
 
-    useEffect(()=>{
-        const unsubscribe = navigation.addListener('focus', () => {
-            getUser();
-        });
-        return unsubscribe;
-    },[]);
+    // useEffect(()=>{
+    //     const unsubscribe = navigation.addListener('focus', () => {
+    //         getUser();
+    //     });
+    //     return unsubscribe;
+    // },[]);
 
     const getUser = async () => {
         setLoadingVisible(true);
@@ -75,6 +76,7 @@ const Profil =  ({route, navigation}) => {
             setLoadingVisible(false);
             setShowLogin(true);
             setNoDataText("Silahkan Login Telebih Dahulu")
+            setUsername("");
           }
           else{
             const timeout = setTimeout(() => {
@@ -91,9 +93,14 @@ const Profil =  ({route, navigation}) => {
         }
     };
 
+    const onRefresh = React.useCallback(() => {
+        setLoadingVisible(true);
+        getUser();
+    }, []);
+
     const [index, setIndex] = React.useState(0);
     const [routes] = React.useState([
-      { key: 'first', title: 'Lapak Saya' },
+    //   { key: 'first', title: 'Lapak Saya' },
       { key: 'second', title: 'Pengaturan Akun' }
     ]);
 
@@ -122,25 +129,54 @@ const Profil =  ({route, navigation}) => {
           case 'second':
             return (
                 <View style={styles.settingAkunArea} >
-                    <ScrollView keyboardShouldPersistTaps={"handled"} >
-                        <View style={styles.segmenWrapper}>
-                            <Text style={styles.segmenTitle}>Akun</Text>
-                                
-                                <TouchableOpacity style={styles.btnPengaturanAkun} onPress={()=> {
-                                    navigation.navigate("EditProfil")
-                                }}>
-                                    <Text style={styles.btnPengaturanAkunLabel}>Edit Profil</Text>
-                                    <Image style={styles.btnPengaturanAkunIcon}  source={iconNextOrange} />
-                                </TouchableOpacity>
+                    
+                    <ScrollView keyboardShouldPersistTaps={"handled"}
+                         refreshControl={
+                            <RefreshControl
+                            refreshing={loadingVisible}
+                            onRefresh={onRefresh}
+                            />
+                        }
+                    >
+                        {(showCobaLagi || showLogin) && !loadingVisible &&(
+                            <View style={styles.noDataWrapper}>
+                                <NoData width={250} height={150} />
+                                <Text style={styles.noDataText1}>{noDataText}</Text>
+                                <Text style={styles.noDataText2}></Text>
+                                {showCobaLagi &&(
+                                    <TouchableOpacity style={styles.btnReloadUser} onPress={()=>{getUser()}}>
+                                        <Text style={styles.btnLoginLabel}>Coba Lagi</Text>
+                                    </TouchableOpacity>
+                                )}
 
-                                <TouchableOpacity style={styles.btnPengaturanAkun} onPress={()=> {
-                                signOut();
-                                getUser();
-                                }}>
-                                    <Text style={styles.btnPengaturanAkunLabel}>Logout</Text>
-                                    <Image style={styles.btnPengaturanAkunIcon}  source={iconNextOrange} />
-                                </TouchableOpacity>
-                        </View>    
+                                {showLogin && (
+                                    <TouchableOpacity style={styles.btnLogin} onPress={()=>{navigation.navigate("Login")}}>
+                                        <Text style={styles.btnLoginLabel}>Login</Text>
+                                    </TouchableOpacity>
+                                )}
+                            </View>
+                        )} 
+
+                        {(!showCobaLagi && !showLogin ) && !loadingVisible &&( 
+                            <View style={styles.segmenWrapper}>
+                                <Text style={styles.segmenTitle}>Akun</Text>
+                                    
+                                    <TouchableOpacity style={styles.btnPengaturanAkun} onPress={()=> {
+                                        navigation.navigate("EditProfil")
+                                    }}>
+                                        <Text style={styles.btnPengaturanAkunLabel}>Edit Profil</Text>
+                                        <Image style={styles.btnPengaturanAkunIcon}  source={iconNextOrange} />
+                                    </TouchableOpacity>
+
+                                    <TouchableOpacity style={styles.btnPengaturanAkun} onPress={()=> {
+                                    signOut();
+                                    getUser();
+                                    }}>
+                                        <Text style={styles.btnPengaturanAkunLabel}>Logout</Text>
+                                        <Image style={styles.btnPengaturanAkunIcon}  source={iconNextOrange} />
+                                    </TouchableOpacity>
+                            </View>    
+                        )}
                     </ScrollView>
                 </View>        
             )
@@ -261,9 +297,107 @@ const Profil =  ({route, navigation}) => {
         navigation.navigate("RekeningBank", params);
     }
 
+    const ProfilLoader = () => (
+        <ContentLoader 
+            viewBox="0 0 400 160" 
+            foregroundColor="grey"
+            style={{backgroundColor:ORANGE, height:217, paddingHorizontal:20}}
+        >
+          <Circle cx="50" cy="30" r="31" />  
+          <Rect x="100" y="5" rx="3" ry="0" width="200" height="15" />
+          <Rect x="100" y="30" rx="3" ry="0" width="150" height="13" />
+          <Rect x="10" y="90" rx="5" ry="0" width="150" height="50" />
+          <Rect x="230" y="90" rx="5" ry="0" width="150" height="50" />
+          <Rect x="10" y="150" rx="3" ry="0" width="200" height="20" />
+        </ContentLoader>
+    )
+
+    const loadFollowing = () => {
+        const params = {
+            username
+        }
+        navigation.navigate("Following", params);
+    }    
+
     return (
         <View style={{flex:1}} >
-            <ProsesModal modalVisible={loadingVisible} setModalVisible={setLoadingVisible} />
+            <View>    
+                <ScrollView
+                    refreshControl={
+                        <RefreshControl
+                        refreshing={loadingVisible}
+                        onRefresh={onRefresh}
+                        />
+                    }
+                >    
+                    {loadingVisible && (
+                        <ProfilLoader/>
+                    )}
+
+                    {!loadingVisible && username != "" && (
+                        <View>
+                            <View style={styles.profilArea}>
+                                <Image style={styles.fotoProfil} source={{uri : base_url+"assets/upload/file user/"+foto_profil}} resizeMethod="resize" resizeMode="cover" />
+                                <View style={styles.profilWrapper}>
+                                    <Text style={styles.namaLengkapLabel}>{nama_lengkap}</Text>
+                                    {/* <Text style={styles.usernameLabel}>{no_telepon.substring(0,6)+no_telepon.substring(6,4).replace(no_telepon.substring(6,4),"****")+no_telepon.substring(10)}</Text> */}
+
+                                    <Text style={styles.usernameLabel}>{username_edit}</Text>
+                                    {/* <Text style={styles.alamatLabel}>{nama_jalan+no_rumah+rw+rt+kelurahan_desa+kecamatan+kota_kabupaten+provinsi}</Text> */}
+                                </View>
+                            </View>
+
+                            <View style={styles.followersArea}>
+                                {/* <View style={{flex:1,flexDirection:'row', justifyContent:"space-between",marginTop:10}} >
+                                    <View style={{flex:1, alignItems:'center'}} >
+                                        <Text style={styles.countLabel} >{total_atasan}</Text>
+                                        <Text style={styles.ketLabel} >Atasan</Text>
+                                    </View>
+                                    <View style={{flex:1, alignItems:'center'}} >
+                                        <Text style={styles.countLabel} >{total_karyawan}</Text>
+                                        <Text style={styles.ketLabel} >Karyawan</Text>
+                                    </View>
+                                </View> */}
+
+                                <View style={{flex:1,flexDirection:'row', justifyContent:"space-between",marginTop:10}} >
+                                    <TouchableOpacity style={{flex:1, alignItems:'center'}} onPress={()=>{
+                                        loadFollowing()
+                                    }} >
+                                        <Text style={styles.countLabel} >{total_following}</Text>
+                                        <Text style={styles.ketLabel}>Mengikuti</Text>
+                                    </TouchableOpacity>
+
+                                    <TouchableOpacity style={{flex:1, alignItems:'center'}} onPress={()=>{
+                                        loadFollowing()
+                                    }} >
+                                        <Text style={styles.countLabel} >{total_followers}</Text>
+                                        <Text style={styles.ketLabel} >Pengikut</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>    
+                            
+                            <View style={{flexDirection:'row', justifyContent:'space-around'}} >
+                                <TouchableOpacity style={styles.btnRekeningSaya} onPress={()=> {loadRekeningBank()} }>
+                                    <Image style={styles.btnRekeningSayaIcon}  source={iconBankCardWhite} />
+                                    <Text style={styles.btnRekeningSayaLabel}>Daftar Rekening Saya</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    )}
+
+                    { !loadingVisible && username == "" && (
+                        <View style={{backgroundColor:ORANGE, height:173, paddingHorizontal:20}}></View>
+                    )}
+                </ScrollView>
+            </View>   
+
+            <TabView
+                navigationState={{ index, routes }}
+                renderScene={_renderTabs}
+                onIndexChange={setIndex}
+                initialLayout={{ width: layout.width }}
+                renderTabBar={renderTabBar}
+            /> 
             <AwesomeAlert
                     show={showAlert}
                     showProgress={false}
@@ -281,89 +415,7 @@ const Profil =  ({route, navigation}) => {
                         setAlert(false);
                     }}
                     onConfirmPressed={alertConfirmTask}
-                />
-            {showCobaLagi || showLogin &&(
-                <View style={styles.noDataWrapper}>
-                    <NoData width={250} height={150} />
-                    <Text style={styles.noDataText1}>{noDataText}</Text>
-                    <Text style={styles.noDataText2}></Text>
-                    {showCobaLagi &&(
-                        <TouchableOpacity style={styles.btnReloadUser} onPress={()=>{getUser()}}>
-                            <Text style={styles.btnLoginLabel}>Coba Lagi</Text>
-                        </TouchableOpacity>
-                    )}
-
-                    {showLogin && (
-                         <TouchableOpacity style={styles.btnLogin} onPress={()=>{navigation.navigate("Login")}}>
-                            <Text style={styles.btnLoginLabel}>Login</Text>
-                        </TouchableOpacity>
-                    )}
-                </View>
-            )}    
-
-        {username != "" &&
-            (
-                <View>
-                    <View style={styles.profilArea}>
-                        <Image style={styles.fotoProfil} source={{uri : base_url+"assets/upload/file user/"+foto_profil}} resizeMethod="resize" resizeMode="cover" />
-                        <View style={styles.profilWrapper}> 
-                            <Text style={styles.namaLengkapLabel}>{nama_lengkap}</Text>
-                            {/* <Text style={styles.usernameLabel}>{no_telepon.substring(0,6)+no_telepon.substring(6,4).replace(no_telepon.substring(6,4),"****")+no_telepon.substring(10)}</Text> */}
-
-                            <Text style={styles.usernameLabel}>{username_edit}</Text>
-                            {/* <Text style={styles.alamatLabel}>{nama_jalan+no_rumah+rw+rt+kelurahan_desa+kecamatan+kota_kabupaten+provinsi}</Text> */}
-                        </View>
-                    </View>
-
-                    <View style={styles.followersArea}>
-                        <View style={{flex:1,flexDirection:'row', justifyContent:"space-between",marginTop:10}} >
-                            <View style={{flex:1, alignItems:'center'}} >
-                                <Text style={styles.countLabel} >{total_atasan}</Text>
-                                <Text style={styles.ketLabel} >Atasan</Text>
-                            </View>
-                            <View style={{flex:1, alignItems:'center'}} >
-                                <Text style={styles.countLabel} >{total_karyawan}</Text>
-                                <Text style={styles.ketLabel} >Karyawan</Text>
-                            </View>
-                        </View>
-
-                        <View style={{flex:1,flexDirection:'row', justifyContent:"space-between",marginTop:10}} >
-                            <View style={{flex:1, alignItems:'center'}} >
-                                <Text style={styles.countLabel} >{total_following}</Text>
-                                <Text style={styles.ketLabel}>Mengikuti</Text>
-                            </View>
-
-                            <View style={{flex:1, alignItems:'center'}} >
-                                <Text style={styles.countLabel} >{total_followers}</Text>
-                                <Text style={styles.ketLabel} >Pengikut</Text>
-                            </View>
-                        </View>
-                    </View>    
-                    
-                    <View style={{flexDirection:'row', justifyContent:'space-around'}} >
-                        <TouchableOpacity style={styles.btnRekeningSaya} onPress={()=> {loadRekeningBank()} }>
-                            <Image style={styles.btnRekeningSayaIcon}  source={iconBankCardWhite} />
-                            <Text style={styles.btnRekeningSayaLabel}>Daftar Rekening Saya</Text>
-                        </TouchableOpacity>
-
-                        
-                    </View>
-            </View>
-            )
-        } 
-
-        {username != "" && (
-            <TabView
-                    //swipeEnabled={true}
-                    navigationState={{ index, routes }}
-                    renderScene={_renderTabs}
-                    onIndexChange={setIndex}
-                    initialLayout={{ width: layout.width }}
-                    //renderTabBar={renderTabBar}
-                    renderTabBar={renderTabBar}
             />
-        )}
-                
         </View> 
     );
     

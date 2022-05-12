@@ -9,25 +9,25 @@ const DANGER = CONSTANTS.COLOR.DANGER;
 const NAVY = CONSTANTS.COLOR.NAVY;
 const ORANGE = CONSTANTS.COLOR.ORANGE;
 
-const Splash = ({navigation}) => {
-    useEffect (() => {
-        // setTimeout( ()=> {
-        //     navigation.replace('Home');
-        // }, 3000)
-        //{'\u00A9'}
-    },[navigation]);
-
+const Splash = (props) => {
     return (
         <View style={styles.container}> 
             <View style={styles.titleContainer}>
                 <View style={styles.content}>
                     <Image source={iconTokeSawit} style={styles.logo} />
+                   
                 </View>
             </View>
              
             <Text style={styles.splashSubTitle}></Text>
             <View style={styles.splashText}>
-                <Text style={styles.splashTitle1}>Version {packageJson.version}</Text> 
+                <Text style={styles.splashTitle2}>
+                    {props.updateAppStatus}
+                </Text> 
+                <Text style={styles.splashTitle1}>
+                    Version Alpha {packageJson.version}
+                </Text> 
+                
             </View>
         </View>
     )
@@ -51,9 +51,9 @@ const styles = StyleSheet.create({
     },
     splashText :{
         position:'absolute',
-        flexDirection:"row",
-        alignItems:'flex-end',
-        justifyContent: 'flex-end',
+        flexDirection:"column",
+        alignItems:'center',
+        justifyContent: 'center',
         bottom:15
     },
     titleContainer : {
@@ -64,8 +64,9 @@ const styles = StyleSheet.create({
         color :'#FFFF',
     },
     splashTitle2 : {
-        fontSize : 28,
-        color : 'yellow',
+        marginBottom:0,
+        fontSize : 11,
+        color : 'white',
     },
     splashSubTitle : {
         fontSize : 15,
