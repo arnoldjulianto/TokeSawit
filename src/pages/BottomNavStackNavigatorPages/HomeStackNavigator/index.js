@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Alert, View, ActivityIndicator, Platform, PermissionsAndroid} from 'react-native';
 import BottomNavigation from '../../../components/BottomNavigation';
 // import { Splash } from '../../../pages';
-import { Login, Register,InputNoHp, SmsVerificationProvider, SmsVerificationAndroid, FotoKlaimDo, PreviewFotoKlaimDo, TentukanAgen, DetailJualDo, RekeningBank, PilihRekeningBank, AddRekeningBank, InputPin, BuatPinBaru, EditProfil, JadiPemilikDo, AddDoSaya, InputDoPPKS, BiayaBongkar, InputHargaDoPPKS, PreviewPemilikDo, LihatProfil, Following, ShowHargaKecuali, ShowHargaKepada } from '../';
+import { Login, Register,InputNoHp, SmsVerificationProvider, SmsVerificationAndroid, FotoKlaimDo, PreviewFotoKlaimDo, TentukanAgen, DetailJualDo, RekeningBank, PilihRekeningBank, AddRekeningBank, InputPin, BuatPinBaru, EditProfil, JadiPemilikDo, AddDoSaya, InputDoPPKS, BiayaBongkar, InputHargaDoPPKS, PreviewPemilikDo, LihatProfil, Following, ShowHargaKecuali, ShowHargaKepada, TentukanTipeDo, ResellerDo } from '../';
 import {AuthContext} from '../../../components/Context';
 import AsyncStorage from '@react-native-community/async-storage';
 import Splash from '../../Splash';
@@ -303,12 +303,14 @@ const HomeStackNavigator =  () =>  {
     }
     // {"AWAITING_USER_ACTION": 6, "CHECKING_FOR_UPDATE": 5, "DOWNLOADING_PACKAGE": 7, "INSTALLING_UPDATE": 8, "SYNC_IN_PROGRESS": 4, "UNKNOWN_ERROR": 3, "UPDATE_IGNORED": 2, "UPDATE_INSTALLED": 1, "UP_TO_DATE": 0}
 
-    if( updateAppStatus != "APLIKASI SUDAH TERUPDATE" && updateAppStatus != "TERJADI KESALAHAN UPDATE APP"  ){
-        return(
-            <View style={{flex:1}} >
-                <Splash updateAppStatus={updateAppStatus} />
-            </View>
-        );
+    if( updateAppStatus != "APLIKASI SUDAH TERUPDATE"   ){
+        if(updateAppStatus != "TERJADI KESALAHAN UPDATE APP"){
+            return(
+                <View style={{flex:1}} >
+                    <Splash updateAppStatus={updateAppStatus} />
+                </View>
+            );
+        }
     }
 
     if(loadingVisible){
@@ -381,6 +383,8 @@ const HomeStackNavigator =  () =>  {
                     <Stack.Screen name="Following" component={Following} />
                     <Stack.Screen name="ShowHargaKecuali" component={ShowHargaKecuali} />
                     <Stack.Screen name="ShowHargaKepada" component={ShowHargaKepada} />
+                    <Stack.Screen name="TentukanTipeDo" component={TentukanTipeDo} />
+                    <Stack.Screen name="ResellerDo" component={ResellerDo} />
                     <Stack.Screen name="SmsVerificationProvider" component={SmsVerificationProvider} />
                     <Stack.Screen name="SmsVerificationAndroid" component={SmsVerificationAndroid} />
                 </Stack.Navigator>

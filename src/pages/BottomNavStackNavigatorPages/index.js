@@ -25,7 +25,9 @@ import LihatProfil from '../LihatProfil';
 import Following from '../Following';
 import ShowHargaKecuali from '../PrivasiHarga/ShowHargaKecuali';
 import ShowHargaKepada from '../PrivasiHarga/ShowHargaKepada';
+import TentukanTipeDo from '../TentukanTipeDo';
+import ResellerDo from '../ResellerDo';
 
 export {
-    HomeStackNavigator,  Login, Register, InputNoHp, SmsVerificationProvider, FotoKlaimDo, PreviewFotoKlaimDo, TentukanAgen, DetailJualDo, RekeningBank, PilihRekeningBank, AddRekeningBank, InputPin, BuatPinBaru, SmsVerificationAndroid, EditProfil, JadiPemilikDo, AddDoSaya, InputDoPPKS, BiayaBongkar, InputHargaDoPPKS, PreviewPemilikDo, LihatProfil, Following, ShowHargaKecuali, ShowHargaKepada
+    HomeStackNavigator,  Login, Register, InputNoHp, SmsVerificationProvider, FotoKlaimDo, PreviewFotoKlaimDo, TentukanAgen, DetailJualDo, RekeningBank, PilihRekeningBank, AddRekeningBank, InputPin, BuatPinBaru, SmsVerificationAndroid, EditProfil, JadiPemilikDo, AddDoSaya, InputDoPPKS, BiayaBongkar, InputHargaDoPPKS, PreviewPemilikDo, LihatProfil, Following, ShowHargaKecuali, ShowHargaKepada, TentukanTipeDo, ResellerDo
 }

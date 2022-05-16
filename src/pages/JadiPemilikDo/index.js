@@ -136,8 +136,8 @@ const JadiPemilikDo = ({route, navigation}) => {
         });
     }
 
-    const loadDoPPKS = () => {
-        navigation.navigate("InputDoPPKS",{username});
+    const loadTentukanTipeDo = () => {
+        navigation.navigate("TentukanTipeDo",{username});
     }
 
     const formatRupiah = (angka, prefix) => {
@@ -430,7 +430,7 @@ const JadiPemilikDo = ({route, navigation}) => {
                     />
 
                     <View style={{justifyContent: 'flex-end',paddingHorizontal:12}}>
-                        <TouchableOpacity style={styles.btnLanjutkan} onPress={()=> {loadDoPPKS()} }>
+                        <TouchableOpacity style={styles.btnLanjutkan} onPress={()=> {loadTentukanTipeDo()} }>
                             <View style={{flexDirection:"row",justifyContent:'center'}}>
                                 <Text style={styles.btnLanjutkanLabel}>Tambah Do</Text>
                                 <Image source={iconAddWhite} style={styles.btnLanjutkanIcon}  />

@@ -329,7 +329,7 @@ const Notifikasi = ({route, navigation}) => {
                 </TouchableOpacity>    
                 <Text style={styles.notifMsg} >
                     <TouchableOpacity onPress={() => navigation.navigate("LihatProfil",     {currentUser:username, username:item.from, setModalVisible}) } >
-                        <Text style={styles.usernameLabel}>{item.from}</Text>
+                        <Text style={styles.usernameLabel}>{item.username_edit}</Text>
                     </TouchableOpacity> 
                     {item.message}</Text>
             </View>
