@@ -219,26 +219,25 @@ const Beranda = (props) => {
                             <Image source={iconPemilikDo} style={styles.btnTopAreaIcon} />
                             <Text style={styles.btnPemilikDoLabel}>Pemilik DO</Text>
                         </TouchableOpacity> */}
-
+                        
                         <TouchableOpacity style={styles.btnAgen} onPress={()=> {
                             loadPemilikDo();
                         }} >
-                            <Image source={iconAgenDo} style={styles.btnTopAreaIcon} />
-                            <Text style={styles.btnAgenLabel}>Agen DO</Text>
+                                <Image source={iconAgenDo} style={styles.btnTopAreaIcon} />
+                                <Text style={styles.btnAgenLabel}>Agen DO</Text>
                         </TouchableOpacity>
 
                         <TouchableOpacity style={styles.btnAdmin} onPress={()=> konfirmasiAdmin()} >
-                            <Image source={iconAdminDo} style={styles.btnTopAreaIcon} />
-                            <Text style={styles.btnAdminLabel}>Admin DO</Text>
+                                <Image source={iconAdminDo} style={styles.btnTopAreaIcon} />
+                                <Text style={styles.btnAdminLabel}>Admin DO</Text>   
                         </TouchableOpacity>
+
+                        
                     </View>
                 </View>
 
-                <MenuHomeAtom username={username} klaimDo={true} beliDo={true} rekapDoSaya={true} buatInvoice={true} bayarInvoice={true} kasihDeposit={true} daftarHutang={true} menuTop={-100}  navigation={props.navigation} /> 
+                <MenuHomeAtom username={username} klaimDo={true} beliDo={true} rekapDoSaya={true} buatInvoice={true} bayarInvoice={true} kasihDeposit={true} daftarHutang={true} menuTop={-90}  navigation={props.navigation} /> 
 
-                        
-
-                
             </ScrollView>
         </View>
     )
@@ -251,10 +250,10 @@ const styles = StyleSheet.create({
     },
     topArea:{
         backgroundColor:ORANGE,
-        flex:0.5,
+        flex:0.2,
         paddingTop:0,
         paddingBottom:90,
-        paddingHorizontal:15
+        paddingHorizontal:20
     },
     topAreaTitle :{
         fontSize:18,
@@ -285,30 +284,38 @@ const styles = StyleSheet.create({
     },
     topButtonWrapper :{
         flexDirection : "row",
-        justifyContent : "space-between",
+        justifyContent : "center",
+        backgroundColor:"white",
+        borderRadius:10
     },
     segmenWrapper :{
         padding:10
     },
     btnTopAreaIcon : {
         width:45,
-        height:45
+        height:45,
+    },
+    btnTopArea :{
+        backgroundColor:"white",
+        paddingHorizontal:5,
+        paddingBottom:5,
+        justifyContent:"center",
+        alignItems:"center",
+        borderRadius:5
     },
     btnAgen :{
         flex:1,
         flexDirection:'column',
-        backgroundColor:'white',
         justifyContent:"center",
         alignItems:'center',
         height:90,
-        marginHorizontal:8,
+        marginHorizontal:0,
         borderRadius:5,
         marginBottom:10,
         paddingTop:10
     },  
     btnAgenLabel :{
-        flex:1,
-        fontSize:15,
+        fontSize:13,
         color:'grey',
         textAlign:'center'
     },
@@ -330,7 +337,6 @@ const styles = StyleSheet.create({
     },
     btnAdmin :{
         flex:1,
-        backgroundColor:'white',
         justifyContent:"center",
         alignItems:'center',
         height:90,
@@ -339,8 +345,7 @@ const styles = StyleSheet.create({
         paddingTop:10
     },  
     btnAdminLabel :{
-        flex:1,
-        fontSize:15,
+        fontSize:13,
         color:'grey',
         textAlign:'center'
     },

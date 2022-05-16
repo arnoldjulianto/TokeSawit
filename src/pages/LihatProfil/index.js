@@ -367,7 +367,7 @@ const LihatProfil = ({route, navigation}) => {
 
                                 <View style={styles.privateAccount} >
                                     <Icon type={"ios"} name={"lock"} size={55} color={"grey"} />
-                                    <Text style={styles.privateAccountLabel}>Akun Ini Privat, Ikuti Untuk Mengetahui Profil & Produk Yang Dimiliki Oleh {username}</Text>
+                                    <Text style={styles.privateAccountLabel}>Akun Ini Privat, Ikuti Untuk Mengetahui Profil & Produk Yang Dimiliki Oleh {username_edit}</Text>
                                 </View>
                             </View>
                         )}

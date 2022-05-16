@@ -11,6 +11,7 @@ import SearchBar from '../../../components/SearchBar/search_bar_edit_profil';
 import MultipleImagePicker from '@baronha/react-native-multiple-image-picker';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import ProsesModal from '../../../components/ProsesModal';
+import ImageResizer from 'react-native-image-resizer';
 
 const NAVY = CONSTANTS.COLOR.NAVY;
 const ORANGE = CONSTANTS.COLOR.ORANGE;
@@ -639,7 +640,31 @@ const EditProfil =  ({route, navigation}) => {
         }
         const response = await MultipleImagePicker.openPicker(options);
         console.log(response);
-        uploadFotoProfil(response);
+        imageResizeHandler(response);
+    }
+
+    const imageResizeHandler = (file) => {
+        setLoadingVisible(true);
+        let compressed;
+        ImageResizer.createResizedImage(file[0].path, 600, 600, 'PNG', 100, 0)
+        .then(response => {
+            // response.uri is the URI of the new image that can now be displayed, uploaded...
+            // response.path is the path of the new image
+            // response.name is the name of the new image with the extension
+            // response.size is the size of the new image
+            console.log("Compressed Image")
+            compressed = {
+                name: response.name,
+                type: 'image/gif',
+                uri: response.uri
+            };
+            uploadFotoProfil(compressed);
+        })
+        .catch(err => {
+            // Oops, something went wrong. Check that the filename is correct and
+            // inspect err to get more details.
+            console.log(err)
+        });
     }
 
     const uploadFotoProfil = (value) => {
@@ -661,22 +686,20 @@ const EditProfil =  ({route, navigation}) => {
             username_lama:username,
             foto_lama:foto_profilEdit,
         }
-        console.log("Edit params : ");
-        console.log(params);
         
+
         const createFormData = (body) => {
             const data = new FormData();
-            data.append("foto_profil", {
-                name: value[0].fileName,
-                type: 'image/gif',
-                uri: 'file://'+value[0].realPath
-            })
+            data.append("foto_profil", value)
             Object.keys(body).forEach(key => {
                 data.append(key, body[key]);
             });
             return data;
         }
         const formData = createFormData(params);
+        console.log("FOTO : ", value)
+        console.log("Edit params : ", params);
+
         fetch(base_url+'User/get_api_upload_foto_profil',
         {
             method: 'post',
@@ -699,6 +722,7 @@ const EditProfil =  ({route, navigation}) => {
                 setConfirmButtonAlert(false);
                 setCancelTextAlert("Tutup");
             }
+            console.log(json)
         })
         .catch((error) => {
             clearTimeout(timeout);
@@ -926,7 +950,7 @@ const EditProfil =  ({route, navigation}) => {
                     </View> 
 
                     <TouchableOpacity style={styles.btnEditProfil} onPress={()=> {editProfilHandler()} }>
-                        <Text style={styles.btnEditProfilLabel}>Edit</Text>
+                        <Text style={styles.btnEditProfilLabel}>SIMPAN</Text>
                     </TouchableOpacity>
 
                 </ScrollView>

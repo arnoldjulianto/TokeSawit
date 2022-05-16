@@ -206,7 +206,7 @@ const Notifikasi = ({route, navigation}) => {
         return(
             <View style={[styles.notifWrapper,{backgroundColor:'#f0f5f5'}]}>
                 <Image style={styles.fotoProfil} source={{uri : base_url+"assets/upload/file user/"+foto_profil}} resizeMethod="resize" resizeMode="cover" />
-                <Text style={styles.notifMsg} ><Text style={styles.usernameLabel}>{item.from}</Text> {item.message}</Text>
+                <Text style={styles.notifMsg} ><Text style={styles.usernameLabel}>{item.username_edit}</Text> {item.message}</Text>
 
                 <TouchableOpacity style={styles.btnNotif1} onPress={()=>{
                     followReqResponse("acc", item.from, item.id);

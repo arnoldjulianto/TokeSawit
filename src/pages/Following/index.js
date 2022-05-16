@@ -192,11 +192,15 @@ const Following =  ({route, navigation}) => {
             <TouchableOpacity style={styles.renderItemUserArea} key={item.index+""+index} onPress={()=>{
                 //handleChange(item.username)
             }} >
+                
                 <Image style={styles.fotoProfil} source={{uri}} resizeMode="cover" resizeMethod="resize" />
                 <View style={styles.detailUser}>
                     {/* <Text style={styles.usernameLabel} >{item.id}</Text> */}
                     <Text style={styles.usernameLabel} >{item.username_edit}</Text>
                     <Text style={styles.namaLengkapLabel} >{item.nama_lengkap}</Text>
+                </View>
+                <View style={styles.actionArea}>
+                    {/* <Text style={styles.usernameLabel} >{item.id}</Text> */}
                 </View>
             </TouchableOpacity>
         )
@@ -241,11 +245,18 @@ const styles = StyleSheet.create({
     renderItemUserArea :{
         flexDirection:'row',
         backgroundColor:'#fcfcfc',
-        justifyContent:"space-around",
+        justifyContent:"space-between",
         marginTop:12,
         paddingVertical:10,
-        borderRadius:5
+        borderRadius:5,
+        paddingHorizontal:10
     },
+    detailUser :{
+        flex:0.5,
+        backgroundColor:'transparent',
+        justifyContent:"center",
+        alignItems:"flex-start",
+    }, 
     usernameLabel :{
         fontSize:13,
         color:'grey',
@@ -260,6 +271,12 @@ const styles = StyleSheet.create({
         width:50,
         height:50,
         borderRadius:120/2,
-        alignItems:"flex-start",
+        justifyContent:"center",
     },
+    actionArea :{
+        flex:0.1,
+        backgroundColor:'transparent',
+        justifyContent:"center",
+        alignItems:"flex-start",
+    }, 
 })

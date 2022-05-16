@@ -303,7 +303,7 @@ const HomeStackNavigator =  () =>  {
     }
     // {"AWAITING_USER_ACTION": 6, "CHECKING_FOR_UPDATE": 5, "DOWNLOADING_PACKAGE": 7, "INSTALLING_UPDATE": 8, "SYNC_IN_PROGRESS": 4, "UNKNOWN_ERROR": 3, "UPDATE_IGNORED": 2, "UPDATE_INSTALLED": 1, "UP_TO_DATE": 0}
 
-    if( updateAppStatus != "APLIKASI SUDAH TERUPDATE" ){
+    if( updateAppStatus != "APLIKASI SUDAH TERUPDATE" && updateAppStatus != "TERJADI KESALAHAN UPDATE APP"  ){
         return(
             <View style={{flex:1}} >
                 <Splash updateAppStatus={updateAppStatus} />

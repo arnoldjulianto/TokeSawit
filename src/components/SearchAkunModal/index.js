@@ -767,12 +767,13 @@ const styles = StyleSheet.create({
     renderItemUserArea :{
         flexDirection:'row',
         backgroundColor:'#fcfcfc',
-        justifyContent:"space-around",
+        justifyContent:"space-between",
         marginTop:10,
         marginBottom:10,
         borderWidth:0.3,
         paddingVertical:10,
-        borderRadius:10
+        borderRadius:10,
+        paddingHorizontal:10
     },
     detailUser :{
         flex:0.7,

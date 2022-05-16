@@ -83,6 +83,7 @@ class Select2 extends Component {
 
     onItemSelected = (item, isSelectSingle) => {
         let selectedItem = [];
+        let { onSelect} = this.props;
         let { data } = this.state;
         item.checked = !item.checked;
         for (let index in data) {
@@ -96,14 +97,23 @@ class Select2 extends Component {
             if (item.checked) selectedItem.push(item);
         })
         this.setState({ data, selectedItem });
+        let selectedIds = [], selectedObjectItems = [];
+        selectedItem.map(item => {
+            selectedIds.push(item.id);
+            selectedObjectItems.push(item);
+        })
+        this.setState({ show: false, keyword: '', preSelectedItem: selectedItem });
+        onSelect && onSelect(selectedIds, selectedObjectItems);
     }
     keyExtractor = (item, idx) => idx.toString();
     renderItem = ({ item, idx }) => {
-        let { colorTheme, isSelectSingle } = this.props;
+        let {colorTheme,isSelectSingle } = this.props;
         return (
             <TouchableOpacity
                 key={idx}
-                onPress={() => this.onItemSelected(item, isSelectSingle)}
+                onPress={() => {
+                    this.onItemSelected(item, isSelectSingle)
+                }}
                 activeOpacity={0.7}
                 style={styles.itemWrapper}>
                 <Text style={[styles.itemText, this.defaultFont]}>
@@ -128,11 +138,11 @@ class Select2 extends Component {
 
     render() {
         let {
-            style, modalStyle, title, onSelect, onRemoveItem, popupTitle, colorTheme,
+            style, modalStyle, title, onRemoveItem, popupTitle, colorTheme,
             isSelectSingle, cancelButtonText, selectButtonText, searchPlaceHolderText,
             selectedTitleStyle, buttonTextStyle, buttonStyle, showSearchBox
         } = this.props;
-        let { show, selectedItem, preSelectedItem } = this.state;
+        let { show,  preSelectedItem } = this.state;
         return (
             <TouchableOpacity
                 onPress={this.showModal}
@@ -189,7 +199,7 @@ class Select2 extends Component {
                             ListEmptyComponent={this.renderEmpty}
                         />
 
-                        <View style={styles.buttonWrapper}>
+                         <View style={styles.buttonWrapper}>
                             <Button
                                 defaultFont={this.defaultFont}
                                 onPress={() => {
@@ -200,6 +210,7 @@ class Select2 extends Component {
                                 backgroundColor='#fff'
                                 textStyle={buttonTextStyle}
                                 style={[styles.button, buttonStyle, { marginRight: 5, marginLeft: 10, borderWidth: 1, borderColor: colorTheme }]} />
+                            {/*    
                             <Button
                                 defaultFont={this.defaultFont}
                                 onPress={() => {
@@ -215,7 +226,8 @@ class Select2 extends Component {
                                 backgroundColor={colorTheme}
                                 textStyle={buttonTextStyle}
                                 style={[styles.button, buttonStyle, { marginLeft: 5, marginRight: 10 }]} />
-                        </View>
+                            */}    
+                        </View> 
                     </Animated.View>
                 </Modal>
                 {

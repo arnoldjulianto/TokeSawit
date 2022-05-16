@@ -31,7 +31,7 @@ const SearchBar = (props) => {
                     <Text style={styles.searchBarTitle}>{props.title}</Text>
                     {props.refresh != false &&
                     <View style={{flex:1,alignItems:'flex-end', justifyContent:'flex-end', right:10}}>
-                        <TouchableOpacity style={{justifyContent:'flex-end'}}  onPress={ ()=> {props.refresh()} }>
+                        <TouchableOpacity style={{justifyContent:'center'}}  onPress={ ()=> {props.refresh()} }>
                             <Image source={iconRefreshWhite} style={styles.searchBarIcon}  />
                         </TouchableOpacity>
                     </View>
@@ -76,8 +76,8 @@ const styles = StyleSheet.create({
         color : 'white',
     },
     searchBarTopIcon : {
-        width:23,
-        height:23,
+        width:20,
+        height:20,
         marginHorizontal:6,
         marginTop:7
     },
@@ -90,8 +90,8 @@ const styles = StyleSheet.create({
         width:330
     },
     searchBarIcon : {
-        height: 40,
-        width: 40,
+        height: 30,
+        width: 30,
     },
     searchBarInput : {
         flex:1,

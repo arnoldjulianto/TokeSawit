@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable prettier/prettier */
 import React, { useEffect, useState } from 'react';
-import { View, Text,  StyleSheet, ScrollView, Image, TouchableOpacity, ActivityIndicator, Dimensions, FlatList } from 'react-native';
+import { View, Text,  StyleSheet, ScrollView, Image, TouchableOpacity, ActivityIndicator, Dimensions, FlatList, useWindowDimensions, RefreshControl } from 'react-native';
 import CONSTANTS from '../../assets/constants';
 import SearchBar from '../../components/SearchBar/search_bar_jadi_pemilik_do';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -12,6 +12,7 @@ import MenuPemilikDoAtom from '../../components/MenuPemilikDoAtom';
 import iconAddWhite from '../../assets/icon/add-white.png';
 import iconNextOrange from '../../assets/icon/next-orange.png';
 import iconEditBlue from '../../assets/icon/edit-blue.png';
+import { TabView, TabBar } from 'react-native-tab-view';
 
 const ORANGE = CONSTANTS.COLOR.ORANGE;
 const NAVY = CONSTANTS.COLOR.NAVY;
@@ -62,6 +63,10 @@ const JadiPemilikDo = ({route, navigation}) => {
             else if(header3focus) sortHarga(false);
         }
     },[arrListDo])
+
+    const onRefresh = React.useCallback(() => {
+        loadListDoSaya();
+      }, []);
 
     const loadListDoSaya = () => {
         setLoadingVisible(true);
@@ -190,7 +195,7 @@ const JadiPemilikDo = ({route, navigation}) => {
                 <Text style={styles.namaDoLabel}>{item.nama_do}</Text>
                 <Text style={styles.hargaLabel}>Rp {formatRupiah(item.harga)}
                     {"\n"}
-                    <Text style={{marginTop:5, color:ORANGE}}>{item.tanggal_perubahan_harga.substr(8,2)+" "+bulan+" "+item.tanggal_perubahan_harga.substr(2,2)}</Text>
+                    <Text style={{marginTop:5, fontSize:14, color:ORANGE}}>{item.tanggal_perubahan_harga.substr(8,2)+" "+bulan+" "+item.tanggal_perubahan_harga.substr(2,2)}</Text>
                 </Text>
             </TouchableOpacity>
         )
@@ -356,15 +361,34 @@ const JadiPemilikDo = ({route, navigation}) => {
         }
         setArrListDo(data);
     }
+    
 
-    return(
-        <View style={{flex:1}}>
-            <EditPemilikDoModal setModalVisible={setModalVisible} modalVisible={modalVisible} navigation={navigation} id_do_ppks={id_do_ppks} username={username} id_ppks={id_ppks} nama_do={nama_do} tanggal_perubahan_harga={tanggal_perubahan_harga} hargaDoPPKS={hargaDoPPKS} keterangan_biaya_bongkar={keterangan_biaya_bongkar} keterangan_harga={keterangan_harga} privasi_harga={privasi_harga} />
+    const [index, setIndex] = React.useState(0);
+    const [routes] = React.useState([
+        { key: 1, title: 'Daftar DO Saya' },
+        { key: 2, title: 'Menu Lain' }
+    ]);
 
-            <SearchBar title={"Menu Pemilik Do"} refresh={()=> loadListDoSaya()} navigation={navigation} />
-            <View style={styles.container}>
+    const layout = useWindowDimensions();
+    const renderTabBar = props => (
+        <TabBar
+          {...props}
+          keyboardDismissMode={"none"}
+          indicatorStyle={{ backgroundColor: ORANGE }}
+          style={{ backgroundColor: 'white' }}
+          renderLabel={({ route, focused, color }) => (
+            <Text style={{ color:ORANGE, margin: 5, fontSize:12 }}>
+              {route.title}
+            </Text>
+          )}
+        />
+    );
+
+    const _renderTabs = ({route}) => {
+        switch (route.key) {
+          case 1:
+            return (
                 <View style={styles.segmenWrapper}>
-                    <Text style={styles.segmenTitle}>List Do Saya</Text>
                     <View style={styles.headerItemArea} >
                         <TouchableOpacity style={styles.headerItem1} onPress={()=> sortHeader(1) } >
                             <Text style={styles.headerLabel1}>PPKS</Text>
@@ -387,30 +411,59 @@ const JadiPemilikDo = ({route, navigation}) => {
                             )}
                         </TouchableOpacity>     
                     </View>
-                    {loadingVisible && (
+                    {/* {loadingVisible && (
                         <View >
                             <ActivityIndicator size={50} color={ORANGE} />
                         </View>
-                    )}
+                    )} */}
+                    <FlatList
+                        data={arrListDo}
+                        extraData={arrListDo}
+                        keyExtractor={(item, index) => (item.id_do_ppks) + index}
+                        renderItem={renderItemListDo}
+                        refreshControl={
+                            <RefreshControl
+                            refreshing={loadingVisible}
+                            onRefresh={onRefresh}
+                            />
+                        }
+                    />
 
-                    {!loadingVisible && (
-                        <FlatList
-                            data={arrListDo}
-                            extraData={arrListDo}
-                            keyExtractor={(item, index) => (item.id_do_ppks) + index}
-                            renderItem={renderItemListDo}
-                        />
-                    )}
-                </View>    
+                    <View style={{justifyContent: 'flex-end',paddingHorizontal:12}}>
+                        <TouchableOpacity style={styles.btnLanjutkan} onPress={()=> {loadDoPPKS()} }>
+                            <View style={{flexDirection:"row",justifyContent:'center'}}>
+                                <Text style={styles.btnLanjutkanLabel}>Tambah Do</Text>
+                                <Image source={iconAddWhite} style={styles.btnLanjutkanIcon}  />
+                            </View>
+                        </TouchableOpacity>
+                    </View> 
+                </View>
+            )
+      
+          case 2:
+            return (
+                <View style={styles.segmenWrapper}>             
+                </View>      
+            )
+        }
+    }
+
+    return(
+        <View style={{flex:1}}>
+            <EditPemilikDoModal setModalVisible={setModalVisible} modalVisible={modalVisible} navigation={navigation} id_do_ppks={id_do_ppks} username={username} id_ppks={id_ppks} nama_do={nama_do} tanggal_perubahan_harga={tanggal_perubahan_harga} hargaDoPPKS={hargaDoPPKS} keterangan_biaya_bongkar={keterangan_biaya_bongkar} keterangan_harga={keterangan_harga} privasi_harga={privasi_harga} />
+
+            <SearchBar title={"Menu Agen DO"} refresh={()=> loadListDoSaya()} navigation={navigation} />
+            <View style={styles.container}>
+                <TabView
+                    navigationState={{ index, routes }}
+                    renderScene={_renderTabs}
+                    onIndexChange={setIndex}
+                    initialLayout={{ width: layout.width }}
+                    renderTabBar={renderTabBar}
+                /> 
+               
             </View>
-            <View style={{justifyContent: 'flex-end',paddingHorizontal:12}}>
-                <TouchableOpacity style={styles.btnLanjutkan} onPress={()=> {loadDoPPKS()} }>
-                    <View style={{flexDirection:"row",justifyContent:'center'}}>
-                        <Text style={styles.btnLanjutkanLabel}>Tambah Do</Text>
-                        <Image source={iconAddWhite} style={styles.btnLanjutkanIcon}  />
-                    </View>
-                </TouchableOpacity>
-            </View>  
+             
         </View>
     );
 }
@@ -419,9 +472,8 @@ export default JadiPemilikDo;
 const styles = StyleSheet.create({
     container:{
         flex:1,
-        paddingHorizontal:10,
         backgroundColor:'transparent',
-        marginBottom:50
+        marginBottom:0
     },
     headerItemArea:{
         flexDirection:'row',
@@ -508,14 +560,15 @@ const styles = StyleSheet.create({
     hargaLabel :{
         flex:0.6,
         color:'black',
-        fontSize:14.5,
-        textAlign: "center"
+        fontSize:18,
+        textAlign: "center",
+        fontWeight:'500'
     },
     segmenWrapper : {
+        flex:1,
         backgroundColor:'white',
-        padding:10,
-        marginTop:20,
-        marginBottom:100
+        paddingHorizontal:5,
+        marginTop:10,
     },
     segmenTitle :{
         fontSize:16,
@@ -542,7 +595,7 @@ const styles = StyleSheet.create({
         backgroundColor:NAVY,
         alignItems:"center",
         height:40,
-        width:Dimensions.get('window').width / 1.5,
+        width:Dimensions.get('window').width / 1.6,
         borderRadius:10,
         justifyContent:"center",
         left: Dimensions.get('window').width / 6,

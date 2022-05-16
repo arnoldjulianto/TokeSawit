@@ -4,6 +4,7 @@ import React,{useEffect, useState} from 'react';
 import {View, ScrollView, Text, TextInput, StyleSheet, Image, ActivityIndicator, RefreshControl, TouchableOpacity, Dimensions, FlatList} from 'react-native';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import Select2 from "../../components/SelectTwo";
+import ProsesModal from "../../components/ProsesModal";
 import iconNext from '../../assets/icon/next.png';
 import iconAddWhite from '../../assets/icon/add-white.png';
 import iconTrash from '../../assets/icon/trash.png';
@@ -134,6 +135,7 @@ const InputDoPPKS = (props) => {
                     }}
                     onConfirmPressed={alertConfirmTask}
             />
+            <ProsesModal modalVisible={loadingVisible} setModalVisible={setLoadingVisible} />
              <View style={styles.container}>
                 <ScrollView
                  refreshControl={
