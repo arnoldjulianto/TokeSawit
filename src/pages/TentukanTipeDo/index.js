@@ -25,13 +25,15 @@ const TentukanTipeDo = ({route, navigation}) => {
             <SearchBar title={"Pilih Salah Satu"} refresh={false} navigation={navigation} />
             <View style={styles.container} >
                 <View style={styles.segmenWrapper} >
+                    <Text style={{marginTop:20}}>Jika Anda adalah Pemilik DO maka pilih <Text style={{fontWeight:'bold'}}>Pemilik DO</Text></Text>
                     <TouchableOpacity style={styles.btnPilihan} onPress={()=> loadDoPPKS()} >
                         <Text style={styles.btnPilihanLabel} >PEMILIK DO</Text>
                         <Image source={nextIcon} style={styles.btnPilihanIcon} />
                     </TouchableOpacity>
-
+                    
+                    <Text style={{marginTop:20}} >Jika Anda ingin menjual DO dari Agen DO lain, maka pilih <Text style={{fontWeight:'bold'}}>Reseller DO</Text>. Tenang, pengikut Anda tidak akan mengetahui apakah Anda Pemilik DO atau Reseller DO</Text>
                     <TouchableOpacity style={styles.btnPilihan} onPress={()=> loadResellerDo()}  >
-                        <Text style={styles.btnPilihanLabel} >RESELLER AGEN DO LAIN</Text>
+                        <Text style={styles.btnPilihanLabel} >RESELLER DO</Text>
                         <Image source={nextIcon} style={styles.btnPilihanIcon} />
                     </TouchableOpacity>
                 </View>

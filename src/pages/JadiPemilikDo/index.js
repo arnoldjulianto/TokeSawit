@@ -66,7 +66,7 @@ const JadiPemilikDo = ({route, navigation}) => {
 
     const onRefresh = React.useCallback(() => {
         loadListDoSaya();
-      }, []);
+    }, []);
 
     const loadListDoSaya = () => {
         setLoadingVisible(true);

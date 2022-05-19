@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Alert, View, ActivityIndicator, Platform, PermissionsAndroid} from 'react-native';
 import BottomNavigation from '../../../components/BottomNavigation';
 // import { Splash } from '../../../pages';
-import { Login, Register,InputNoHp, SmsVerificationProvider, SmsVerificationAndroid, FotoKlaimDo, PreviewFotoKlaimDo, TentukanAgen, DetailJualDo, RekeningBank, PilihRekeningBank, AddRekeningBank, InputPin, BuatPinBaru, EditProfil, JadiPemilikDo, AddDoSaya, InputDoPPKS, BiayaBongkar, InputHargaDoPPKS, PreviewPemilikDo, LihatProfil, Following, ShowHargaKecuali, ShowHargaKepada, TentukanTipeDo, ResellerDo } from '../';
+import { Login, Register,InputNoHp, SmsVerificationProvider, SmsVerificationAndroid, FotoKlaimDo, PreviewFotoKlaimDo, TentukanAgen, DetailJualDo, RekeningBank, PilihRekeningBank, AddRekeningBank, InputPin, BuatPinBaru, EditProfil, JadiPemilikDo, AddDoSaya, InputDoPPKS, BiayaBongkar, InputHargaDoPPKS, PreviewPemilikDo, LihatProfil, Following, ShowHargaKecuali, ShowHargaKepada, TentukanTipeDo, ResellerDo, UsersDOPPKS, FeeResellerDO } from '../';
 import {AuthContext} from '../../../components/Context';
 import AsyncStorage from '@react-native-community/async-storage';
 import Splash from '../../Splash';
@@ -44,6 +44,7 @@ const HomeStackNavigator =  () =>  {
     const [alertConfirmTask, setAlertConfirmTask] = useState(() => closeAlert() );
     const [initialRoute, setInitialRoute] = useState("Home");
     const [updateAppStatus, setUpdateAppStatus] = useState("");
+    const [showSplash, setShowSplash] = useState(true);
 
     const initialLoginState ={
         isLoading : true,
@@ -264,38 +265,48 @@ const HomeStackNavigator =  () =>  {
     const onSyncStatusChange = (SyncStatus) => {
         switch (SyncStatus) {
             case 5:
+                setShowSplash(true);
                 console.log("MEMERIKSA UPDATE")
                 setUpdateAppStatus("MEMERIKSA UPDATE");
                 break;
             case 6:
+                setShowSplash(true);
                 console.log("MENUNGGU USER ACTION")
                 setUpdateAppStatus("MENUNGGU USER ACTION");
                 break;
             case 7:
+                setShowSplash(true)
                 console.log("MENGUNDUH PACKAGE UPDATE");
-                setUpdateAppStatus("MENGUNDUH PACKAGE UPDATE");
+                setUpdateAppStatus("MENGUNDUH PACKAGE UPDATE");;
                 break;
             case 8:
+                setShowSplash(true);
                 console.log("MENGINSTALL UPDATE");
                 setUpdateAppStatus("MENGINSTALL UPDATE");
                 break;
             case 4:
+                setShowSplash(false);
                 console.log("PROSES SINKRONISASI UPDATE");
                 setUpdateAppStatus("PROSES SINKRONISASI UPDATE");
                 break; 
             case 3:
+                setShowSplash(false);
                 console.log("TERJADI KESALAHAN UPDATE APP")
                 setUpdateAppStatus("TERJADI KESALAHAN UPDATE APP");
                 break;  
             case 2:
+                setShowSplash(false);
                 console.log("UPDATE DIABAIKAN")
                 setUpdateAppStatus("UPDATE DIABAIKAN");
                 break;      
             case 1:
+                setShowSplash(false);
                 console.log("UPDATE TERINSTALL")
                 setUpdateAppStatus("UPDATE TERINSTALL");
+                setShowSplash(false);
                 break;   
             case 0:
+                setShowSplash(false);
                 console.log("APLIKASI SUDAH TERUPDATE")
                 setUpdateAppStatus("APLIKASI SUDAH TERUPDATE");
                 break;            
@@ -303,14 +314,12 @@ const HomeStackNavigator =  () =>  {
     }
     // {"AWAITING_USER_ACTION": 6, "CHECKING_FOR_UPDATE": 5, "DOWNLOADING_PACKAGE": 7, "INSTALLING_UPDATE": 8, "SYNC_IN_PROGRESS": 4, "UNKNOWN_ERROR": 3, "UPDATE_IGNORED": 2, "UPDATE_INSTALLED": 1, "UP_TO_DATE": 0}
 
-    if( updateAppStatus != "APLIKASI SUDAH TERUPDATE"   ){
-        if(updateAppStatus != "TERJADI KESALAHAN UPDATE APP"){
-            return(
-                <View style={{flex:1}} >
-                    <Splash updateAppStatus={updateAppStatus} />
-                </View>
-            );
-        }
+    if( showSplash ){
+        return(
+            <View style={{flex:1}} >
+                <Splash updateAppStatus={updateAppStatus} />
+            </View>
+        );
     }
 
     if(loadingVisible){
@@ -385,6 +394,8 @@ const HomeStackNavigator =  () =>  {
                     <Stack.Screen name="ShowHargaKepada" component={ShowHargaKepada} />
                     <Stack.Screen name="TentukanTipeDo" component={TentukanTipeDo} />
                     <Stack.Screen name="ResellerDo" component={ResellerDo} />
+                    <Stack.Screen name="UsersDOPPKS" component={UsersDOPPKS} />
+                    <Stack.Screen name="FeeResellerDO" component={FeeResellerDO} />
                     <Stack.Screen name="SmsVerificationProvider" component={SmsVerificationProvider} />
                     <Stack.Screen name="SmsVerificationAndroid" component={SmsVerificationAndroid} />
                 </Stack.Navigator>
