@@ -61,7 +61,7 @@ const LihatProfil = ({route, navigation}) => {
             setModalVisible(true);
           }),
         [navigation]
-      );
+    );
 
     const loadDataUser = () => {
         setLoadingVisible(true);

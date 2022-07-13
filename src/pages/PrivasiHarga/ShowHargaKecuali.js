@@ -19,7 +19,7 @@ const alert_title = CONSTANTS.MSG.ALERT_TITLE;
 
 const ShowHargaKecuali = ({route, navigation}) => {
     const [showAlert, setAlert] = useState(false);
-    let {id_do_ppks, currentUser, showEditPemilikDoModal} = route.params;
+    let {id_do_ppks, id_reseller_do, currentUser, showEditPemilikDoModal, type, setPrivasiHarga} = route.params;
     const closeAlert = () => {
         console.log("alert close");
         setAlert(false);
@@ -36,6 +36,7 @@ const ShowHargaKecuali = ({route, navigation}) => {
     const [loadingVisible, setLoadingVisible] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
     const [checkedAll, setCheckedAll] = useState(false);
+    const [sembunyikanHarga, setSembunyikanHarga] = useState(null);
 
     useEffect(()=>{
         console.log(searchParam)
@@ -55,6 +56,22 @@ const ShowHargaKecuali = ({route, navigation}) => {
           }),
         [navigation]
     );
+    
+    useEffect(
+        () =>
+          navigation.addListener('beforeRemove', (e) => {
+            e.preventDefault();
+            //navigation.dispatch(e.data.action);
+            if(!sembunyikanHarga || sembunyikanHarga ==  null) setPrivasiHarga("Publik");
+            showEditPemilikDoModal(true);
+          }),
+        [navigation, sembunyikanHarga]
+    );
+
+    useEffect(()=>{
+        console.log('Sembunyikan Harga : ', sembunyikanHarga)
+        if(sembunyikanHarga != null) navigation.goBack();
+    },[sembunyikanHarga])
 
     useEffect(() => {
         if(arrSembunyikanDari.length > 0){
@@ -72,6 +89,8 @@ const ShowHargaKecuali = ({route, navigation}) => {
 
         const params = {
             id_do_ppks,
+            id_reseller_do,
+            type,
             searchParam,
             currentUser
         }
@@ -128,8 +147,10 @@ const ShowHargaKecuali = ({route, navigation}) => {
 
         const params = {
             id_do_ppks,
+            id_reseller_do,
             pemilik_do_ppks:currentUser,
-            arrSembunyikanDari:JSON.stringify(arrSembunyikanDari)
+            type,
+            arrSembunyikanDari:JSON.stringify(arrSembunyikanDari),
         }
         console.log(params);
         
@@ -155,7 +176,8 @@ const ShowHargaKecuali = ({route, navigation}) => {
             setModalVisible(false);
             if(json.response == 1){
                 showEditPemilikDoModal(true)
-                navigation.goBack();
+                if(json.sembunyikan_harga == "true") setSembunyikanHarga(true);
+                else setSembunyikanHarga(false);
             }
             console.log(json);
         })
@@ -191,9 +213,6 @@ const ShowHargaKecuali = ({route, navigation}) => {
           return value;
         });
         setArrSembunyikanDari(temp);
-        const cek = cekJumlahChecked();
-        if(!cek) setCheckedAll(true);
-        else if(cek) setCheckedAll(false);
     };
 
     const cekJumlahChecked = () =>{
@@ -232,8 +251,6 @@ const ShowHargaKecuali = ({route, navigation}) => {
             </TouchableOpacity>
         )
     }
-
-    
 
     return(
         <View style={{flex:1}}>
@@ -332,7 +349,8 @@ const styles = StyleSheet.create({
         height:45,
         justifyContent:"center",
         color:"black",
-        borderBottomWidth:1,
+        borderWidth:0.3,
+        borderRadius:5
     },
     textInput:{
         borderColor:"black",
@@ -344,7 +362,7 @@ const styles = StyleSheet.create({
     },
     segmenWrapper : {
         backgroundColor:'white',
-        paddingVertical:20,
+        paddingVertical:10,
         paddingHorizontal:5,
         marginTop:5,
         marginBottom:10,
@@ -360,7 +378,7 @@ const styles = StyleSheet.create({
         flexDirection:'row',
         backgroundColor:'#fcfcfc',
         justifyContent:"space-around",
-        marginTop:12,
+        marginVertical:12,
         borderWidth:0.3,
         paddingVertical:10,
         borderRadius:5

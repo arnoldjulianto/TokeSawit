@@ -5,7 +5,8 @@ import CONSTANTS from '../../assets/constants';
 import iconNext from '../../assets/icon/next.png';
 import SearchBar from '../../components/SearchBar/search_bar_jadi_pemilik_do';
 import AwesomeAlert from 'react-native-awesome-alerts';
-import RadioForm, { RadioButton, RadioButtonInput, RadioButtonLabel } from 'react-native-simple-radio-button';
+import RadioPrivasiHarga from '../../components/RadioPrivasiHarga';
+import AsyncStorage from '@react-native-community/async-storage';
 
 const DANGER = CONSTANTS.COLOR.DANGER;
 const NAVY = CONSTANTS.COLOR.NAVY;
@@ -14,7 +15,7 @@ const base_url = CONSTANTS.CONFIG.BASE_URL;
 const alert_title = CONSTANTS.MSG.ALERT_TITLE;
 
 const FeeResellerDO = ({route, navigation}) => {
-    const closeAlert = () => {
+    const closeAlert = () => () => {
         console.log("alert close");
         setAlert(false);
     }
@@ -31,12 +32,19 @@ const FeeResellerDO = ({route, navigation}) => {
     const [confirmTextAlert, setConfirmTextAlert] = useState("");
     const [cancelTextAlert, setCancelTextAlert] = useState("");
     const [alertConfirmTask, setAlertConfirmTask] = useState(() => closeAlert() );
-    const [privasiHarga, setPrivasiHarga] = useState("");
+    const [alertCancelTask, setAlertCancelTask] = useState(() => closeAlert() );
+    const [privasiHarga, setPrivasiHarga] = useState("Publik");
     const [modalVisible, setModalVisible] = useState(false);
+    const [startCekPrivasiHarga, setStartCekPrivasiHarga] = useState(false);
+    const [currentUser, setCurrentUser] = useState("");
 
     useEffect(()=>{
-        loadDataDO();
+        getUser();
     },[])
+
+    useEffect(()=>{
+        if(currentUser != "") clearPrivasiHargaUndefined();
+    },[currentUser])
 
     useEffect(()=>{
         if(fee != "" && typeof fee !== "undefined"){
@@ -45,12 +53,12 @@ const FeeResellerDO = ({route, navigation}) => {
             setHargaJual( formatRupiah( ( num1 - num2 ).toString() ) )
         }
         else{
-            setHargaJual(harga)
+            setHargaJual(formatRupiah(harga));
         }
     },[fee])
 
     useEffect(()=>{
-        if(hargaJual != "" && typeof hargaJual !== "undefined"){
+        if(hargaJual != "0" && typeof hargaJual !== "undefined"){
             if(parseInt(hargaJual.replace(".", "")) < 0 )  {
                 setAlertMessage("Harga yang Anda Jual Tidak Boleh Lebih Kecil Dari Nol");
                 setHargaJual(formatRupiah(harga));
@@ -59,11 +67,36 @@ const FeeResellerDO = ({route, navigation}) => {
                 setAlert(true);
             }
         }
+        
     },[hargaJual])
 
+    useEffect(() => {
+        if(fee == ""){
+            setHargaJual(formatRupiah(harga));
+        }
+    },[harga])
+    
+
     const onRefresh = React.useCallback(() => {
-        loadDataDO();
+        getUser();
     }, []);
+
+    const getUser = async () => {
+        try {
+          const value = await AsyncStorage.getItem('username');
+          if (value === null) {
+            // We have data!!
+          }
+          else{
+              setCurrentUser(value);
+              loadDataDO(); 
+              clearPrivasiHargaUndefined(value); 
+          }
+        } catch (error) {
+          // Error retrieving data
+          console.log(error)
+        }
+    };
 
     const loadDataDO = () => {
         setLoadingVisible(true);
@@ -73,10 +106,9 @@ const FeeResellerDO = ({route, navigation}) => {
 
         const params = {
             id,
-            type
+            type,
         }
         console.log(params);
-        
         const createFormData = (body) => {
             const data = new FormData();
             Object.keys(body).forEach(key => {
@@ -96,11 +128,9 @@ const FeeResellerDO = ({route, navigation}) => {
         .then((response) => response.json())
         .then((json) => {
             clearTimeout(timeout);
-            setLoadingVisible(false);
             setHarga(formatRupiah(json.harga.toString()));
-            if(hargaJual == "0"){
-                setHargaJual(formatRupiah(json.harga.toString()));
-            }
+            setStartCekPrivasiHarga(true);
+            setLoadingVisible(false);
         })
         .catch((error) => {
             clearTimeout(timeout);
@@ -108,6 +138,48 @@ const FeeResellerDO = ({route, navigation}) => {
             console.log(error);
         });
     }    
+
+    const clearPrivasiHargaUndefined = (currentUser) => {
+        const timeout = setTimeout(() => {
+            setLoadingVisible(false);
+        }, 30000);
+
+        const params = {
+            id_do_ppks:"undefined",
+            id_reseller_do:"undefined",
+            pemilik_do_ppks:currentUser,
+            type:"Reseller DO",
+        }
+        
+        console.log(params);
+        const createFormData = (body) => {
+            const data = new FormData();
+            Object.keys(body).forEach(key => {
+                data.append(key, body[key]);
+            });
+            return data;
+        }
+        const formData = createFormData(params);
+        fetch(base_url+'PrivasiHarga/clear_undefined',
+        {
+            method: 'post',
+            body: formData,
+            headers: {
+              'Content-Type': 'multipart/form-data; ',
+            },
+        })
+        .then((response) => response.json())
+        .then((json) => {
+            clearTimeout(timeout);
+            setLoadingVisible(false);
+            console.log("Deleted")
+        })
+        .catch((error) => {
+            clearTimeout(timeout);
+            setLoadingVisible(false);
+            console.log(error);
+        });
+    }
 
     const formatRupiah = (angka, prefix) => {
         if(angka != "") {
@@ -133,19 +205,75 @@ const FeeResellerDO = ({route, navigation}) => {
         }
     }
 
-    const radio_props1 = [
-        {label: 'Publik', value: 'Publik' },
-        {label: 'Pengikut Saya', value: '' },
-        {label: 'Pengikut Saya Kecuali ...', value: 'Pengikut_kecuali' },
-        {label: 'Hanya Kepada ...', value: 'Hanya_kepada' },
-    ];
-
     const submitHandler = () => {
+        if(typeof fee === "undefined" || fee == ""){
+            setAlertMessage("Harap Masukkan Fee Yang Anda Inginkan");
+            setCancelTextAlert("Tutup");
+            setAlert(true);
+        }
+        else{
+            setLoadingVisible(true);
+            const timeout = setTimeout(() => {
+                setLoadingVisible(false);
+                setAlertMessage("Permintaan Tidak Dapat Dipenuhi, Server Tidak Merespons");
+                setCancelTextAlert("Tutup");
+                setAlert(true);
+            }, 30000);
 
+            const params = {
+                id:id,
+                currentUser,
+                jenis_reseller:type,
+                fee,
+                privasi_harga:privasiHarga,
+                keterangan_biaya_bongkar,
+            }
+            
+            console.log(params);
+            const createFormData = (body) => {
+                const data = new FormData();
+                Object.keys(body).forEach(key => {
+                    data.append(key, body[key]);
+                });
+                return data;
+            }
+            const formData = createFormData(params);
+            fetch(base_url+'PemilikDo/get_api_add_reseller_do',
+            {
+                method: 'post',
+                body: formData,
+                headers: {
+                'Content-Type': 'multipart/form-data; ',
+                },
+            })
+            .then((response) => response.json())
+            .then((json) => {
+                clearTimeout(timeout);
+                setLoadingVisible(false);
+                if(json.response == 1){
+                    setAlertMessage("Data Berhasil Disimpan");
+                    setCancelTextAlert("Tutup");
+                    setAlert(true);
+                    setAlertCancelTask(()=> loadJadiPemilikDo());
+                }
+            })
+            .catch((error) => {
+                clearTimeout(timeout);
+                setLoadingVisible(false);
+                setAlertMessage("Terjadi Kesalahan \n"+ error);
+                setCancelTextAlert("Tutup");
+                setAlert(true);
+                console.log(error);
+            });
+        }
+    }
+
+    const loadJadiPemilikDo = () => () => {
+        navigation.navigate("JadiPemilikDo", {username:currentUser});
     }
 
     return(
-        <View >
+        <View>
             <AwesomeAlert
                     show={showAlert}
                     showProgress={false}
@@ -159,9 +287,7 @@ const FeeResellerDO = ({route, navigation}) => {
                     confirmText={confirmTextAlert}
                     confirmButtonColor={NAVY}
                     cancelButtonColor={ORANGE}
-                    onCancelPressed={() => {
-                        setAlert(false);
-                    }}
+                    onCancelPressed={alertCancelTask}
                     onConfirmPressed={alertConfirmTask}
                 />
             <SearchBar title={"Tentukan Fee"} refresh={false} navigation={navigation} />
@@ -174,123 +300,63 @@ const FeeResellerDO = ({route, navigation}) => {
                 }
             >
                 <View style={styles.container} >
-                    <View style={styles.segmenWrapper} >
-                        <Text style={styles.segmenTitle} >Fee</Text>
-                        <View style={styles.segmenRow}>
-                            <Text style={styles.lblHeader} >Harga {nama_lengkap}</Text>
-                            <Text style={styles.lblContent}>Rp {harga}</Text>
-                        </View>
+                    {!loadingVisible && currentUser != "" && (
+                        <View>
+                            <View style={styles.segmenWrapper} >
+                                <Text style={styles.segmenTitle} >Fee</Text>
+                                <View style={styles.segmenRow}>
+                                    <Text style={styles.lblHeader} >Harga {nama_lengkap}</Text>
+                                    <Text style={styles.lblContent}>Rp {harga}</Text>
+                                </View>
 
-                        <View style={styles.segmenRow}>
-                            <Text style={styles.lblHeader} >Tentukan Fee Anda</Text>
-                            <View style={styles.inputWrapperFee}>
-                                
-                                <Text style={styles.lblContent}>Rp</Text>
-                                <TextInput style={styles.textInputFee} placeholder="" placeholderTextColor= 'gray' value={fee} onChangeText = { (value) => {setFee(formatRupiah(value))} } keyboardType={"numeric"} 
-                                />
+                                <View style={styles.segmenRow}>
+                                    <Text style={styles.lblHeader} >Tentukan Fee Anda</Text>
+                                    <View style={styles.inputWrapperFee}>
+                                        
+                                        <Text style={styles.lblContent}>Rp</Text>
+                                        <TextInput style={styles.textInputFee} placeholder="" placeholderTextColor= 'gray' value={fee} onChangeText = { (value) => {setFee(formatRupiah(value))} } keyboardType={"numeric"} 
+                                        />
+                                    </View>
+                                </View>
+
+                                <View style={styles.segmenRow}>
+                                    <Text style={styles.lblHeader} >Harga Yang Ingin Anda Jual</Text>
+                                    <Text style={styles.lblContent}>Rp {hargaJual}</Text>
+                                </View>
                             </View>
-                        </View>
 
-                        <View style={styles.segmenRow}>
-                            <Text style={styles.lblHeader} >Harga Yang Ingin Anda Jual</Text>
-                            <Text style={styles.lblContent}>Rp {hargaJual}</Text>
-                        </View>
-                            
-                    </View>
-
-                    <View style={styles.segmenWrapper} >
-                        <View style={styles.privasiHarga}>
-                            <View>
+                            <View style={styles.segmenWrapper} >
                                 <Text style={styles.segmenTitle}>Privasi Harga</Text>
-                                <Text style={styles.ketLabel}>Siapa saja yang dapat melihat dan mengetahui perubahan harga dari DO ini{"\n"}</Text>
-                                {privasiHarga != null && (
-                                <RadioForm
-                                    formHorizontal={false}
-                                    animation={true}
-                                    >
-                                    {
-                                        radio_props1.map((obj, i) => (
-                                        <RadioButton labelHorizontal={true} key={i} style={{marginBottom:20}} >
-                                            <RadioButtonInput
-                                            obj={obj}
-                                            index={i}
-                                            isSelected={privasiHarga === obj.value }
-                                            onPress={(value) => {
-                                                setPrivasiHarga(value)
-                                                if(i == 0 && edit){
-                                                    //updatePrivasiHarga("");
-                                                }
-                                                else if(i == 1){
-                                                    navigation.navigate("ShowHargaKecuali", {id_do_ppks:null, currentUser:username,showEditPemilikDoModal:setModalVisible});
-                                                    setModalVisible(false);
-                                                }
-                                                else if(i == 2){
-                                                    navigation.navigate("ShowHargaKepada", {id_do_ppks:null, currentUser:username,showEditPemilikDoModal:setModalVisible});
-                                                    setModalVisible(false);
-                                                }
-                                            }}
-                                            borderWidth={1}
-                                            buttonInnerColor={ORANGE}
-                                            buttonOuterColor={privasiHarga === obj.value ? ORANGE : '#000'}
-                                            buttonSize={15}
-                                            buttonOuterSize={30}
-                                            buttonStyle={{}}
-                                            buttonWrapStyle={{borderColor:ORANGE,marginLeft: 10}}
-                                            />
-                                            <RadioButtonLabel
-                                            obj={obj}
-                                            index={i}
-                                            labelHorizontal={true}
-                                            onPress={(value) => {
-                                                setPrivasiHarga(value)
-                                                if(i == 0){
-                                                    //updatePrivasiHarga("");
-                                                }
-                                                else if(i == 1){
-                                                    navigation.navigate("ShowHargaKecuali", {id_do_ppks:null, currentUser:username,showEditPemilikDoModal:setModalVisible});
-                                                    setModalVisible(false);
-                                                }
-                                                else if(i == 2){
-                                                    navigation.navigate("ShowHargaKepada", {id_do_ppks:null, currentUser:username,showEditPemilikDoModal:setModalVisible});
-                                                    setModalVisible(false);
-                                                }
-                                            }}
-                                            labelStyle={{fontSize: 15, color: 'black'}}
-                                            labelWrapStyle={{}}
-                                            />
-                                        </RadioButton>
-                                        ))
-                                    }  
-                                    </RadioForm>
-                                )}    
-                            </View>
-                        </View>
-                    </View> 
+                                <RadioPrivasiHarga startCekPrivasiHarga={startCekPrivasiHarga} setStartCekPrivasiHarga={setStartCekPrivasiHarga} privasiHarga={privasiHarga} setPrivasiHarga={setPrivasiHarga} setModalVisible={setModalVisible} modalVisible={modalVisible} navigation={navigation} loadingVisible={loadingVisible} setLoadingVisible={setLoadingVisible} id_do_ppks={"undefined"} id_reseller_do={"undefined"} type={"Reseller DO"} currentUser={currentUser}  />                    
+                            </View> 
 
-                    <View style={styles.segmenWrapper} >
-                        <Text style={styles.segmenTitle} >Keterangan Biaya Bongkar</Text>
-                        <Text style={styles.ketLabel} >
-                                <Text style={{fontWeight:'bold'}}>LEWATI</Text> Jika Tidak Ada Biaya Bongkar.{"\n"}
-                                Jika Ada, Tuliskan Pada Kolom Deskripsi.{"\n"}
+                            <View style={styles.segmenWrapper} >
+                                <Text style={styles.segmenTitle} >Keterangan Biaya Bongkar</Text>
+                                <Text style={styles.ketLabel} >
+                                        <Text style={{fontWeight:'bold'}}>LEWATI</Text> Jika Tidak Ada Biaya Bongkar.{"\n"}
+                                        Jika Ada, Tuliskan Pada Kolom Deskripsi.{"\n"}
+                                        </Text>
+                                        <Text style={styles.ketLabel} >* Contoh :{"\n"}
+                                            - Bak Mati Rp 100.000 / Do{"\n"}
+                                            - Dump Truk Rp 20.000 / Do{"\n"}
+                                            atau{"\n"}
+                                        " Rp 25 / Kg x Tonase Kotor "{"\n"}
                                 </Text>
-                                <Text style={styles.ketLabel} >* Contoh :{"\n"}
-                                    - Bak Mati Rp 100.000 / Do{"\n"}
-                                    - Dump Truk Rp 20.000 / Do{"\n"}
-                                    atau{"\n"}
-                                " Rp 25 / Kg x Tonase Kotor "{"\n"}
-                        </Text>
-                        <View style={styles.inputWrapperBiayaBongkar}>
-                            <TextInput style={styles.textInputBiayaBongkar} placeholder="Deskripsikan . . ." placeholderTextColor= 'gray' value={keterangan_biaya_bongkar} onChangeText = { (value) => {setKetBiayaBongkar(value)} } multiline={true} numberOfLines={4}
-                            />
+                                <View style={styles.inputWrapperBiayaBongkar}>
+                                    <TextInput style={styles.textInputBiayaBongkar} placeholder="Deskripsikan . . ." placeholderTextColor= 'gray' value={keterangan_biaya_bongkar} onChangeText = { (value) => {setKetBiayaBongkar(value)} } multiline={true} numberOfLines={4}
+                                    />
+                                </View>
+                            </View> 
+                        
+                            <TouchableOpacity style={styles.btnLanjutkan} onPress={()=> {submitHandler()} } >
+                                    <View style={{flexDirection:"row",justifyContent:'center'}}>
+                                        <Text style={styles.btnLanjutkanLabel}>Lanjutkan</Text>
+                                        <Image source={iconNext} style={styles.btnLanjutkanIcon}  />
+                                    </View>
+                            </TouchableOpacity> 
                         </View>
-                    </View> 
+                    )}    
                     
-                    <TouchableOpacity style={styles.btnLanjutkan} onPress={()=> {} } >
-                            <View style={{flexDirection:"row",justifyContent:'center'}}>
-                                <Text style={styles.btnLanjutkanLabel}>Lanjutkan</Text>
-                                <Image source={iconNext} style={styles.btnLanjutkanIcon}  />
-                            </View>
-                    </TouchableOpacity> 
                 </View>
             </ScrollView>
         </View>

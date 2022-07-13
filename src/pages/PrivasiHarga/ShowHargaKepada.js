@@ -19,7 +19,7 @@ const alert_title = CONSTANTS.MSG.ALERT_TITLE;
 
 const ShowHargaKepada = ({route, navigation}) => {
     const [showAlert, setAlert] = useState(false);
-    let {id_do_ppks, currentUser, showEditPemilikDoModal} = route.params;
+    let {id_do_ppks, id_reseller_do, currentUser, showEditPemilikDoModal, type, setPrivasiHarga} = route.params;
     const closeAlert = () => {
         console.log("alert close");
         setAlert(false);
@@ -36,6 +36,7 @@ const ShowHargaKepada = ({route, navigation}) => {
     const [loadingVisible, setLoadingVisible] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
     const [checkedAll, setCheckedAll] = useState(false);
+    const [tampilkanHargaKepada, setTampilkanHargaKepada] = useState(null);
 
     useEffect(()=>{
         console.log(searchParam)
@@ -50,11 +51,17 @@ const ShowHargaKepada = ({route, navigation}) => {
         () =>
           navigation.addListener('beforeRemove', (e) => {
             e.preventDefault();
-            navigation.dispatch(e.data.action);
+            if(!tampilkanHargaKepada || tampilkanHargaKepada ==  null) setPrivasiHarga("Publik");
             showEditPemilikDoModal(true);
+            navigation.dispatch(e.data.action);
           }),
-        [navigation]
+        [navigation, tampilkanHargaKepada]
     );
+    
+    useEffect(()=>{
+        console.log('Tampilkan Harga : ', tampilkanHargaKepada)
+        if(tampilkanHargaKepada != null) navigation.goBack();
+    },[tampilkanHargaKepada])
 
     useEffect(() => {
         if(arrTampilkanHargaKepada.length > 0){
@@ -72,6 +79,8 @@ const ShowHargaKepada = ({route, navigation}) => {
 
         const params = {
             id_do_ppks,
+            id_reseller_do,
+            type,
             searchParam,
             currentUser
         }
@@ -128,7 +137,9 @@ const ShowHargaKepada = ({route, navigation}) => {
 
         const params = {
             id_do_ppks,
+            id_reseller_do,
             pemilik_do_ppks:currentUser,
+            type,
             arrTampilkanHargaKepada:JSON.stringify(arrTampilkanHargaKepada)
         }
         console.log(params);
@@ -155,7 +166,8 @@ const ShowHargaKepada = ({route, navigation}) => {
             setModalVisible(false);
             if(json.response == 1){
                 showEditPemilikDoModal(true)
-                navigation.goBack();
+                if(json.tampilkan_harga_kepada == "true") setTampilkanHargaKepada(true);
+                else setTampilkanHargaKepada(false);
             }
             console.log(json);
         })
@@ -191,9 +203,6 @@ const ShowHargaKepada = ({route, navigation}) => {
           return value;
         });
         setArrTampilkanHargaKepada(temp);
-        const cek = cekJumlahChecked();
-        if(!cek) setCheckedAll(true);
-        else if(cek) setCheckedAll(false);
     };
 
     const cekJumlahChecked = () =>{
@@ -232,8 +241,6 @@ const ShowHargaKepada = ({route, navigation}) => {
             </TouchableOpacity>
         )
     }
-
-    
 
     return(
         <View style={{flex:1}}>
@@ -332,7 +339,8 @@ const styles = StyleSheet.create({
         height:45,
         justifyContent:"center",
         color:"black",
-        borderBottomWidth:1,
+        borderWidth:0.3,
+        borderRadius:5
     },
     textInput:{
         borderColor:"black",

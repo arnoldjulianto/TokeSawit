@@ -6,11 +6,9 @@ import { View, Text,  StyleSheet, TouchableOpacity, ActivityIndicator,RefreshCon
 import iconNext from '../../assets/icon/next.png';
 import CONSTANTS from '../../assets/constants';
 import AwesomeAlert from 'react-native-awesome-alerts';
-import RadioForm, { RadioButton, RadioButtonInput, RadioButtonLabel } from 'react-native-simple-radio-button';
 
 const ORANGE = CONSTANTS.COLOR.ORANGE;
 const NAVY = CONSTANTS.COLOR.NAVY;
-const DANGER = CONSTANTS.COLOR.DANGER;
 const base_url = CONSTANTS.CONFIG.BASE_URL;
 const alert_title = CONSTANTS.MSG.ALERT_TITLE;
 
@@ -42,7 +40,7 @@ const DetailPemilikDo = (props) => {
     else if(bulan == "10") bulan = "Oktober";
     else if(bulan == "11") bulan = "November";
     else if(bulan == "12") bulan = "Desember";
-    const[privasiHarga, setPrivasiHarga] = useState("");
+    const [startCekPrivasiHarga, setStartCekPrivasiHarga] = useState(false);
 
     useEffect(()=>{
         console.log(props.id_do_ppks)
@@ -81,87 +79,7 @@ const DetailPemilikDo = (props) => {
             clearTimeout(timeout);
             setNamaPPKS(json[0].nama_ppks)
             setLoadingVisible(false);
-            if(props.edit) cekPrivasiHarga()
-        })
-        .catch((error) => {
-            clearTimeout(timeout);
-            setLoadingVisible(false);
-            console.log(error);
-        });
-    }
-
-    const cekPrivasiHarga = () => {
-        setLoadingVisible(true);
-        const timeout = setTimeout(() => {
-            setLoadingVisible(false);
-        }, 30000);
-
-        const params = {
-            id_do_ppks:props.id_do_ppks
-        }
-        console.log(params);
-        
-        const createFormData = (body) => {
-            const data = new FormData();
-            Object.keys(body).forEach(key => {
-                data.append(key, body[key]);
-            });
-            return data;
-        }
-        const formData = createFormData(params);
-        fetch(base_url+'PrivasiHarga/get_api_cek_privasi_harga',
-        {
-            method: 'post',
-            body: formData,
-            headers: {
-              'Content-Type': 'multipart/form-data; ',
-            },
-        })
-        .then((response) => response.json())
-        .then((json) => {
-            clearTimeout(timeout);
-            setLoadingVisible(false);
-            setPrivasiHarga(json.privasi_harga)
-        })
-        .catch((error) => {
-            clearTimeout(timeout);
-            setLoadingVisible(false);
-            console.log(error);
-        });
-    }
-
-    const updatePrivasiHarga = (value) => {
-        setLoadingVisible(true);
-        const timeout = setTimeout(() => {
-            setLoadingVisible(false);
-        }, 30000);
-
-        const params = {
-            id_do_ppks:props.id_do_ppks,
-            privasi_harga:value,
-        }
-        console.log(params);
-        
-        const createFormData = (body) => {
-            const data = new FormData();
-            Object.keys(body).forEach(key => {
-                data.append(key, body[key]);
-            });
-            return data;
-        }
-        const formData = createFormData(params);
-        fetch(base_url+'PemilikDo/get_api_update_privasi_harga',
-        {
-            method: 'post',
-            body: formData,
-            headers: {
-              'Content-Type': 'multipart/form-data; ',
-            },
-        })
-        .then((response) => response.json())
-        .then((json) => {
-            clearTimeout(timeout);
-            cekPrivasiHarga();
+            if(props.edit) setStartCekPrivasiHarga(true)
         })
         .catch((error) => {
             clearTimeout(timeout);
@@ -249,11 +167,7 @@ const DetailPemilikDo = (props) => {
         }
     }
 
-    const radio_props1 = [
-        {label: 'Pengikut Saya', value: '' },
-        {label: 'Pengikut Saya Kecuali ...', value: 'Pengikut_kecuali' },
-        {label: 'Hanya Kepada ...', value: 'Hanya_kepada' },
-    ];
+    
 
     return (
         <View style={styles.container}>
@@ -317,72 +231,7 @@ const DetailPemilikDo = (props) => {
                                     <Text style={styles.ketLabel}>{props.keterangan_harga}</Text>
                                 </View>
                                 
-                                <View style={styles.privasiHarga}>
-                                    <Text style={styles.formLabel}>Privasi Harga</Text>
-                                    <View>
-                                        <Text style={[{marginBottom:20}]}>Siapa saja yang dapat melihat dan mengetahui perubahan harga dari DO ini</Text>
-                                        {privasiHarga != null && (
-                                        <RadioForm
-                                            formHorizontal={false}
-                                            animation={true}
-                                            >
-                                            {
-                                                radio_props1.map((obj, i) => (
-                                                <RadioButton labelHorizontal={true} key={i} style={{marginBottom:20}} >
-                                                    <RadioButtonInput
-                                                    obj={obj}
-                                                    index={i}
-                                                    isSelected={privasiHarga === obj.value }
-                                                    onPress={(value) => {
-                                                        setPrivasiHarga(value)
-                                                        if(i == 0 && props.edit){
-                                                            updatePrivasiHarga("");
-                                                        }
-                                                        else if(i == 1){
-                                                            props.navigation.navigate("ShowHargaKecuali", {id_do_ppks:props.id_do_ppks, currentUser:props.username,showEditPemilikDoModal:props.setModalVisible});
-                                                            props.setModalVisible(false);
-                                                        }
-                                                        else if(i == 2){
-                                                            props.navigation.navigate("ShowHargaKepada", {id_do_ppks:props.id_do_ppks, currentUser:props.username,showEditPemilikDoModal:props.setModalVisible});
-                                                            props.setModalVisible(false);
-                                                        }
-                                                    }}
-                                                    borderWidth={1}
-                                                    buttonInnerColor={ORANGE}
-                                                    buttonOuterColor={privasiHarga === obj.value ? ORANGE : '#000'}
-                                                    buttonSize={15}
-                                                    buttonOuterSize={30}
-                                                    buttonStyle={{}}
-                                                    buttonWrapStyle={{borderColor:ORANGE,marginLeft: 10}}
-                                                    />
-                                                    <RadioButtonLabel
-                                                    obj={obj}
-                                                    index={i}
-                                                    labelHorizontal={true}
-                                                    onPress={(value) => {
-                                                        setPrivasiHarga(value)
-                                                        if(i == 0){
-                                                            updatePrivasiHarga("");
-                                                        }
-                                                        else if(i == 1){
-                                                            props.navigation.navigate("ShowHargaKecuali", {id_do_ppks:props.id_do_ppks, currentUser:props.username,showEditPemilikDoModal:props.setModalVisible});
-                                                            props.setModalVisible(false);
-                                                        }
-                                                        else if(i == 2){
-                                                            props.navigation.navigate("ShowHargaKepada", {id_do_ppks:props.id_do_ppks, currentUser:props.username,showEditPemilikDoModal:props.setModalVisible});
-                                                            props.setModalVisible(false);
-                                                        }
-                                                    }}
-                                                    labelStyle={{fontSize: 15, color: 'black'}}
-                                                    labelWrapStyle={{}}
-                                                    />
-                                                </RadioButton>
-                                                ))
-                                            }  
-                                            </RadioForm>
-                                        )}    
-                                    </View>
-                                </View>
+                               
 
                                 {!props.edit && (
                                     <TouchableOpacity style={styles.btnLanjutkan} onPress={()=> {submitHandler()} }>
